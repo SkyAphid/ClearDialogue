@@ -1,26 +1,35 @@
 package nokori.jdialogue.ui;
 
 import javafx.animation.FadeTransition;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.geometry.Bounds;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import nokori.jdialogue.util.FontUtil;
 
 public class Button extends ButtonSkeleton{
 	
-	public static final int FADE_TIME = 200;
 	public static final Color TEXT_COLOR = Color.rgb(240, 240, 240);
+	
+	public static final int BUTTON_MARGIN_X = 20;
+	
+	public static final int FADE_TIME = 200;
+	public static final double FADE_MAX_OPACITY = 0.3;
+	
+	private Scene scene;
 	
 	private Rectangle highlight;
 	
-	public Button(int x, int y, int w, int h, int arc, DropShadow shadow, String buttonTitle, Font font) {
-		super(x, y, w, h, arc, shadow);
+	public Button(Scene scene, int w, int h, int arc, DropShadow shadow, String buttonTitle, Font font) {
+		super(w, h, arc, shadow);
+		
+		this.scene = scene;
 		
 		//Fade Rectangle
 		highlight = new Rectangle(w, h);
@@ -36,26 +45,28 @@ public class Button extends ButtonSkeleton{
 		text.setFill(TEXT_COLOR);
 		text.setMouseTransparent(true);
 		
-		//Compile to StackPane
-		stackPane.getChildren().addAll(highlight, text);
-
-		//Alignments
-		StackPane.setMargin(text, new Insets(13, 0, 0, 0));
-		StackPane.setAlignment(text, Pos.TOP_CENTER);
+		Bounds bounds = FontUtil.getStringBounds(font, buttonTitle);
+		text.setLayoutX(BUTTON_MARGIN_X);
+		text.setLayoutY(h/2 + bounds.getHeight()/2);
 		
-		StackPane.setAlignment(highlight, Pos.TOP_CENTER);
+		//Compile to pane
+		pane.getChildren().addAll(highlight, text);
 	}
 	
 	@Override
-	public void mouseEntered(MouseEvent event, Rectangle background) {
+	public void mouseEntered(MouseEvent event) {
+		scene.setCursor(Cursor.HAND);
+		
 		FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_TIME), highlight);
 		fadeTransition.setFromValue(highlight.getOpacity());
-		fadeTransition.setToValue(0.3);
+		fadeTransition.setToValue(FADE_MAX_OPACITY);
 		fadeTransition.play();
 	}
 	
 	@Override
-	public void mouseExited(MouseEvent event, Rectangle background) {
+	public void mouseExited(MouseEvent event) {
+		scene.setCursor(Cursor.DEFAULT);
+		
 		FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_TIME), highlight);
 		fadeTransition.setFromValue(highlight.getOpacity());
 		fadeTransition.setToValue(0.0);
@@ -64,10 +75,6 @@ public class Button extends ButtonSkeleton{
 	
 	public Rectangle getHighlightRectangle() {
 		return highlight;
-	}
-	
-	public StackPane getStackPane() {
-		return stackPane;
 	}
 	
 	public static String getTextColorCode() {

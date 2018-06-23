@@ -2,60 +2,67 @@ package nokori.jdialogue.ui;
 
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class ButtonSkeleton {
 	
 	protected Rectangle rectangle;
-	protected StackPane stackPane;
+	protected Pane pane;
 	
-	public ButtonSkeleton(int x, int y, int w, int h, int arc, DropShadow shadow) {
+	public ButtonSkeleton(int w, int h, int arc, DropShadow shadow) {
 		//Rectangle style
 		rectangle = new Rectangle(w, h);
 		rectangle.setFill(Color.CORAL);
 		rectangle.setArcHeight(arc);
 		rectangle.setArcWidth(arc);
 		rectangle.setEffect(shadow);
-
+		rectangle.setLayoutX(0);
+		rectangle.setLayoutY(0);
+		
+		//Compile to pane
+		pane = new Pane();
+		pane.getChildren().add(rectangle);
+		
 		//Events
-		rectangle.setOnMouseEntered(event -> {
-			mouseEntered(event, rectangle);
+		pane.setOnMouseEntered(event -> {
+			mouseEntered(event);
 		});
 		
-		rectangle.setOnMouseExited(event -> {
-			mouseExited(event, rectangle);
+		pane.setOnMouseExited(event -> {
+			mouseExited(event);
 		});
 		
-		rectangle.setOnMouseClicked(event -> {
-			mouseClicked(event, rectangle);
+		pane.setOnMouseClicked(event -> {
+			mouseClicked(event);
 		});
 		
-		//Compile to StackPane
-		stackPane = new StackPane();
-		stackPane.getChildren().add(rectangle);
-		stackPane.setTranslateX(x);
-		stackPane.setTranslateY(y);
+		pane.setOnMouseMoved(event -> {
+			mouseMoved(event);
+		});
 	}
 	
-	public void mouseEntered(MouseEvent event, Rectangle background) {
-		
-	}
-	
-	public void mouseExited(MouseEvent event, Rectangle background) {
+	public void mouseEntered(MouseEvent event) {
 		
 	}
 	
-	public void mouseClicked(MouseEvent event, Rectangle background) {
+	public void mouseExited(MouseEvent event) {
+		
+	}
+	
+	public void mouseClicked(MouseEvent event) {
+		
+	}
+	
+	public void mouseMoved(MouseEvent event) {
 		
 	}
 	
 	public Rectangle getBackgroundRectangle() {
 		return rectangle;
 	}
-	
-	public StackPane getStackPane() {
-		return stackPane;
+	public Pane getPane() {
+		return pane;
 	}
 }

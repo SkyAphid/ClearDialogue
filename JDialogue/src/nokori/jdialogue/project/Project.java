@@ -1,4 +1,4 @@
-package nokori.jdialogue;
+package nokori.jdialogue.project;
 
 import java.util.ArrayList;
 
