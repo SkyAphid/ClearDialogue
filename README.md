@@ -1,2 +1,2 @@
 # JDialogue
-Open source branching dialogue editor for video games
+Java-based branching dialogue editor for video games
