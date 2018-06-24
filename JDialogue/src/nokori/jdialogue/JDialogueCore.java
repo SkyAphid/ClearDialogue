@@ -264,7 +264,7 @@ public class JDialogueCore extends Application {
 		}
 		
 		if (dialogueNode instanceof DialogueResponseNode) {
-			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, replicaProRegular20, monaco12);
+			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, replicaProRegular20, monaco12, 30);
 		}
 		
 		if (dialogueNodePane != null) {

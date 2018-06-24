@@ -4,7 +4,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -28,7 +27,6 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		label.setMaxHeight(HEIGHT - DIALOGUE_NODE_RIBBON_HEIGHT - 20f); 
 		label.setFont(textFont);
 		label.setTextFill(Color.BLACK);
-		label.setBackground(Background.EMPTY);
 		label.setWrapText(true);
 		label.setMouseTransparent(true);
 		

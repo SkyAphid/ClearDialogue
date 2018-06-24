@@ -30,19 +30,21 @@ public class DialogueNodePane extends StackPane {
 	public static final int DIALOGUE_NODE_RIBBON_HEIGHT = 40;
 	
 	protected DialogueNode node;
+	
+	private Rectangle outline, background;
 
 	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont) {
 		this.node = node;
 		
 		//Outline for highlighting node
-		Rectangle outline = new Rectangle(WIDTH, HEIGHT);
+		outline = new Rectangle(WIDTH, HEIGHT);
 		outline.setFill(Color.TRANSPARENT);
 		outline.setStroke(Color.CORAL);
 		outline.setOpacity(0.0);
 		outline.setMouseTransparent(true);
 		
 		//Background
-		Rectangle background = new Rectangle(WIDTH, HEIGHT);
+		background = new Rectangle(WIDTH, HEIGHT);
 		background.setFill(Color.WHITE);
 		background.setStroke(Color.LIGHTGRAY);
 		background.setEffect(shadow);
@@ -98,6 +100,14 @@ public class DialogueNodePane extends StackPane {
 		fadeTransition.setFromValue(0.0);
 		fadeTransition.setToValue(1.0);
 		fadeTransition.play();
+	}
+	
+	public void setDimensions(int width, int height) {
+		outline.setWidth(width);
+		outline.setHeight(height);
+		
+		background.setWidth(width);
+		background.setHeight(height);
 	}
 	
 	public DialogueNode getNode() {

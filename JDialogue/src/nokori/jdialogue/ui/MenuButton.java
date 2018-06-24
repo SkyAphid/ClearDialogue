@@ -92,7 +92,7 @@ public class MenuButton extends Button{
 	public void mouseEntered(MouseEvent event) {
 		super.mouseEntered(event);
 		
-		var transition = new RectangleResizeHeightTransition(Duration.millis(Button.FADE_TIME), getBackgroundRectangle(), extendedH);
+		RectangleResizeHeightTransition transition = new RectangleResizeHeightTransition(Duration.millis(Button.FADE_TIME), getBackgroundRectangle(), extendedH);
 		transition.setOnFinished(fin -> {
 			if (menuButtonSelected) {
 				getPane().getChildren().add(optionGroup);

@@ -13,6 +13,10 @@ public class DialogueResponseNode extends DialogueNode {
 	
 	public DialogueResponseNode(String name, double x, double y) {
 		super(name, x, y);
+		
+		for (int i = 0; i < 10; i++) {
+			responses.add(i + " Response Test Response Test Response Test Response Test Response Test Response Test Response Test Response Test ");
+		}
 	}
 
 	public ArrayList<String> getResponses() {
