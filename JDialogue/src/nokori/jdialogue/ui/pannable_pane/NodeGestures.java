@@ -30,7 +30,7 @@ public class NodeGestures {
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
 		public void handle(MouseEvent event) {
-
+			
 			// left mouse button => dragging
 			if (!event.isPrimaryButtonDown())
 				return;
@@ -49,6 +49,8 @@ public class NodeGestures {
 
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
+			
+			mouseDragged(event);
 
 			// left mouse button => dragging
 			if (!event.isPrimaryButtonDown())
@@ -61,8 +63,15 @@ public class NodeGestures {
 			node.setTranslateX(nodeDragContext.translateAnchorX + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / scale));
 			node.setTranslateY(nodeDragContext.translateAnchorY + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / scale));
 
-			//Manually consume in DialogueNodePane
-			//event.consume();
+			event.consume();
 		}
 	};
+	
+	/**
+	 * Custom callback because the normal one has to consume the event for the dragging to work correctly
+	 * @param event
+	 */
+	public void mouseDragged(MouseEvent event) {
+		
+	}
 }

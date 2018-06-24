@@ -133,22 +133,6 @@ public class DialogueNodePane extends StackPane {
 			fadeTransition.play();
 		});
 		
-		setOnMouseDragged(event -> {
-			for (int i = 0; i < connectorLines.size(); i++) {
-				BoundLine line = connectorLines.get(i);
-				
-				if (line.update()) {
-					continue;
-				}else {
-					connectorLines.remove(i);
-					i--;
-				}
-			}
-
-			//Ensures that the dragging works, was originally called in NodeGestures, but moved here so that we could add the above functionality
-			event.consume();
-		});
-		
 		//Initial animation
 		int animTime = 200;
 		
@@ -194,6 +178,19 @@ public class DialogueNodePane extends StackPane {
 			core.setSelectedConnector(null);
 			
 			System.err.println("Connected " + connector.getParent().getName() + " and " + selected.getConnector().getParent().getName());
+		}
+	}
+	
+	public void updateConnectors() {
+		for (int i = 0; i < connectorLines.size(); i++) {
+			BoundLine line = connectorLines.get(i);
+			
+			if (line.update()) {
+				continue;
+			}else {
+				connectorLines.remove(i);
+				i--;
+			}
 		}
 	}
 }

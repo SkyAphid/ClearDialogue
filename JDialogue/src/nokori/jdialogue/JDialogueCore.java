@@ -2,6 +2,7 @@ package nokori.jdialogue;
 
 import javafx.application.Application;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
@@ -118,7 +119,24 @@ public class JDialogueCore extends Application {
         
 		scene.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
 		
-		nodeGestures = new NodeGestures(pannablePane);
+		/*
+		 * NodeGestures controls the node dragging in pannable pane
+		 * 
+		 * We extend it to also notify the node panes of dragging so that they can reposition their
+		 * connector lines accordingly
+		 */
+    	nodeGestures = new NodeGestures(pannablePane) {
+    		@Override
+    		public void mouseDragged(MouseEvent event) {
+    			if (event.getSource() instanceof Node) {
+	    			Node n = (Node) event.getSource();
+					
+					if (n instanceof DialogueNodePane) {
+						((DialogueNodePane) n).updateConnectors();
+					}
+    			}
+    		}
+    	};
 		
 		/*
 		 * Initialize UI
