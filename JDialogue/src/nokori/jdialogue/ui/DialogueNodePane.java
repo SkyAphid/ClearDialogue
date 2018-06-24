@@ -1,11 +1,9 @@
 package nokori.jdialogue.ui;
 
-import java.awt.Event;
 import java.util.ArrayList;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.RotateTransition;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -13,7 +11,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
