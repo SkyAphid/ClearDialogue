@@ -9,13 +9,31 @@ package nokori.jdialogue.project;
  *
  */
 public class DialogueNodeConnector {
-	private DialogueNode connectedTo = null;
 	
-	public void setConnectedTo(DialogueNode dialogueNode) {
-		connectedTo = dialogueNode;
+	private DialogueNode parent;
+	private DialogueNodeConnector connectedTo = null;
+	
+	/**
+	 * @param parent the DialogueNode that this connector is stored in
+	 */
+	public DialogueNodeConnector(DialogueNode parent) {
+		this.parent = parent;
 	}
 	
-	public DialogueNode getConnectedTo() {
+	public DialogueNode getParent() {
+		return parent;
+	}
+
+	public void connect(DialogueNodeConnector dialogueNodeConnector) {
+		connectedTo = dialogueNodeConnector;
+		dialogueNodeConnector.connectedTo = this;
+	}
+	
+	public DialogueNodeConnector getConnectedTo() {
 		return connectedTo;
+	}
+	
+	public boolean isConnected(DialogueNodeConnector dialogueNodeConnector) {
+		return (connectedTo == dialogueNodeConnector);
 	}
 }

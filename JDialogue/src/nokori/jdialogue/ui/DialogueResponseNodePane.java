@@ -2,16 +2,15 @@ package nokori.jdialogue.ui;
 
 import java.util.ArrayList;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
 import javafx.scene.text.Font;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueResponseNode;
+import nokori.jdialogue.project.DialogueResponseNode.Response;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -24,30 +23,58 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 	public DialogueResponseNodePane(JDialogueCore core, DialogueResponseNode node, DropShadow shadow, Font titleFont, Font textFont, int incrementH) {
 		super(core, node, shadow, titleFont);
 		
-		ArrayList<String> responses = node.getResponses();
+		ArrayList<Response> responses = node.getResponses();
 		
-		int extendedH = Math.max((responses.size() * incrementH), HEIGHT);
+		//The ten is to give the bottom extra bounding space
+		int extendedH = Math.max(TITLE_HEIGHT + 10 + (responses.size() * incrementH), HEIGHT);
 		
-		Group group = new Group();
+		Group labelGroup = new Group();
+		Group connectorGroup = new Group();
 		
 		for (int i = 0; i < responses.size(); i++) {
-			String response = responses.get(i);
+			Response response = responses.get(i);
 			
-			Label label = new Label(response);
+			int y = (i * incrementH);
+			
+			/*
+			 * Node Connector
+			 */
+			
+			int connectorRadius = (int) (incrementH * (1.0/3.0));
+			
+			Arc connector = new Arc();
+			connector.setFill(outConnectorColor);
+			connector.setRadiusX(connectorRadius);
+			connector.setRadiusY(connectorRadius);
+			connector.setStartAngle(90);
+			connector.setLength(-180);
+			connector.setLayoutY(y);
+			
+			connectorGroup.getChildren().add(connector);
+			
+			/*
+			 * Label
+			 */
+			
+			Label label = new Label(response.getText());
 			label.setFont(textFont);
 			label.setMaxWidth(WIDTH - 20f);
 			label.setTextFill(Color.BLACK);
 			label.setMouseTransparent(true);
 			
-			label.setLayoutY((i * incrementH));
+			label.setLayoutY(y);
 			
-			StackPane.setMargin(label, new Insets(0, 10, 10, 10));
-			
-			group.getChildren().add(label);
+			labelGroup.getChildren().add(label);
 		}
 		
-		getChildren().add(group);
+		labelGroup.setTranslateY(TITLE_HEIGHT/2);
 		
-		setHeight(extendedH);
+		connectorGroup.setTranslateX(WIDTH/2 + 5);
+		connectorGroup.setTranslateY(TITLE_HEIGHT/2);
+		
+		getChildren().add(labelGroup);
+		getChildren().add(connectorGroup);
+		
+		setBackgroundHeight(extendedH);
 	}
 }

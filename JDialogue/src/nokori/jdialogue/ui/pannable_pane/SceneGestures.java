@@ -60,9 +60,15 @@ public class SceneGestures {
 			canvas.setTranslateX(sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX);
 			canvas.setTranslateY(sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY);
 
+			mouseDragged(event);
+			
 			event.consume();
 		}
 	};
+	
+	public void mouseDragged(MouseEvent event) {
+		
+	}
 
 	/**
 	 * Mouse wheel handler: zoom to pivot point

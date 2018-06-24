@@ -1,6 +1,7 @@
 package nokori.jdialogue;
 
 import javafx.application.Application;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
@@ -21,6 +22,7 @@ import nokori.jdialogue.project.Project;
 import nokori.jdialogue.throwable.MissingDialogueNodePaneError;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.ButtonSkeleton;
+import nokori.jdialogue.ui.ConnectorSelection;
 import nokori.jdialogue.ui.DialogueNodePane;
 import nokori.jdialogue.ui.DialogueResponseNodePane;
 import nokori.jdialogue.ui.DialogueTextNodePane;
@@ -31,9 +33,6 @@ import nokori.jdialogue.ui.pannable_pane.SceneGestures;
 
 /**
  * The Core of this program, containing the GUI.
- * 
- * Inspired by this example:
- * https://stackoverflow.com/questions/39556757/best-easiest-way-to-implement-node-based-graphical-gui
  * 
  * UI design inspired by Yarn:
  * https://github.com/InfiniteAmmoInc/Yarn
@@ -73,8 +72,8 @@ public class JDialogueCore extends Application {
 	//Project data
 	private Project project = new Project();
 	
-	//Instance data
-	private DialogueNodePane selectedNode = null;
+	//Connector management
+	private ConnectorSelection selectedConnector = null;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -104,12 +103,19 @@ public class JDialogueCore extends Application {
 		scene = new Scene(uiPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 		
 		//Configure pannable pane
-        SceneGestures sceneGestures = new SceneGestures(pannablePane);
+        SceneGestures sceneGestures = new SceneGestures(pannablePane) {
+        	@Override
+        	public void mouseDragged(MouseEvent event) {
+        		scene.setCursor(Cursor.CLOSED_HAND);
+        	}
+        };
+        
         scene.setOnMouseDragged(sceneGestures.getOnMouseDraggedEventHandler());
         scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
+        scene.setOnMouseReleased(event -> {
+        	scene.setCursor(Cursor.DEFAULT);
+        });
         
-		//scene.addEventFilter(MouseEvent.MOUSE_PRESSED, sceneGestures.getOnMousePressedEventHandler());
-		//scene.addEventFilter(MouseEvent.MOUSE_DRAGGED, sceneGestures.getOnMouseDraggedEventHandler());
 		scene.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
 		
 		nodeGestures = new NodeGestures(pannablePane);
@@ -277,7 +283,7 @@ public class JDialogueCore extends Application {
 	        dialogueNodePane.setTranslateY(dialogueNode.getY());
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_PRESSED, nodeGestures.getOnMousePressedEventHandler());
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_DRAGGED, nodeGestures.getOnMouseDraggedEventHandler());
-
+	        
 			pannablePane.getChildren().add(dialogueNodePane);
 			
 		} else {
@@ -286,10 +292,17 @@ public class JDialogueCore extends Application {
 	}
 	
 	/**
-	 * @return the currently selected DialogueNodeFX, used for connecting nodes together.
+	 * Set the selected connector so that the user can connect two nodes together
 	 */
-	public DialogueNodePane getSelectedNode() {
-		return selectedNode;
+	public void setSelectedConnector(ConnectorSelection selectedConnector) {
+		this.selectedConnector = selectedConnector;
+	}
+	
+	/**
+	 * @return the currently selected DialogueNodeConnector.
+	 */
+	public ConnectorSelection getSelectedConnector() {
+		return selectedConnector;
 	}
 	
 	/**
@@ -330,5 +343,13 @@ public class JDialogueCore extends Application {
 		buttonPane.setLayoutY(BUTTON_Y);
 		
 		uiPane.getChildren().add(buttonPane);
+	}
+
+	public Scene getScene() {
+		return scene;
+	}
+
+	public PannablePane getPannablePane() {
+		return pannablePane;
 	}
 }

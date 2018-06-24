@@ -58,13 +58,11 @@ public class NodeGestures {
 
 			Node node = (Node) event.getSource();
 
-			node.setTranslateX(
-					nodeDragContext.translateAnchorX + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / scale));
-			node.setTranslateY(
-					nodeDragContext.translateAnchorY + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / scale));
+			node.setTranslateX(nodeDragContext.translateAnchorX + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / scale));
+			node.setTranslateY(nodeDragContext.translateAnchorY + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / scale));
 
-			event.consume();
-
+			//Manually consume in DialogueNodePane
+			//event.consume();
 		}
 	};
 }

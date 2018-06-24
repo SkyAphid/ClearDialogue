@@ -94,7 +94,7 @@ public class MenuButton extends Button{
 		
 		RectangleResizeHeightTransition transition = new RectangleResizeHeightTransition(Duration.millis(Button.FADE_TIME), getBackgroundRectangle(), extendedH);
 		transition.setOnFinished(fin -> {
-			if (menuButtonSelected) {
+			if (menuButtonSelected && !getPane().getChildren().contains(optionGroup)) {
 				getPane().getChildren().add(optionGroup);
 			}
 		});

@@ -11,10 +11,15 @@ public abstract class DialogueNode {
 	private String tag = "";
 	private double x, y;
 	
+	//Connector so that other nodes can input into this one
+	private DialogueNodeConnector inConnector;
+
 	public DialogueNode(String name, double x, double y) {
 		this.name = name;
 		this.x = x;
 		this.y = y;
+		
+		inConnector = new DialogueNodeConnector(this);
 	}
 
 	public double getX() {
@@ -47,5 +52,13 @@ public abstract class DialogueNode {
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+
+	public DialogueNodeConnector getInConnector() {
+		return inConnector;
+	}
+
+	public void setInConnector(DialogueNodeConnector inConnector) {
+		this.inConnector = inConnector;
 	}
 }
