@@ -21,8 +21,8 @@ public class MenuButton extends Button{
 	private boolean menuButtonSelected = false;
 	private Group optionGroup = new Group();
 	
-	public MenuButton(Scene scene, int w, int h, int arc, DropShadow shadow, String buttonTitle, Font titleFont, Font optionsFont, String[] options, int optionIncrementH) {
-		super(scene, w, h, arc, shadow, buttonTitle, titleFont);
+	public MenuButton(Scene scene, int w, int h, DropShadow shadow, String buttonTitle, Font titleFont, Font optionsFont, String[] options, int optionIncrementH) {
+		super(scene, w, h, shadow, buttonTitle, titleFont);
 		defaultH = h;
 		
 		extendedH = (int) ((options.length + 1) * optionIncrementH);
@@ -94,8 +94,8 @@ public class MenuButton extends Button{
 		
 		RectangleResizeHeightTransition transition = new RectangleResizeHeightTransition(Duration.millis(Button.FADE_TIME), getBackgroundRectangle(), extendedH);
 		transition.setOnFinished(fin -> {
-			if (menuButtonSelected && !getPane().getChildren().contains(optionGroup)) {
-				getPane().getChildren().add(optionGroup);
+			if (menuButtonSelected && !getChildren().contains(optionGroup)) {
+				getChildren().add(optionGroup);
 			}
 		});
 		transition.play();
@@ -107,7 +107,7 @@ public class MenuButton extends Button{
 	public void mouseExited(MouseEvent event) {
 		super.mouseExited(event);
 		
-		getPane().getChildren().remove(optionGroup);
+		getChildren().remove(optionGroup);
 		new RectangleResizeHeightTransition(Duration.millis(Button.FADE_TIME), getBackgroundRectangle(), defaultH).play();
 		
 		menuButtonSelected = false;

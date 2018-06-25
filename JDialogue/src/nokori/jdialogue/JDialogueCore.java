@@ -23,11 +23,11 @@ import nokori.jdialogue.project.Project;
 import nokori.jdialogue.throwable.MissingDialogueNodePaneError;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.ButtonSkeleton;
-import nokori.jdialogue.ui.ConnectorSelection;
-import nokori.jdialogue.ui.DialogueNodePane;
-import nokori.jdialogue.ui.DialogueResponseNodePane;
-import nokori.jdialogue.ui.DialogueTextNodePane;
 import nokori.jdialogue.ui.MenuButton;
+import nokori.jdialogue.ui.node.ConnectorSelection;
+import nokori.jdialogue.ui.node.DialogueNodePane;
+import nokori.jdialogue.ui.node.DialogueResponseNodePane;
+import nokori.jdialogue.ui.node.DialogueTextNodePane;
 import nokori.jdialogue.ui.pannable_pane.NodeGestures;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
 import nokori.jdialogue.ui.pannable_pane.SceneGestures;
@@ -38,7 +38,29 @@ import nokori.jdialogue.ui.pannable_pane.SceneGestures;
  * UI design inspired by Yarn:
  * https://github.com/InfiniteAmmoInc/Yarn
  * 
+ * I apologize in advance for weird uses of JavaFX, this was my first time using it, 
+ * but I wanted to make something that works right out of the box and this was my best bet.
+ * 
+ * The system is pretty customizable, so if you see anything you don't like, 
+ * it should be pretty easy to plug and play the various parts.
+ * 
+ * When in doubt, read the comments
+ * 
+ * @author NOKORIWARE 2018
+ * 
+ * ------------------------------------------------------------------------------
+ * 
+ * How to add a new DialogueNode type:
+ * 
+ * 1) Make a DialogueNode extension (example: DialogueTextNode)
+ * 2) Make a DialogueNodePane extension that implements your custom DialogueNode (example: DialogueTextNodePane)
+ * 3) Make a DialogueNodeEditor extension that implements your custom DialogueNode (example: DialogueTextNodeEditor)
+ * 4) Hook up to JDialogueCore (addNodeButton(), addDialogueNode())
+ * 
+ * it just werkz
+ * 
  */
+
 public class JDialogueCore extends Application {
 	
 	private static final String PROGRAM_NAME = "JDialogue";
@@ -50,17 +72,21 @@ public class JDialogueCore extends Application {
 
 	//display data
 	private Pane uiPane;
+	
+	private static final int PANNABLE_PANE_WIDTH = 10_000;
+	private static final int PANNABLE_PANE_HEIGHT = 10_000;
 	private PannablePane pannablePane;
 	private NodeGestures nodeGestures;
 	
 	private Scene scene;
 	
 	//styling
-	private static final int BUTTON_START_X = 20;
-	private static final int BUTTON_Y = 20;
-	private static final int BUTTON_WIDTH = 150;
-	private static final int BUTTON_HEIGHT = 50;
-	private static final int BUTTON_ARC = 5;
+	public static final int BUTTON_START_X = 20;
+	public static final int BUTTON_Y = 20;
+	public static final int BUTTON_WIDTH = 150;
+	public static final int BUTTON_HEIGHT = 50;
+	
+	public static final int ROUNDED_RECTANGLE_ARC = 5;
 	
 	private static final int MENU_BUTTON_INCREMENT_HEIGHT = 50;
 	
@@ -87,37 +113,61 @@ public class JDialogueCore extends Application {
 	public void start(Stage primaryStage) {
 		/*
 		 * Program UI containers
+		 * 
+		 * Panes and pane accessories, I tell ya what
 		 */
 		
-		//Panes and pane accessories, I tell ya what
+		//uiPane contains UI elements that don't move
 		uiPane = new Pane();
 		
-		uiPane.setOnMouseClicked(event -> {
+		//Moves focus away from various TextFields in the UI (namely the project name one beside the node button)
+		uiPane.setOnMousePressed(event -> {
 			uiPane.requestFocus();
 		});
 		
-		pannablePane = new PannablePane();
-
+		//Pannable pane contains all of the nodes, can be panned and zoomed
+		pannablePane = new PannablePane(PANNABLE_PANE_WIDTH, PANNABLE_PANE_HEIGHT);
+		pannablePane.setOnMouseClicked(event -> {
+			if (selectedConnector != null) {
+				setSelectedConnector(null);
+			}
+		});
+		
+		//Update the following connector line on mouse move
+		pannablePane.setOnMouseMoved(event -> {
+			if (selectedConnector != null) {
+				scene.setCursor(Cursor.OPEN_HAND);
+				selectedConnector.getFollowingConnectorLine().update(event, pannablePane);
+			}
+		});
+		
+		pannablePane.setTranslateX(-PANNABLE_PANE_WIDTH/2);
+		pannablePane.setTranslateY(-PANNABLE_PANE_HEIGHT/2);
+		
 		uiPane.getChildren().add(pannablePane);
 		
 		//Scene
 		scene = new Scene(uiPane, WINDOW_WIDTH, WINDOW_HEIGHT);
+		scene.getStylesheets().add("file:scrollbar_style.css");
 		
-		//Configure pannable pane
+		//Configure pannable pane mouse gestures
         SceneGestures sceneGestures = new SceneGestures(pannablePane) {
         	@Override
         	public void mouseDragged(MouseEvent event) {
+        		//Drag the grabbing hand when you pane the screen
         		scene.setCursor(Cursor.CLOSED_HAND);
         	}
         };
         
+        //PannablePane event handlers (panning/zooming)
         scene.setOnMouseDragged(sceneGestures.getOnMouseDraggedEventHandler());
         scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
-        scene.setOnMouseReleased(event -> {
+		scene.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
+        
+        //Reset the cursor when you panning panning
+        scene.setOnMouseClicked(event -> {
         	scene.setCursor(Cursor.DEFAULT);
         });
-        
-		scene.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
 		
 		/*
 		 * NodeGestures controls the node dragging in pannable pane
@@ -125,14 +175,17 @@ public class JDialogueCore extends Application {
 		 * We extend it to also notify the node panes of dragging so that they can reposition their
 		 * connector lines accordingly
 		 */
+        
     	nodeGestures = new NodeGestures(pannablePane) {
     		@Override
     		public void mouseDragged(MouseEvent event) {
     			if (event.getSource() instanceof Node) {
+            		setSelectedConnector(null);
+            		
 	    			Node n = (Node) event.getSource();
 					
 					if (n instanceof DialogueNodePane) {
-						((DialogueNodePane) n).updateConnectors();
+						((DialogueNodePane) n).updateConnectors(event, pannablePane);
 					}
     			}
     		}
@@ -151,19 +204,6 @@ public class JDialogueCore extends Application {
 		addProjectNameField();
 
 		uiPane.requestFocus();
-		
-		
-		/*Rectangle startBox = createNode(50, 50);
-		startBox.setX(50);
-		startBox.setY(50);
-
-		Rectangle endBox = createNode(50, 50);
-		endBox.setX(350);
-		endBox.setY(200);
-
-		Line connector = createConnector(startBox, endBox);
-		
-		pane.getChildren().addAll(startBox, endBox, connector);*/
 		
 		/*
 		 * Finalize
@@ -198,7 +238,7 @@ public class JDialogueCore extends Application {
 	private void addProgramInfo() {
 		int offsetY = 20;
 		
-		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION);
+		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " | Hold LMB = Drag Node | 2xLMB = Edit Node | 2xRMB = Delete Node");
 		text.setFont(replicaProRegular20);
 		text.setFill(Color.LIGHTGRAY.darker());
 		text.setX(20);
@@ -223,14 +263,13 @@ public class JDialogueCore extends Application {
 				"LOAD..."
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, BUTTON_ARC, shadow, "FILE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT);
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT);
 		
 		//Add to pane
-		Pane buttonPane = button.getPane();
-		buttonPane.setLayoutX(BUTTON_START_X);
-		buttonPane.setLayoutY(BUTTON_Y);
+		button.setLayoutX(BUTTON_START_X);
+		button.setLayoutY(BUTTON_Y);
 		
-		uiPane.getChildren().add(buttonPane);
+		uiPane.getChildren().add(button);
 	}
 	
 	/**
@@ -244,7 +283,7 @@ public class JDialogueCore extends Application {
 				"RESPONSE..."
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, BUTTON_ARC, shadow, "+NODE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "+NODE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
@@ -268,11 +307,10 @@ public class JDialogueCore extends Application {
 		};
 		
 		//Add to pane
-		Pane buttonPane = button.getPane();
-		buttonPane.setLayoutX(buttonX);
-		buttonPane.setLayoutY(BUTTON_Y);
+		button.setLayoutX(buttonX);
+		button.setLayoutY(BUTTON_Y);
 		
-		uiPane.getChildren().add(buttonPane);
+		uiPane.getChildren().add(button);
 	}
 	
 	/**
@@ -310,10 +348,29 @@ public class JDialogueCore extends Application {
 	}
 	
 	/**
+	 * Removes a dialogue node
+	 * @param dialogueNode
+	 */
+	public void removeDialogueNode(DialogueNodePane dialogueNodePane) {
+		project.removeNode(dialogueNodePane.getNode());
+		pannablePane.getChildren().remove(dialogueNodePane);
+	}
+	
+	/**
 	 * Set the selected connector so that the user can connect two nodes together
 	 */
 	public void setSelectedConnector(ConnectorSelection selectedConnector) {
+		if (this.selectedConnector != null) {
+			pannablePane.getChildren().remove(this.selectedConnector.getFollowingConnectorLine());
+		}
+		
 		this.selectedConnector = selectedConnector;
+		
+		if (selectedConnector != null) {
+			pannablePane.getChildren().add(selectedConnector.getFollowingConnectorLine());
+		}else {
+			scene.setCursor(Cursor.DEFAULT);
+		}
 	}
 	
 	/**
@@ -329,19 +386,19 @@ public class JDialogueCore extends Application {
 	private void addProjectNameField() {
 		int buttonX = BUTTON_START_X + ((BUTTON_WIDTH + 10) * 2);
 		
-		ButtonSkeleton projectNameField = new ButtonSkeleton(300, BUTTON_HEIGHT, BUTTON_ARC, shadow);
+		ButtonSkeleton projectNameField = new ButtonSkeleton(300, BUTTON_HEIGHT, shadow);
 		
 		//Project name text field
 		TextField textField = new TextField(project.getName());
 		textField.setFont(replicaProRegular20);
 		textField.setBackground(Background.EMPTY);
-		textField.setStyle("-fx-text-inner-color: " + Button.getTextColorCode() + ";");
+		textField.setStyle("-fx-text-inner-color: " + Button.getTextColorCode() + "; -fx-border-color: " + Button.getTextColorCode() + "; -fx-border-width: 0 0 1 0;");
 		textField.setLayoutX(Button.BUTTON_MARGIN_X);
 		textField.setLayoutY(6); //manually measured
 		
 		//Update project name 
-		textField.setOnKeyTyped(event -> {
-			project.setName(textField.getText());
+		textField.textProperty().addListener((o, oldText, newText) -> {
+			project.setName(newText);
 		});
 		
 		//having enter cancel out the focus gives a feeling of confirmation
@@ -352,15 +409,13 @@ public class JDialogueCore extends Application {
 		});
 
 		//Add to button skeleton
-		Pane buttonPane = projectNameField.getPane();
-		
-		projectNameField.getPane().getChildren().add(textField);
+		projectNameField.getChildren().add(textField);
 		
 		//Add to pane
-		buttonPane.setLayoutX(buttonX);
-		buttonPane.setLayoutY(BUTTON_Y);
+		projectNameField.setLayoutX(buttonX);
+		projectNameField.setLayoutY(BUTTON_Y);
 		
-		uiPane.getChildren().add(buttonPane);
+		uiPane.getChildren().add(projectNameField);
 	}
 
 	public Scene getScene() {
@@ -369,5 +424,9 @@ public class JDialogueCore extends Application {
 
 	public PannablePane getPannablePane() {
 		return pannablePane;
+	}
+	
+	public Pane getUIPane() {
+		return uiPane;
 	}
 }

@@ -1,4 +1,4 @@
-package nokori.jdialogue.ui.pannable_pane;
+package nokori.jdialogue.test;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -13,6 +13,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import nokori.jdialogue.ui.pannable_pane.NodeGestures;
+import nokori.jdialogue.ui.pannable_pane.PannablePane;
+import nokori.jdialogue.ui.pannable_pane.SceneGestures;
 
 /**
  * An application with a zoomable and pannable canvas.
@@ -28,7 +31,7 @@ public class PannablePaneTestApplication extends Application {
         Group group = new Group();
 
         // create canvas
-        PannablePane canvas = new PannablePane();
+        PannablePane canvas = new PannablePane(600, 600);
 
         // we don't want the canvas on the top/left in this example => just
         // translate it a bit

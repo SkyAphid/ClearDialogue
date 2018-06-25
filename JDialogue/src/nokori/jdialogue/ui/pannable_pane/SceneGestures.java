@@ -14,10 +14,10 @@ public class SceneGestures {
 
 	private DragContext sceneDragContext = new DragContext();
 
-	PannablePane canvas;
+	PannablePane pannablePane;
 
-	public SceneGestures(PannablePane canvas) {
-		this.canvas = canvas;
+	public SceneGestures(PannablePane pannablePane) {
+		this.pannablePane = pannablePane;
 	}
 
 	public EventHandler<MouseEvent> getOnMousePressedEventHandler() {
@@ -43,8 +43,8 @@ public class SceneGestures {
 			sceneDragContext.mouseAnchorX = event.getSceneX();
 			sceneDragContext.mouseAnchorY = event.getSceneY();
 
-			sceneDragContext.translateAnchorX = canvas.getTranslateX();
-			sceneDragContext.translateAnchorY = canvas.getTranslateY();
+			sceneDragContext.translateAnchorX = pannablePane.getTranslateX();
+			sceneDragContext.translateAnchorY = pannablePane.getTranslateY();
 
 		}
 
@@ -57,8 +57,8 @@ public class SceneGestures {
 			//if (!event.isMiddleButtonDown())
 			//	return;
 
-			canvas.setTranslateX(sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX);
-			canvas.setTranslateY(sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY);
+			pannablePane.setTranslateX(sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX);
+			pannablePane.setTranslateY(sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY);
 
 			mouseDragged(event);
 			
@@ -80,7 +80,7 @@ public class SceneGestures {
 
 			double delta = 1.2;
 
-			double scale = canvas.getScale(); // currently we only use Y, same value is used for X
+			double scale = pannablePane.getScale(); // currently we only use Y, same value is used for X
 			double oldScale = scale;
 
 			if (event.getDeltaY() < 0) {
@@ -93,13 +93,13 @@ public class SceneGestures {
 
 			double f = (scale / oldScale) - 1;
 
-			double dx = (event.getSceneX() - (canvas.getBoundsInParent().getWidth()/2 + canvas.getBoundsInParent().getMinX()));
-			double dy = (event.getSceneY() - (canvas.getBoundsInParent().getHeight()/2 + canvas.getBoundsInParent().getMinY()));
+			double dx = (event.getSceneX() - (pannablePane.getBoundsInParent().getWidth()/2 + pannablePane.getBoundsInParent().getMinX()));
+			double dy = (event.getSceneY() - (pannablePane.getBoundsInParent().getHeight()/2 + pannablePane.getBoundsInParent().getMinY()));
 
-			canvas.setScale(scale);
+			pannablePane.setScale(scale);
 
 			// note: pivot value must be untransformed, i. e. without scaling
-			canvas.setPivot(f * dx, f * dy);
+			pannablePane.setPivot(f * dx, f * dy);
 
 			event.consume();
 

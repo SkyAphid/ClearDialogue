@@ -1,4 +1,4 @@
-package nokori.jdialogue.ui;
+package nokori.jdialogue.ui.node;
 
 import java.util.ArrayList;
 
@@ -11,6 +11,7 @@ import javafx.scene.text.Font;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueResponseNode.Response;
+import nokori.jdialogue.ui.editor.DialogueResponseNodeEditor;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -20,16 +21,52 @@ import nokori.jdialogue.project.DialogueResponseNode.Response;
  */
 public class DialogueResponseNodePane extends DialogueNodePane{
 	
+	private Group labelGroup = null;
+	private Group connectorGroup = null;
+	
+	private Font textFont;
+	private int incrementH;
+	
 	public DialogueResponseNodePane(JDialogueCore core, DialogueResponseNode node, DropShadow shadow, Font titleFont, Font textFont, int incrementH) {
 		super(core, node, shadow, titleFont);
 		
-		ArrayList<Response> responses = node.getResponses();
+		this.textFont = textFont;
+		this.incrementH = incrementH;
+		
+		//Open Editor
+		setOnMouseClicked(event -> {
+			if (checkDispose(event, core)) {
+				return;
+			}
+			
+			if (event.getClickCount() > 1) {
+				core.getUIPane().getChildren().add(new DialogueResponseNodeEditor(core, node, this, titleFont, textFont));
+			}
+		});
+		
+		refresh(core);
+	}
+	
+	@Override
+	public void refresh(JDialogueCore core) {
+		super.refresh(core);
+		
+		//Remove old connectors and labels to replace with new ones
+		if (labelGroup != null) {
+			getChildren().remove(labelGroup);
+		}
+		
+		if (connectorGroup != null) {
+			getChildren().remove(connectorGroup);
+		}
+		
+		labelGroup = new Group();
+		connectorGroup = new Group();
+		
+		ArrayList<Response> responses = ((DialogueResponseNode) node).getResponses();
 		
 		//The ten is to give the bottom extra bounding space
 		int extendedH = Math.max(TITLE_HEIGHT + 10 + (responses.size() * incrementH), HEIGHT);
-		
-		Group labelGroup = new Group();
-		Group connectorGroup = new Group();
 		
 		for (int i = 0; i < responses.size(); i++) {
 			Response response = responses.get(i);
@@ -49,6 +86,18 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 			connector.setStartAngle(90);
 			connector.setLength(-180);
 			connector.setLayoutY(y);
+			
+			connector.setOnMouseClicked(event -> {
+				connectorClicked(event, core, connector, response.getOutConnector());
+			});
+			
+			connector.setOnMouseEntered(event -> {
+				connectorHighlightTransition(core.getScene(), connector, outConnectorColor, true);
+			});
+			
+			connector.setOnMouseExited(event -> {
+				connectorHighlightTransition(core.getScene(), connector, outConnectorColor, false);
+			});
 			
 			connectorGroup.getChildren().add(connector);
 			

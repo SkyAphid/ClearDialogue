@@ -8,7 +8,7 @@ package nokori.jdialogue.project;
 public abstract class DialogueNode {
 	
 	private String name;
-	private String tag = "";
+	private String tag = "No Tag";
 	private double x, y;
 	
 	//Connector so that other nodes can input into this one

@@ -1,29 +1,30 @@
-package nokori.jdialogue.ui;
+package nokori.jdialogue.ui.node;
 
 import java.util.ArrayList;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.FillTransition;
 import javafx.animation.RotateTransition;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
+import nokori.jdialogue.ui.Button;
+import nokori.jdialogue.ui.pannable_pane.PannablePane;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -31,7 +32,12 @@ import nokori.jdialogue.project.DialogueNodeConnector;
  * It doesn't store any actual dialogue data, it's just the GUI representation of that data.
  *
  */
-public class DialogueNodePane extends StackPane {
+public abstract class DialogueNodePane extends StackPane {
+	
+	//Start/Dispose animation
+	private static final int FADE_TIME = 200;
+	private static final double START_ROT = 25.0;
+	
 	//Basic background dimension data that all nodes should share in-common
 	public static final int WIDTH = 200;
 	public static final int HEIGHT = 200;
@@ -46,6 +52,7 @@ public class DialogueNodePane extends StackPane {
 	//Instances
 	protected DialogueNode node;
 	private Rectangle outline, background;
+	private Text title;
 	
 	//Connector system
 	private ArrayList<BoundLine> connectorLines = new ArrayList<BoundLine>();
@@ -76,14 +83,22 @@ public class DialogueNodePane extends StackPane {
 		connector.setLength(180);
 		
 		connector.setOnMouseClicked(event -> {
-			connectorClicked(core, connector, node.getInConnector());
+			connectorClicked(event, core, connector, node.getInConnector());
+		});
+		
+		connector.setOnMouseEntered(event -> {
+			connectorHighlightTransition(core.getScene(), connector, inConnectorColor, true);
+		});
+		
+		connector.setOnMouseExited(event -> {
+			connectorHighlightTransition(core.getScene(), connector, inConnectorColor, false);
 		});
 		
 		StackPane.setAlignment(connector, Pos.CENTER_LEFT);
 		StackPane.setMargin(connector, new Insets(0, 0, 0, -CONNECTOR_RADIUS));
 		
 		//Title text
-		Text title = new Text(node.getName());
+		title = new Text(node.getName());
 		title.setFont(titleFont);
 		title.setFill(Color.BLACK);
 		title.setMouseTransparent(true);
@@ -106,16 +121,6 @@ public class DialogueNodePane extends StackPane {
 		//Configure pane
 		getChildren().addAll(background, connector, title, separator, outline);
 		
-		setOnMousePressed(event -> {
-			if (!event.isPrimaryButtonDown()) return;
-			
-			core.getScene().setCursor(Cursor.CLOSED_HAND);
-		});
-		
-		setOnMouseReleased(event -> {
-			core.getScene().setCursor(Cursor.DEFAULT);
-		});
-		
 		setOnMouseEntered(event -> {
 			FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
 			fadeTransition.setFromValue(outline.getOpacity());
@@ -129,19 +134,59 @@ public class DialogueNodePane extends StackPane {
 			fadeTransition.setToValue(0.0);
 			fadeTransition.play();
 		});
+
+		setOnMouseClicked(event -> {
+			checkDispose(event, core);
+		});
 		
 		//Initial animation
-		int animTime = 200;
-		
-		RotateTransition rotateTransition = new RotateTransition(Duration.millis(animTime), this);
-		rotateTransition.setFromAngle(45.0);
+		RotateTransition rotateTransition = new RotateTransition(Duration.millis(FADE_TIME), this);
+		rotateTransition.setFromAngle(START_ROT);
 		rotateTransition.setToAngle(0.0);
 		rotateTransition.play();
 		
-		FadeTransition fadeTransition = new FadeTransition(Duration.millis(animTime), this);
+		FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_TIME), this);
 		fadeTransition.setFromValue(0.0);
 		fadeTransition.setToValue(1.0);
 		fadeTransition.play();
+	}
+	
+	/**
+	 * Refresh nodes to have the latest Node data
+	 */
+	public void refresh(JDialogueCore core) {
+		title.setText(node.getName());
+	}
+	
+	protected boolean checkDispose(MouseEvent event, JDialogueCore core) {
+		if (event.getClickCount() > 1 && event.getButton() == MouseButton.SECONDARY) {
+			dispose(core);
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Begin the process of deleting this node
+	 */
+	protected void dispose(JDialogueCore core) {
+		setMouseTransparent(true);
+		
+		RotateTransition rotateTransition = new RotateTransition(Duration.millis(FADE_TIME/2), this);
+		rotateTransition.setFromAngle(0.0);
+		rotateTransition.setToAngle(START_ROT);
+		rotateTransition.play();
+		
+		FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_TIME/2), this);
+		fadeTransition.setFromValue(1.0);
+		fadeTransition.setToValue(0.0);
+		fadeTransition.play();
+		
+		fadeTransition.setOnFinished(event -> {
+			core.removeDialogueNode(this);
+		});
 	}
 	
 	public void setBackgroundHeight(int height) {
@@ -152,106 +197,83 @@ public class DialogueNodePane extends StackPane {
 	public DialogueNode getNode() {
 		return node;
 	}
-	
-	protected void connectorClicked(JDialogueCore core, Arc connectorNode, DialogueNodeConnector connector) {
+
+	protected void connectorClicked(MouseEvent event, JDialogueCore core, Arc connectorNode, DialogueNodeConnector connector) {
+		PannablePane pannablePane = core.getPannablePane();
+		
 		if (core.getSelectedConnector() == null) {
+			//Disconnect the old connector
+			connector.disconnect();
+			
 			//Select the connector
-			core.setSelectedConnector(new ConnectorSelection(connectorNode, connector));
-			System.err.println("Selected connector belonging to " + connector.getParent().getName());
+			core.setSelectedConnector(new ConnectorSelection(pannablePane, this, connectorNode, connector));
+			//System.out.println("Selected connector belonging to " + connector.getParent().getName());
+			
+			//Update old connectors to delete any that may have just been disconnected
+			updateConnectors(event, pannablePane);
+			
+			event.consume();
 		}else {
 			ConnectorSelection selected = core.getSelectedConnector();
+			
+			DialogueNodePane parent = selected.getParent();
 			Arc selectedNode = selected.getConnectorNode();
 			DialogueNodeConnector selectedConnector = selected.getConnector();
 			
-			//Connect the connectors
-			selectedConnector.connect(connector);
-		
-			//Add UI representation of connection
-			BoundLine line = new BoundLine(core.getPannablePane(), selectedNode, selectedConnector, connectorNode, connector);
-			connectorLines.add(line);
-			core.getPannablePane().getChildren().add(line);
+			if (selectedConnector != connector) {
+				
+				//Connect the connectors
+				selectedConnector.connect(connector);
+			
+				//Add UI representation of connection
+				BoundLine line = new BoundLine(pannablePane, selectedNode, selectedConnector, connectorNode, connector);
+				parent.connectorLines.add(line);
+				connectorLines.add(line);
+				core.getPannablePane().getChildren().add(line);
+				
+				line.update(event, pannablePane);
+			}
 			
 			//Reset selection
 			core.setSelectedConnector(null);
 			
-			System.err.println("Connected " + connector.getParent().getName() + " and " + selected.getConnector().getParent().getName());
+			//System.out.println("Connected " + connector.getParent().getName() + " and " + selected.getConnector().getParent().getName());
 		}
 	}
 	
-	public void updateConnectors() {
+	/**
+	 * Update the positions of the node connectors and remove ones that are no longer valid
+	 */
+	public void updateConnectors(MouseEvent event, PannablePane connectorParent) {
 		for (int i = 0; i < connectorLines.size(); i++) {
 			BoundLine line = connectorLines.get(i);
 			
-			if (line.update()) {
+			if (line.update(event, connectorParent)) {
 				continue;
 			}else {
+				connectorParent.getChildren().remove(line);
 				connectorLines.remove(i);
 				i--;
 			}
 		}
 	}
-}
-
-/**
- * Creates a Line that's attached to two Nodes.
- * 
- * I know this entire implementation is hacky af but this is literally the only solution I could get to work properly
- * 
- * Pulled from
- * https://stackoverflow.com/questions/43115807/how-to-draw-line-between-two-nodes-placed-in-different-panes-regions
- */
-class BoundLine extends Line {
-
-	private Pane commonAncestor;
-	private Arc node1, node2;
-	private DialogueNodeConnector connector1, connector2;
-	
-	public BoundLine(Pane commonAncestor, Arc node1, DialogueNodeConnector connector1, Arc node2, DialogueNodeConnector connector2) {
-		
-		this.commonAncestor = commonAncestor;
-		this.node1 = node1;
-		this.connector1 = connector1;
-		
-		this.node2 = node2;
-		this.connector2 = connector2;
-		
-		update();
-		
-		setStrokeWidth(2);
-		setStroke(Color.GRAY.deriveColor(0, 1, 1, 0.5));
-		setStrokeLineCap(StrokeLineCap.BUTT);
-		getStrokeDashArray().setAll(10.0, 5.0);
-
-		setMouseTransparent(true);
-	}
 	
 	/**
-	 * @return false if this line is no longer valid
+	 * Convenience function for highlighting nodes when selected
 	 */
-	boolean update() {
-		if (!connector1.isConnected(connector2)) return false;
+	public static void connectorHighlightTransition(Scene scene, Arc node, Color originalColor, boolean highlighted) {
+		FillTransition fillTransition = new FillTransition(Duration.millis(Button.FADE_TIME), node);
 		
-		Bounds n1InCommonAncestor = getRelativeBounds(node1, commonAncestor);
-		Bounds n2InCommonAncestor = getRelativeBounds(node2, commonAncestor);
+		if (highlighted) {
+			fillTransition.setFromValue(originalColor);
+			fillTransition.setToValue(originalColor.brighter().brighter());
+			scene.setCursor(Cursor.HAND);
+		}else {
+			fillTransition.setFromValue(originalColor.brighter().brighter());
+			fillTransition.setToValue(originalColor);
+			scene.setCursor(Cursor.DEFAULT);
+		}
 		
-		Point2D n1Center = getCenter(n1InCommonAncestor);
-		Point2D n2Center = getCenter(n2InCommonAncestor);
-		
-		setStartX(n1Center.getX());
-		setStartY(n1Center.getY());
-		
-		setEndX(n2Center.getX());
-		setEndY(n2Center.getY());
-		
-		return true;
-	}
-	
-	private Bounds getRelativeBounds(Node node, Node relativeTo) {
-	    Bounds nodeBoundsInScene = node.localToScene(node.getBoundsInLocal());
-	    return relativeTo.sceneToLocal(nodeBoundsInScene);
-	}
-
-	private Point2D getCenter(Bounds b) {
-	    return new Point2D(b.getMinX() + b.getWidth() / 2, b.getMinY() + b.getHeight() / 2);
+		fillTransition.play();
 	}
 }

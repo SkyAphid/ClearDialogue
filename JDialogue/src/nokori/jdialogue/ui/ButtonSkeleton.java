@@ -5,40 +5,39 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import nokori.jdialogue.JDialogueCore;
 
-public class ButtonSkeleton {
+public class ButtonSkeleton extends Pane {
 	
 	protected Rectangle rectangle;
-	protected Pane pane;
 	
-	public ButtonSkeleton(int w, int h, int arc, DropShadow shadow) {
+	public ButtonSkeleton(int w, int h, DropShadow shadow) {
 		//Rectangle style
 		rectangle = new Rectangle(w, h);
 		rectangle.setFill(Color.CORAL);
-		rectangle.setArcHeight(arc);
-		rectangle.setArcWidth(arc);
+		rectangle.setArcHeight(JDialogueCore.ROUNDED_RECTANGLE_ARC);
+		rectangle.setArcWidth(JDialogueCore.ROUNDED_RECTANGLE_ARC);
 		rectangle.setEffect(shadow);
 		rectangle.setLayoutX(0);
 		rectangle.setLayoutY(0);
 		
 		//Compile to pane
-		pane = new Pane();
-		pane.getChildren().add(rectangle);
+		getChildren().add(rectangle);
 		
 		//Events
-		pane.setOnMouseEntered(event -> {
+		setOnMouseEntered(event -> {
 			mouseEntered(event);
 		});
 		
-		pane.setOnMouseExited(event -> {
+		setOnMouseExited(event -> {
 			mouseExited(event);
 		});
 		
-		pane.setOnMouseClicked(event -> {
+		setOnMouseClicked(event -> {
 			mouseClicked(event);
 		});
 		
-		pane.setOnMouseMoved(event -> {
+		setOnMouseMoved(event -> {
 			mouseMoved(event);
 		});
 	}
@@ -61,8 +60,5 @@ public class ButtonSkeleton {
 	
 	public Rectangle getBackgroundRectangle() {
 		return rectangle;
-	}
-	public Pane getPane() {
-		return pane;
 	}
 }

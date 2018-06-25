@@ -11,6 +11,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.util.FontUtil;
 
 public class Button extends ButtonSkeleton{
@@ -26,8 +27,8 @@ public class Button extends ButtonSkeleton{
 	
 	private Rectangle highlight;
 	
-	public Button(Scene scene, int w, int h, int arc, DropShadow shadow, String buttonTitle, Font font) {
-		super(w, h, arc, shadow);
+	public Button(Scene scene, int w, int h, DropShadow shadow, String buttonTitle, Font font) {
+		super(w, h, shadow);
 		
 		this.scene = scene;
 		
@@ -35,8 +36,8 @@ public class Button extends ButtonSkeleton{
 		highlight = new Rectangle(w, h);
 		highlight.setFill(Color.WHITE);
 		highlight.setOpacity(0.0);
-		highlight.setArcHeight(arc);
-		highlight.setArcWidth(arc);
+		highlight.setArcHeight(JDialogueCore.ROUNDED_RECTANGLE_ARC);
+		highlight.setArcWidth(JDialogueCore.ROUNDED_RECTANGLE_ARC);
 		highlight.setMouseTransparent(true);
 		
 		//Text style
@@ -50,7 +51,7 @@ public class Button extends ButtonSkeleton{
 		text.setLayoutY(h/2 + bounds.getHeight()/2);
 		
 		//Compile to pane
-		pane.getChildren().addAll(highlight, text);
+		getChildren().addAll(highlight, text);
 	}
 	
 	@Override

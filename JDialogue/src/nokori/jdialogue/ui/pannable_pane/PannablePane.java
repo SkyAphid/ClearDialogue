@@ -14,13 +14,19 @@ public class PannablePane extends Pane {
 
 	DoubleProperty scale = new SimpleDoubleProperty(1.0);
 
-	public PannablePane() {
+	/**
+	 * We limit the width and height to prevent headaches regarding node placement and configuring
+	 */
+	public PannablePane(int width, int height) {
 		// add scale transform
 		scaleXProperty().bind(scale);
 		scaleYProperty().bind(scale);
 
-		//setPrefSize(600, 600);
-		//setStyle("-fx-background-color: lightgrey; -fx-border-color: blue;");
+		setPrefSize(width, height);
+		setMinSize(width, height);
+		setMaxSize(width, height);
+
+		setStyle("-fx-border-color: gray; -fx-border-width: 5; -fx-border-style: segments(50) line-cap butt;");
 
 		// logging
 		/*addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {

@@ -19,9 +19,7 @@ public class DialogueResponseNode extends DialogueNode {
 	public DialogueResponseNode(String name, double x, double y) {
 		super(name, x, y);
 
-		for (int i = 0; i < 3; i++) {
-			addResponse(i + " Response Test");
-		}
+		addResponse("Default Response");
 	}
 
 	/**
@@ -29,6 +27,10 @@ public class DialogueResponseNode extends DialogueNode {
 	 */
 	public void addResponse(String text) {
 		responses.add(new Response(text, new DialogueNodeConnector(this)));
+	}
+	
+	public void clearResponses() {
+		responses.clear();
 	}
 
 	public ArrayList<Response> getResponses() {

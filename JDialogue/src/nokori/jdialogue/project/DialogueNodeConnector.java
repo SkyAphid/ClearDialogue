@@ -1,5 +1,7 @@
 package nokori.jdialogue.project;
 
+import nokori.jdialogue.throwable.NullConnectorError;
+
 /**
  * A connector that can be attached to a node.
  * 
@@ -25,8 +27,23 @@ public class DialogueNodeConnector {
 	}
 
 	public void connect(DialogueNodeConnector dialogueNodeConnector) {
-		connectedTo = dialogueNodeConnector;
-		dialogueNodeConnector.connectedTo = this;
+		if (dialogueNodeConnector != null) {
+			//System.out.println(parent.getName() + " connected to " + dialogueNodeConnector.getParent().getName());
+			
+			connectedTo = dialogueNodeConnector;
+			dialogueNodeConnector.connectedTo = this;
+		}else {
+			throw new NullConnectorError(parent.getName());
+		}
+	}
+	
+	public void disconnect() {
+		if (connectedTo != null) {
+			//System.out.println(parent.getName() + " disconnected from " + connectedTo.getParent().getName());
+			
+			connectedTo.connectedTo = null;
+			connectedTo = null;
+		}
 	}
 	
 	public DialogueNodeConnector getConnectedTo() {

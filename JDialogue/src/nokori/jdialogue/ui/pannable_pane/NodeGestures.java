@@ -1,6 +1,7 @@
 package nokori.jdialogue.ui.pannable_pane;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 
@@ -12,10 +13,10 @@ public class NodeGestures {
 
 	private DragContext nodeDragContext = new DragContext();
 
-	PannablePane canvas;
+	PannablePane pannablePane;
 
-	public NodeGestures(PannablePane canvas) {
-		this.canvas = canvas;
+	public NodeGestures(PannablePane pannablePane) {
+		this.pannablePane = pannablePane;
 
 	}
 
@@ -56,12 +57,14 @@ public class NodeGestures {
 			if (!event.isPrimaryButtonDown())
 				return;
 
-			double scale = canvas.getScale();
+			double scale = pannablePane.getScale();
 
 			Node node = (Node) event.getSource();
-
+			
 			node.setTranslateX(nodeDragContext.translateAnchorX + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / scale));
 			node.setTranslateY(nodeDragContext.translateAnchorY + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / scale));
+			
+			clampToParentBounds(node);
 
 			event.consume();
 		}
@@ -73,5 +76,29 @@ public class NodeGestures {
 	 */
 	public void mouseDragged(MouseEvent event) {
 		
+	}
+	
+	/**
+	 * Ensure that draggable nodes don't leave bounds
+	 * @param newX
+	 * @param newY
+	 * @return
+	 */
+	private boolean clampToParentBounds(Node node) {
+
+        Bounds parentBounds = pannablePane.getLayoutBounds();
+        Bounds childBounds = node.getBoundsInLocal();
+        
+        double translateX = node.getTranslateX();
+        double translateY = node.getTranslateY();
+        
+        node.setTranslateX(clamp(translateX, parentBounds.getMinX() - childBounds.getMinX(), parentBounds.getMaxX() - childBounds.getMaxX()));
+        node.setTranslateY(clamp(translateY, parentBounds.getMinY() - childBounds.getMinY(), parentBounds.getMaxY() - childBounds.getMaxY()));
+        
+        return false;
+    }
+	
+	private static double clamp(double val, double min, double max) {
+	    return Math.max(min, Math.min(max, val));
 	}
 }
