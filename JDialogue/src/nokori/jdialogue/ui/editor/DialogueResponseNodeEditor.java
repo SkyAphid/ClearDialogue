@@ -1,9 +1,11 @@
 package nokori.jdialogue.ui.editor;
 
+import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -32,11 +34,14 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 		textArea.setWrapText(false);
 		textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
 		textArea.setStyle("-fx-font-family: " + textFont.getName() + "; -fx-font-size: " + textFont.getSize() + "pt;");
+		
+		//Virtual scroll pane
+		VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<StyleClassedTextArea>(textArea);
+		
+		StackPane.setAlignment(scrollPane, Pos.CENTER);
+		StackPane.setMargin(scrollPane, new Insets(START_BODY_Y, 20, 20, 20));
 
-		StackPane.setAlignment(textArea, Pos.CENTER);
-		StackPane.setMargin(textArea, new Insets(START_BODY_Y, 20, 20, 20));
-
-		getChildren().add(textArea);
+		getChildren().add(scrollPane);
 	}
 
 	protected void dispose(JDialogueCore core, DialogueNode node, DialogueNodePane dialogueNodePane, Rectangle background) {
