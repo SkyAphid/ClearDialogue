@@ -21,7 +21,6 @@ import nokori.jdialogue.ui.pannable_pane.PannablePane;
  */
 public class BoundLine extends CubicCurve {
 
-	private Pane commonAncestor;
 	private Arc node1, node2;
 	private DialogueNodeConnector connector1, connector2;
 	
@@ -30,28 +29,42 @@ public class BoundLine extends CubicCurve {
 	/**
 	 * Connect a single node to the mouse
 	 */
-	public BoundLine(Pane commonAncestor, Arc node1, DialogueNodeConnector connector1) {
-		this(commonAncestor, node1, connector1, null, null);
+	public BoundLine(Arc node1, DialogueNodeConnector connector1) {
+		this(node1, connector1, null, null);
 		followMouseMode = true;
 	}
 	
 	/**
 	 * Connect two nodes together.
 	 */
-	public BoundLine(Pane commonAncestor, Arc node1, DialogueNodeConnector connector1, Arc node2, DialogueNodeConnector connector2) {
+	public BoundLine(Arc node1, DialogueNodeConnector connector1, Arc node2, DialogueNodeConnector connector2) {
 		
-		this.commonAncestor = commonAncestor;
-		this.node1 = node1;
-		this.connector1 = connector1;
-		
-		this.node2 = node2;
-		this.connector2 = connector2;
+		setNode1(node1, connector1);
+		setNode2(node2, connector2);
 		
 		setFill(Color.TRANSPARENT);
 		setStrokeWidth(2);
 		setStroke(Color.BLACK);
 
 		setMouseTransparent(true);
+	}
+	
+	public void setNode1(Arc node1, DialogueNodeConnector connector1) {
+		this.node1 = node1;
+		this.connector1 = connector1;
+	}
+	
+	public void setNode2(Arc node2, DialogueNodeConnector connector2) {
+		this.node2 = node2;
+		this.connector2 = connector2;
+	}
+	
+	public DialogueNodeConnector getConnector1() {
+		return connector1;
+	}
+	
+	public DialogueNodeConnector getConnector2() {
+		return connector2;
 	}
 	
 	/**
@@ -66,7 +79,7 @@ public class BoundLine extends CubicCurve {
 		 * Calculate first point coordinates
 		 */
 		
-		Bounds n1InCommonAncestor = getRelativeBounds(node1, commonAncestor);
+		Bounds n1InCommonAncestor = getRelativeBounds(pannablePane, node1);
 		Point2D n1Center = getCenter(n1InCommonAncestor);
 
 		double n1X = n1Center.getX();
@@ -85,7 +98,7 @@ public class BoundLine extends CubicCurve {
 			
 			//System.err.println(connector1.getParent().getName() + " connector follow mouse");
 		}else {
-			Bounds n2InCommonAncestor = getRelativeBounds(node2, commonAncestor);
+			Bounds n2InCommonAncestor = getRelativeBounds(pannablePane, node2);
 			Point2D n2Center = getCenter(n2InCommonAncestor);
 			
 			n2X = n2Center.getX();
@@ -119,7 +132,7 @@ public class BoundLine extends CubicCurve {
 		return true;
 	}
 	
-	private Bounds getRelativeBounds(Node node, Node relativeTo) {
+	private Bounds getRelativeBounds(Pane relativeTo, Node node) {
 	    Bounds nodeBoundsInScene = node.localToScene(node.getBoundsInLocal());
 	    return relativeTo.sceneToLocal(nodeBoundsInScene);
 	}

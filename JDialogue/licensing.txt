@@ -1,0 +1,19 @@
+JDialogue, 2018, NOKORIWARE
+www.nokoriware.com
+Licensed under MIT
+https://github.com/SkyAphid/JDialogue
+
+---------------------------------------------------------------------------------------------
+
+Pen Application Icon is used with minor color edits, retrieved from:
+https://www.flaticon.com/free-icon/pen_297584
+Author: Maxim Basinski, Licensed under Creative Commons 3.0
+https://creativecommons.org/licenses/by/3.0/
+
+---------------------------------------------------------------------------------------------
+
+RichTextFX is used by the User Interface
+https://github.com/FXMisc/RichTextFX
+Licensed under BSD 2-Clause Simplified License:
+https://github.com/FXMisc/RichTextFX/blob/master/LICENSE
+

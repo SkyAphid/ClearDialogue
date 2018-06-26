@@ -57,16 +57,19 @@ public class SceneGestures {
 			//if (!event.isMiddleButtonDown())
 			//	return;
 
-			pannablePane.setTranslateX(sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX);
-			pannablePane.setTranslateY(sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY);
+			double newTranslateX = sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX;
+			double newTranslateY = sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY;
+			
+			pannablePane.setTranslateX(newTranslateX);
+			pannablePane.setTranslateY(newTranslateY);
 
-			mouseDragged(event);
+			mouseDragged(event, newTranslateX, newTranslateY);
 			
 			event.consume();
 		}
 	};
 	
-	public void mouseDragged(MouseEvent event) {
+	public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
 		
 	}
 
@@ -100,12 +103,18 @@ public class SceneGestures {
 
 			// note: pivot value must be untransformed, i. e. without scaling
 			pannablePane.setPivot(f * dx, f * dy);
+			
+			mouseScrolled(event, scale);
 
 			event.consume();
 
 		}
 
 	};
+	
+	public void mouseScrolled(ScrollEvent event, double newScale) {
+		
+	}
 
 	public static double clamp(double value, double min, double max) {
 

@@ -1,12 +1,21 @@
 package nokori.jdialogue.project;
 
+import java.io.Serializable;
+import java.rmi.server.UID;
+
 /**
  * 
  * This is the skeleton for all nodes, hosting only basic fundamental data.
  *
  */
-public abstract class DialogueNode {
+public abstract class DialogueNode implements Serializable {
 	
+	private static final long serialVersionUID = 9061233295902786274L;
+
+	//Give every node a unique ID for potential saving/loading/usage purposes
+	private String uid = new UID().toString();
+	
+	//Basic user-settable information
 	private String name;
 	private String tag = "No Tag";
 	private double x, y;
@@ -18,26 +27,14 @@ public abstract class DialogueNode {
 		this.name = name;
 		this.x = x;
 		this.y = y;
-		
+
 		inConnector = new DialogueNodeConnector(this);
 	}
 
-	public double getX() {
-		return x;
-	}
-
-	public void setX(double x) {
-		this.x = x;
-	}
-
-	public double getY() {
-		return y;
+	public String getUID() {
+		return uid;
 	}
 	
-	public void setY(double y) {
-		this.y = y;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -52,6 +49,22 @@ public abstract class DialogueNode {
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+	
+	public double getX() {
+		return x;
+	}
+
+	public void setX(double x) {
+		this.x = x;
+	}
+
+	public double getY() {
+		return y;
+	}
+	
+	public void setY(double y) {
+		this.y = y;
 	}
 
 	public DialogueNodeConnector getInConnector() {

@@ -7,6 +7,8 @@ package nokori.jdialogue.project;
  */
 public class DialogueTextNode extends DialogueNode {
 
+	private static final long serialVersionUID = -3049363958493031040L;
+
 	private String text = "Default Text";
 	
 	//Out connector for connecting to other nodes

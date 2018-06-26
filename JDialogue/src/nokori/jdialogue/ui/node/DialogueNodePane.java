@@ -1,7 +1,5 @@
 package nokori.jdialogue.ui.node;
 
-import java.util.ArrayList;
-
 import javafx.animation.FadeTransition;
 import javafx.animation.FillTransition;
 import javafx.animation.RotateTransition;
@@ -53,9 +51,6 @@ public abstract class DialogueNodePane extends StackPane {
 	protected DialogueNode node;
 	private Rectangle outline, background;
 	private Text title;
-	
-	//Connector system
-	private ArrayList<BoundLine> connectorLines = new ArrayList<BoundLine>();
 
 	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont) {
 		this.node = node;
@@ -202,21 +197,19 @@ public abstract class DialogueNodePane extends StackPane {
 		PannablePane pannablePane = core.getPannablePane();
 		
 		if (core.getSelectedConnector() == null) {
-			//Disconnect the old connector
-			connector.disconnect();
+			connector.disconnectAll();
 			
 			//Select the connector
-			core.setSelectedConnector(new ConnectorSelection(pannablePane, this, connectorNode, connector));
+			core.setSelectedConnector(new ConnectorSelection(this, connectorNode, connector));
 			//System.out.println("Selected connector belonging to " + connector.getParent().getName());
 			
 			//Update old connectors to delete any that may have just been disconnected
-			updateConnectors(event, pannablePane);
+			core.updateConnectors(event);
 			
 			event.consume();
 		}else {
 			ConnectorSelection selected = core.getSelectedConnector();
 			
-			DialogueNodePane parent = selected.getParent();
 			Arc selectedNode = selected.getConnectorNode();
 			DialogueNodeConnector selectedConnector = selected.getConnector();
 			
@@ -226,11 +219,9 @@ public abstract class DialogueNodePane extends StackPane {
 				selectedConnector.connect(connector);
 			
 				//Add UI representation of connection
-				BoundLine line = new BoundLine(pannablePane, selectedNode, selectedConnector, connectorNode, connector);
-				parent.connectorLines.add(line);
-				connectorLines.add(line);
-				core.getPannablePane().getChildren().add(line);
-				
+				BoundLine line = new BoundLine(selectedNode, selectedConnector, connectorNode, connector);
+				core.addConnectorLine(line);
+
 				line.update(event, pannablePane);
 			}
 			
@@ -238,23 +229,6 @@ public abstract class DialogueNodePane extends StackPane {
 			core.setSelectedConnector(null);
 			
 			//System.out.println("Connected " + connector.getParent().getName() + " and " + selected.getConnector().getParent().getName());
-		}
-	}
-	
-	/**
-	 * Update the positions of the node connectors and remove ones that are no longer valid
-	 */
-	public void updateConnectors(MouseEvent event, PannablePane connectorParent) {
-		for (int i = 0; i < connectorLines.size(); i++) {
-			BoundLine line = connectorLines.get(i);
-			
-			if (line.update(event, connectorParent)) {
-				continue;
-			}else {
-				connectorParent.getChildren().remove(line);
-				connectorLines.remove(i);
-				i--;
-			}
 		}
 	}
 	

@@ -9,6 +9,8 @@ import java.util.ArrayList;
  */
 public class DialogueResponseNode extends DialogueNode {
 
+	private static final long serialVersionUID = -6673674509676451177L;
+	
 	/*
 	 * You can have as many responses as you want, along with corresponding
 	 * connectors so that each response can connect to a different dialogue text
@@ -28,7 +30,7 @@ public class DialogueResponseNode extends DialogueNode {
 	public void addResponse(String text) {
 		responses.add(new Response(text, new DialogueNodeConnector(this)));
 	}
-	
+
 	public void clearResponses() {
 		responses.clear();
 	}
@@ -50,8 +52,16 @@ public class DialogueResponseNode extends DialogueNode {
 			return text;
 		}
 
+		public void setText(String text) {
+			this.text = text;
+		}
+
 		public DialogueNodeConnector getOutConnector() {
 			return outConnector;
+		}
+
+		public void setOutConnector(DialogueNodeConnector outConnector) {
+			this.outConnector = outConnector;
 		}
 	};
 }

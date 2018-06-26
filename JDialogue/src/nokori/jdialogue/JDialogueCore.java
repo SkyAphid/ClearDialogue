@@ -1,11 +1,16 @@
 package nokori.jdialogue;
 
+import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.UIManager;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -15,7 +20,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import nokori.jdialogue.io.JDialogueIO;
+import nokori.jdialogue.io.JsonIO;
+import nokori.jdialogue.io.SerializerIO;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueTextNode;
@@ -24,6 +33,7 @@ import nokori.jdialogue.throwable.MissingDialogueNodePaneError;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.ButtonSkeleton;
 import nokori.jdialogue.ui.MenuButton;
+import nokori.jdialogue.ui.node.BoundLine;
 import nokori.jdialogue.ui.node.ConnectorSelection;
 import nokori.jdialogue.ui.node.DialogueNodePane;
 import nokori.jdialogue.ui.node.DialogueResponseNodePane;
@@ -55,9 +65,15 @@ import nokori.jdialogue.ui.pannable_pane.SceneGestures;
  * 1) Make a DialogueNode extension (example: DialogueTextNode)
  * 2) Make a DialogueNodePane extension that implements your custom DialogueNode (example: DialogueTextNodePane)
  * 3) Make a DialogueNodeEditor extension that implements your custom DialogueNode (example: DialogueTextNodeEditor)
- * 4) Hook up to JDialogueCore (addNodeButton(), addDialogueNode())
+ * 4) Hook up to JDialogueCore: addNodeButton(), addDialogueNode()
+ * 5) Add support to various ExporterImporter behaviors (unless you use the serializer, in which case, it'll just werk)
  * 
- * it just werkz
+ * ------------------------------------------------------------------------------
+ * 
+ * How to add a new export/import behavior:
+ * 
+ * 1) Make a class that implements JDialogueIO (example: JsonIO)
+ * 2) Hook it up JDialogueCore: addMenuButton()
  * 
  */
 
@@ -83,7 +99,7 @@ public class JDialogueCore extends Application {
 	//styling
 	public static final int BUTTON_START_X = 20;
 	public static final int BUTTON_Y = 20;
-	public static final int BUTTON_WIDTH = 150;
+	public static final int BUTTON_WIDTH = 200;
 	public static final int BUTTON_HEIGHT = 50;
 	
 	public static final int ROUNDED_RECTANGLE_ARC = 5;
@@ -94,15 +110,23 @@ public class JDialogueCore extends Application {
 	
 	private Font replicaProRegular20 = Font.loadFont("file:ReplicaProRegular.otf", 20);
 	private Font replicaProLight20 = Font.loadFont("file:ReplicaProLight.otf", 20);
-	private Font monaco12 = Font.loadFont("file:Monaco.ttf", 12);
+	private Font monaco12 = Font.loadFont("file:Monaco.ttf", 14);
 	
 	//Project data
-	private Project project = new Project();
+	private Project project = new Project(-PANNABLE_PANE_WIDTH/2, -PANNABLE_PANE_HEIGHT/2, 1.0);
 	
 	//Connector management
+	protected ArrayList<BoundLine> connectorLines = new ArrayList<BoundLine>();
 	private ConnectorSelection selectedConnector = null;
 	
+	
 	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		launch(args);
 	}
 
@@ -110,7 +134,17 @@ public class JDialogueCore extends Application {
 	 * Start program
 	 */
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage stage) {
+		stage.getIcons().addAll(
+				new Image("file:icons/icon_512x512.png"),
+				new Image("file:icons/icon_256x256.png"),
+				new Image("file:icons/icon_128x128.png"),
+				new Image("file:icons/icon_64x64.png"),
+				new Image("file:icons/icon_48x48.png"),
+				new Image("file:icons/icon_32x32.png"),
+				new Image("file:icons/icon_24x24.png"),
+				new Image("file:icons/icon_16x16.png"));
+		
 		/*
 		 * Program UI containers
 		 * 
@@ -141,8 +175,9 @@ public class JDialogueCore extends Application {
 			}
 		});
 		
-		pannablePane.setTranslateX(-PANNABLE_PANE_WIDTH/2);
-		pannablePane.setTranslateY(-PANNABLE_PANE_HEIGHT/2);
+		pannablePane.setTranslateX(project.getViewportX());
+		pannablePane.setTranslateY(project.getViewportY());
+		pannablePane.setScale(project.getViewportScale());
 		
 		uiPane.getChildren().add(pannablePane);
 		
@@ -153,9 +188,18 @@ public class JDialogueCore extends Application {
 		//Configure pannable pane mouse gestures
         SceneGestures sceneGestures = new SceneGestures(pannablePane) {
         	@Override
-        	public void mouseDragged(MouseEvent event) {
+        	public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
         		//Drag the grabbing hand when you pane the screen
         		scene.setCursor(Cursor.CLOSED_HAND);
+        		
+        		//Set viewport memory
+        		project.setViewportX(newTranslateX);
+        		project.setViewportY(newTranslateY);
+        	}
+        	
+        	@Override
+        	public void mouseScrolled(ScrollEvent event, double newScale) {
+        		project.setViewportScale(newScale);
         	}
         };
         
@@ -185,7 +229,7 @@ public class JDialogueCore extends Application {
 	    			Node n = (Node) event.getSource();
 					
 					if (n instanceof DialogueNodePane) {
-						((DialogueNodePane) n).updateConnectors(event, pannablePane);
+						updateConnectors(event);
 					}
     			}
     		}
@@ -199,7 +243,7 @@ public class JDialogueCore extends Application {
 		
 		addBackground();
 		addProgramInfo();
-		addMenuButton();
+		addMenuButton(stage);
 		addNodeButton();
 		addProjectNameField();
 
@@ -209,9 +253,9 @@ public class JDialogueCore extends Application {
 		 * Finalize
 		 */
 		
-		primaryStage.setTitle(PROGRAM_NAME);
-		primaryStage.setScene(scene);
-		primaryStage.show();
+		stage.setTitle(PROGRAM_NAME);
+		stage.setScene(scene);
+		stage.show();
 	}
 	
 	/**
@@ -238,7 +282,7 @@ public class JDialogueCore extends Application {
 	private void addProgramInfo() {
 		int offsetY = 20;
 		
-		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " | Hold LMB = Drag Node | 2xLMB = Edit Node | 2xRMB = Delete Node");
+		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " | Hold LMB = Drag/Pan | 2xLMB = Edit Node | 2xRMB = Delete Node");
 		text.setFont(replicaProRegular20);
 		text.setFill(Color.LIGHTGRAY.darker());
 		text.setX(20);
@@ -256,20 +300,66 @@ public class JDialogueCore extends Application {
 	/**
 	 * Button for activating save/load settings and any other settings added in the future
 	 */
-	private void addMenuButton() {
+	private void addMenuButton(Stage stage) {
 		//Add new import/export options here and add functionality below
 		String[] options = {
 				"SAVE...",
-				"LOAD..."
+				"OPEN...",
+				"EXPORT JSON...",
+				"IMPORT JSON..."
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT);
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+			@Override
+			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
+				switch(optionIndex) {
+				case 0:
+					exportProject(stage, new SerializerIO());
+					break;
+				case 1:
+					importProject(stage, new SerializerIO());
+					break;
+				case 2:
+					exportProject(stage, new JsonIO());
+					break;
+				case 3:
+					importProject(stage, new JsonIO());
+					break;
+				}
+			}
+		};
 		
 		//Add to pane
 		button.setLayoutX(BUTTON_START_X);
 		button.setLayoutY(BUTTON_Y);
 		
 		uiPane.getChildren().add(button);
+	}
+	
+	private void exportProject(Stage stage, JDialogueIO behavior) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save " + behavior.getTypeName() + " file");
+		fileChooser.setInitialDirectory(new File("."));
+		fileChooser.setInitialFileName(project.getName() + "." + behavior.getTypeName());
+		
+		File f = fileChooser.showSaveDialog(stage);
+		
+		if (f != null) {
+			behavior.exportProject(project, f);
+		}
+	}
+	
+	private void importProject(Stage stage, JDialogueIO behavior) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open " + behavior.getTypeName() + " file");
+		fileChooser.setInitialDirectory(new File("."));
+		fileChooser.getExtensionFilters().add(behavior.getExtensionFilter());
+		
+		File f = fileChooser.showOpenDialog(stage);
+
+		if (f != null) {
+			project = behavior.importProject(f);
+		}
 	}
 	
 	/**
@@ -289,16 +379,15 @@ public class JDialogueCore extends Application {
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
 				double nodeX = -pannablePane.getTranslateX() + uiPane.widthProperty().get()/2 - DialogueNodePane.WIDTH/2;
 				double nodeY = -pannablePane.getTranslateY() + uiPane.heightProperty().get()/2 - DialogueNodePane.HEIGHT/2;
-				int totalNodes = project.getNodes().size();
 				
 				DialogueNode node = null;
 				
 				switch(optionIndex) {
 				case 0:
-					node = new DialogueTextNode("[" + totalNodes +"] Dialogue Node", nodeX, nodeY);
+					node = new DialogueTextNode("New Dialogue Node", nodeX, nodeY);
 					break;
 				case 1:
-					node = new DialogueResponseNode("[" + totalNodes +"] Response Node", nodeX, nodeY);
+					node = new DialogueResponseNode("New Response Node", nodeX, nodeY);
 					break;
 				}
 				
@@ -326,7 +415,7 @@ public class JDialogueCore extends Application {
 		}
 		
 		if (dialogueNode instanceof DialogueResponseNode) {
-			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, replicaProRegular20, monaco12, 30);
+			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, replicaProRegular20, monaco12, 45);
 		}
 		
 		if (dialogueNodePane != null) {
@@ -378,6 +467,28 @@ public class JDialogueCore extends Application {
 	 */
 	public ConnectorSelection getSelectedConnector() {
 		return selectedConnector;
+	}
+	
+	/**
+	 * Update the positions of the node connectors and remove ones that are no longer valid
+	 */
+	public void updateConnectors(MouseEvent event) {
+		for (int i = 0; i < connectorLines.size(); i++) {
+			BoundLine line = connectorLines.get(i);
+			
+			if (line.update(event, pannablePane)) {
+				continue;
+			}else {
+				pannablePane.getChildren().remove(line);
+				connectorLines.remove(i);
+				i--;
+			}
+		}
+	}
+	
+	public void addConnectorLine(BoundLine line) {
+		connectorLines.add(line);
+		pannablePane.getChildren().add(line);
 	}
 	
 	/**

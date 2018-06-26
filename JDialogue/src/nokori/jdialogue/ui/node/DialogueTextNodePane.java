@@ -26,27 +26,27 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		super(core, node, shadow, titleFont);
 		
 		//Out-Connector
-		Arc connector = new Arc();
-		connector.setFill(outConnectorColor);
-		connector.setRadiusX(CONNECTOR_RADIUS);
-		connector.setRadiusY(CONNECTOR_RADIUS);
-		connector.setStartAngle(90);
-		connector.setLength(-180);
+		Arc outConnector = new Arc();
+		outConnector.setFill(outConnectorColor);
+		outConnector.setRadiusX(CONNECTOR_RADIUS);
+		outConnector.setRadiusY(CONNECTOR_RADIUS);
+		outConnector.setStartAngle(90);
+		outConnector.setLength(-180);
 		
-		connector.setOnMouseClicked(event -> {
-			connectorClicked(event, core, connector, node.getOutConnector());
+		outConnector.setOnMouseClicked(event -> {
+			connectorClicked(event, core, outConnector, node.getOutConnector());
 		});
 		
-		connector.setOnMouseEntered(event -> {
-			connectorHighlightTransition(core.getScene(), connector, outConnectorColor, true);
+		outConnector.setOnMouseEntered(event -> {
+			connectorHighlightTransition(core.getScene(), outConnector, outConnectorColor, true);
 		});
 		
-		connector.setOnMouseExited(event -> {
-			connectorHighlightTransition(core.getScene(), connector, outConnectorColor, false);
+		outConnector.setOnMouseExited(event -> {
+			connectorHighlightTransition(core.getScene(), outConnector, outConnectorColor, false);
 		});
 		
-		StackPane.setAlignment(connector, Pos.CENTER_RIGHT);
-		StackPane.setMargin(connector, new Insets(0, -CONNECTOR_RADIUS, 0, 0));
+		StackPane.setAlignment(outConnector, Pos.CENTER_RIGHT);
+		StackPane.setMargin(outConnector, new Insets(0, -CONNECTOR_RADIUS, 0, 0));
 
 		//Body Text Viewer
 		body = new Label(node.getText());
@@ -60,7 +60,7 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		StackPane.setAlignment(body, Pos.BOTTOM_CENTER);
 		StackPane.setMargin(body, new Insets(0, 10, 10, 10));
 		
-		getChildren().add(connector);
+		getChildren().add(outConnector);
 		getChildren().add(body);
 		
 		//Open Editor

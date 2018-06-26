@@ -1,17 +1,19 @@
 package nokori.jdialogue.ui.editor;
 
+import java.util.ArrayList;
+
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueResponseNode;
+import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.ui.node.DialogueNodePane;
 
 public class DialogueResponseNodeEditor extends DialogueNodeEditor {
@@ -33,7 +35,11 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 		textArea.insertText(0, defaultText);
 		textArea.setWrapText(false);
 		textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
-		textArea.setStyle("-fx-font-family: " + textFont.getName() + "; -fx-font-size: " + textFont.getSize() + "pt;");
+		
+		//I don't know why the font size is inconsistent for RichTextFX
+		//On top of that, the font is thinner in RichTextFX than it is normal JavaFX
+		//The inconsistencies bother me but yolo420blazeit
+		textArea.setStyle("-fx-font-family: " + textFont.getName() + "; -fx-font-size: " + (textFont.getSize()-4) + "pt; -fx-font-weight: normal; -fx-font-style: normal;");
 		
 		//Virtual scroll pane
 		VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<StyleClassedTextArea>(textArea);
@@ -47,13 +53,25 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 	protected void dispose(JDialogueCore core, DialogueNode node, DialogueNodePane dialogueNodePane, Rectangle background) {
 		//On dispose, sync the dialogueNode with the new data
 		DialogueResponseNode dialogueNode = ((DialogueResponseNode) node);
-		dialogueNode.clearResponses();
+		
+		ArrayList<Response> oldResponses = new ArrayList<Response>(dialogueNode.getResponses());
+		dialogueNode.getResponses().clear();
 		
 		for (int i = 0; i < textArea.getParagraphs().size(); i++) {
 			String paragraph = textArea.getParagraph(i).getText();
 			
 			if (!paragraph.trim().isEmpty()) {
-				dialogueNode.addResponse(paragraph);
+				if (i < oldResponses.size()) {
+					Response oldResponse = oldResponses.get(i);
+					
+					if (!paragraph.equals(oldResponse.getText())) {
+						oldResponse.setText(paragraph);
+					}
+					
+					dialogueNode.getResponses().add(oldResponse);
+				}else {
+					dialogueNode.addResponse(paragraph);
+				}
 			}
 		}
 		
