@@ -10,4 +10,4 @@ JDialogue is built for video games specifically, and supports basic dialogue and
 As long as you have [Java8 or above installed](https://java.com/en/), JDialogue should work right out of the box. 
 
 ## Implementing JDialogue in Your Game
-JDialogue was designed primarily with Java-based games in mind, but it was also designed to work for any platform. If you don't want to write your own deserializer from scratch, I recommend checking out the `nokori.jdialogue.io` package of the source code.
+JDialogue was designed primarily with Java-based games in mind, but it was also designed to work for any platform through the JSON functionality. If you don't want to write your own deserializer from scratch, I recommend checking out the `nokori.jdialogue.io` package of the source code.
