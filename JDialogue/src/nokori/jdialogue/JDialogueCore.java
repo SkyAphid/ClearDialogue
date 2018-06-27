@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.swing.UIManager;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -25,16 +26,20 @@ import javafx.stage.Stage;
 import nokori.jdialogue.io.JDialogueIO;
 import nokori.jdialogue.io.JsonIO;
 import nokori.jdialogue.io.SerializerIO;
+import nokori.jdialogue.project.Connection;
 import nokori.jdialogue.project.DialogueNode;
+import nokori.jdialogue.project.DialogueNodeConnector;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueTextNode;
 import nokori.jdialogue.project.Project;
+import nokori.jdialogue.throwable.MissingArcError;
 import nokori.jdialogue.throwable.MissingDialogueNodePaneError;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.ButtonSkeleton;
 import nokori.jdialogue.ui.MenuButton;
 import nokori.jdialogue.ui.node.BoundLine;
 import nokori.jdialogue.ui.node.ConnectorSelection;
+import nokori.jdialogue.ui.node.DialogueNodeConnectorArc;
 import nokori.jdialogue.ui.node.DialogueNodePane;
 import nokori.jdialogue.ui.node.DialogueResponseNodePane;
 import nokori.jdialogue.ui.node.DialogueTextNodePane;
@@ -160,7 +165,19 @@ public class JDialogueCore extends Application {
 		});
 		
 		//Pannable pane contains all of the nodes, can be panned and zoomed
-		pannablePane = new PannablePane(PANNABLE_PANE_WIDTH, PANNABLE_PANE_HEIGHT);
+		pannablePane = new PannablePane(PANNABLE_PANE_WIDTH, PANNABLE_PANE_HEIGHT) {
+			@Override
+			protected void layoutChildren() {
+				super.layoutChildren();
+			
+				//Updates connectors if the pane changes
+				Platform.runLater(() -> {
+					updateConnectors(null);
+				});
+			}
+		};
+		
+		//Cancel out selected connector if you're holding one and click the background
 		pannablePane.setOnMouseClicked(event -> {
 			if (selectedConnector != null) {
 				setSelectedConnector(null);
@@ -229,7 +246,15 @@ public class JDialogueCore extends Application {
 	    			Node n = (Node) event.getSource();
 					
 					if (n instanceof DialogueNodePane) {
+						//Update connectors if a node was moved
 						updateConnectors(event);
+						
+						//Update node positiong
+						DialogueNodePane pane = (DialogueNodePane) n;
+						DialogueNode node = pane.getDialogueNode();
+						
+						node.setX(pane.getTranslateX());
+						node.setY(pane.getTranslateY());
 					}
     			}
     		}
@@ -336,11 +361,15 @@ public class JDialogueCore extends Application {
 		uiPane.getChildren().add(button);
 	}
 	
+	/**
+	 * Opens an export dialog for the selected JDialogueIO and runs it once a file is selected
+	 */
 	private void exportProject(Stage stage, JDialogueIO behavior) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save " + behavior.getTypeName() + " file");
 		fileChooser.setInitialDirectory(new File("."));
 		fileChooser.setInitialFileName(project.getName() + "." + behavior.getTypeName());
+		fileChooser.getExtensionFilters().add(behavior.getExtensionFilter());
 		
 		File f = fileChooser.showSaveDialog(stage);
 		
@@ -349,6 +378,9 @@ public class JDialogueCore extends Application {
 		}
 	}
 	
+	/**
+	 * Opens an import dialog for the selected JDialogueIO and runs it once a file is selected
+	 */
 	private void importProject(Stage stage, JDialogueIO behavior) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open " + behavior.getTypeName() + " file");
@@ -358,8 +390,63 @@ public class JDialogueCore extends Application {
 		File f = fileChooser.showOpenDialog(stage);
 
 		if (f != null) {
+			pannablePane.getChildren().clear();
 			project = behavior.importProject(f);
+			refreshAfterImport();
 		}
+	}
+	
+	/**
+	 * After a Project is imported, run this to update the editor to contain its contents.
+	 */
+	private void refreshAfterImport() {
+		pannablePane.setTranslateX(project.getViewportX());
+		pannablePane.setTranslateY(project.getViewportY());
+		pannablePane.setScale(project.getViewportScale());
+
+		//Build all of the DialogueNodePanes (graphical representation of node)
+		for (int i = 0; i < project.getNumNodes(); i++) {
+			DialogueNode node = project.getNode(i);
+			createDialogueNodePane(node);
+		}
+
+		//Build all BoundLine objects for each Connection
+		for (int i = 0; i < project.getNumConnections(); i++) {
+			Connection connection = project.getConnection(i);
+			
+			DialogueNodeConnector connector1 = connection.getConnector1();
+			DialogueNodeConnector connector2 = connection.getConnector2();
+			
+			DialogueNodeConnectorArc arc1 = getDialogueNodeConnectorArcOf(connector1);
+			DialogueNodeConnectorArc arc2 = getDialogueNodeConnectorArcOf(connector2);
+			
+			if (arc1 != null && arc2 != null) {
+				BoundLine line = new BoundLine(arc1, connector1, arc2, connector2);
+
+				addConnectorLine(line);
+				
+			}else {
+				throw new MissingArcError("\n" + connector1.getParent().getName() + " -> " + arc1 + "\n" + connector2.getParent().getName() + " -> " + arc2);
+			}
+		}
+	}
+	
+	private DialogueNodeConnectorArc getDialogueNodeConnectorArcOf(DialogueNodeConnector connector) {
+		for (int i = 0; i < pannablePane.getChildren().size(); i++) {
+			Node n = pannablePane.getChildren().get(i);
+			
+			if (n instanceof DialogueNodePane) {
+				DialogueNodePane pane = (DialogueNodePane) n;
+				
+				DialogueNodeConnectorArc arc = pane.getDialogueNodeConnectorArcOf(connector);
+				
+				if (arc != null) {
+					return arc;
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -384,14 +471,16 @@ public class JDialogueCore extends Application {
 				
 				switch(optionIndex) {
 				case 0:
-					node = new DialogueTextNode("New Dialogue Node", nodeX, nodeY);
+					node = new DialogueTextNode(project, "New Dialogue", nodeX, nodeY);
 					break;
 				case 1:
-					node = new DialogueResponseNode("New Response Node", nodeX, nodeY);
+					node = new DialogueResponseNode(project, "New Response", nodeX, nodeY);
 					break;
 				}
 				
-				addDialogueNode(node);
+				//Add node to project data
+				project.addNode(node);
+				createDialogueNodePane(node);
 			}
 		};
 		
@@ -407,7 +496,7 @@ public class JDialogueCore extends Application {
 	 * @param dialogueNode
 	 * @throws MissingDialogueNodePaneError 
 	 */
-	private void addDialogueNode(DialogueNode dialogueNode) {
+	private void createDialogueNodePane(DialogueNode dialogueNode) {
 		DialogueNodePane dialogueNodePane = null;
 		
 		if (dialogueNode instanceof DialogueTextNode) {
@@ -420,9 +509,6 @@ public class JDialogueCore extends Application {
 		
 		if (dialogueNodePane != null) {
 			
-			//Add node to project data
-			project.addNode(dialogueNode);
-			
 			//Add node to current instance (UI)
 	        dialogueNodePane.setTranslateX(dialogueNode.getX());
 	        dialogueNodePane.setTranslateY(dialogueNode.getY());
@@ -430,7 +516,6 @@ public class JDialogueCore extends Application {
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_DRAGGED, nodeGestures.getOnMouseDraggedEventHandler());
 	        
 			pannablePane.getChildren().add(dialogueNodePane);
-			
 		} else {
 			throw new MissingDialogueNodePaneError(dialogueNode);
 		}
@@ -441,8 +526,14 @@ public class JDialogueCore extends Application {
 	 * @param dialogueNode
 	 */
 	public void removeDialogueNode(DialogueNodePane dialogueNodePane) {
-		project.removeNode(dialogueNodePane.getNode());
+		DialogueNode node = dialogueNodePane.getDialogueNode();
+		
+		node.disconnectAllConnectors();
+		project.removeNode(node);
+		
 		pannablePane.getChildren().remove(dialogueNodePane);
+		
+		updateConnectors(null);
 	}
 	
 	/**

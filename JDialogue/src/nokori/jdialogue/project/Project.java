@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Project implements Serializable {
 	
 	private static final long serialVersionUID = -8369866434879310100L;
-
+	
 	//The name of the project
 	private String name = "Default Project";
 	
@@ -19,6 +19,9 @@ public class Project implements Serializable {
 	
 	//All nodes contained by this project
 	private ArrayList<DialogueNode> nodes = new ArrayList<DialogueNode>();
+	
+	//All connections between the various nodes are stored here
+	private ArrayList<Connection> connections = new ArrayList<Connection>();
 	
 	public Project(double viewportX, double viewportY, double viewportScale) {
 		this.viewportX = viewportX;
@@ -70,6 +73,7 @@ public class Project implements Serializable {
 	}
 	
 	public void removeNode(DialogueNode node) {
+		
 		nodes.remove(node);
 	}
 	
@@ -79,5 +83,81 @@ public class Project implements Serializable {
 	
 	public int getNumNodes() {
 		return nodes.size();
+	}
+	
+	/*
+	 * 
+	 * Connections are managed by the Project so that we have a singular location for
+	 * all of the various node relationships. The alternative (which I tried first) was 
+	 * having the nodes themselves manage the connections, but that ended up being very
+	 * messy due to the fact that each node can have numerous connections.
+	 * 
+	 */
+	
+	public void addConnection(Connection connection) {
+		connections.add(connection);
+	}
+	
+	public Connection getConnection(int index) {
+		return connections.get(index);
+	}
+
+	public int getNumConnections() {
+		return connections.size();
+	}
+	
+	public void disconnect(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
+		for (int i = 0; i < connections.size(); i++) {
+			Connection c = connections.get(i);
+			
+			if (c.represents(connector1, connector2)) {
+				connections.remove(i);
+				i--;
+			}
+		}
+	}
+	
+	/**
+	 * Delete all Connections to this connector
+	 */
+	public void disconnectAll(DialogueNodeConnector connector) {
+		for (int i = 0; i < connections.size(); i++) {
+			Connection c = connections.get(i);
+			
+			if (c.contains(connector)) {
+				connections.remove(i);
+				i--;
+			}
+		}
+	}
+	
+	/**
+	 * Checks if the two connectors have a Connection
+	 */
+	public boolean isConnected(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
+		for (int i = 0; i < connections.size(); i++) {
+			Connection c = connections.get(i);
+			
+			if (c.represents(connector1, connector2)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Checks if a similar Connection already exists
+	 */
+	public boolean connectionExists(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
+		for (int i = 0; i < connections.size(); i++) {
+			Connection c = connections.get(i);
+			
+			if (c.represents(connector1, connector2)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

@@ -51,8 +51,6 @@ public class NodeGestures {
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
 			
-			mouseDragged(event);
-
 			// left mouse button => dragging
 			if (!event.isPrimaryButtonDown())
 				return;
@@ -65,6 +63,8 @@ public class NodeGestures {
 			node.setTranslateY(nodeDragContext.translateAnchorY + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / scale));
 			
 			clampToParentBounds(node);
+			
+			mouseDragged(event);
 
 			event.consume();
 		}

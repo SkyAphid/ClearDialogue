@@ -14,9 +14,9 @@ public class DialogueTextNode extends DialogueNode {
 	//Out connector for connecting to other nodes
 	private DialogueNodeConnector outConnector;
 	
-	public DialogueTextNode(String name, double x, double y) {
-		super(name, x, y);
-		outConnector = new DialogueNodeConnector(this);
+	public DialogueTextNode(Project project, String name, double x, double y) {
+		super(project, name, x, y);
+		outConnector = new DialogueNodeConnector(project, this);
 	}
 
 	public String getText() {
@@ -29,5 +29,11 @@ public class DialogueTextNode extends DialogueNode {
 
 	public DialogueNodeConnector getOutConnector() {
 		return outConnector;
+	}
+	
+	@Override
+	public void disconnectAllConnectors() {
+		super.disconnectAllConnectors();
+		outConnector.disconnectAll();
 	}
 }

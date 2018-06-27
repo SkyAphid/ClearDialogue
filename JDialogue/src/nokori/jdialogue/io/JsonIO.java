@@ -39,6 +39,7 @@ public class JsonIO implements JDialogueIO{
 	 * Basic Node data JSON tags
 	 */
 	public static final String JSON_NODES = "nodes";
+	public static final String JSON_NODE_TYPE = "type";
 	
 	public static final String JSON_UID = "uid";
 	public static final String JSON_NAME = "name";
@@ -49,27 +50,30 @@ public class JsonIO implements JDialogueIO{
 	public static final String JSON_TEXT = "text";
 	
 	/*
-	 * Connector JSON tags
+	 * Connection JSON tags
 	 */
-	public static final String JSON_IN_CONNECTOR_UID = "inConnectorUID";
-	public static final String JSON_IN_CONNECTOR_CONNECTED_TO_UID = "inConnectorConnectedToUID";
-	
-	public static final String JSON_OUT_CONNECTOR_UID = "outConnectorUID";
-	public static final String JSON_OUT_CONNECTOR_CONNECTED_TO_UID = "outConnectorConnectedToUID";
+	public static final String JSON_CONNECTION = "connection";
+	public static final String JSON_CONNECTOR_1 = "connector1";
+	public static final String JSON_CONNECTOR_2 = "connector2";
 	
 	/*
-	 * Node type IDs
+	 * Dialogue Node Type JSON tags
 	 */
 	
-	public static final String JSON_NODE_TYPE = "type";
 	public static final String JSON_NODE_TYPE_DIALOGUE = "typeDialogue";
 	
+	/*
+	 * Response Node Type JSON tags
+	 */
+	
 	public static final String JSON_NODE_TYPE_RESPONSE = "typeResponse";
-	//public static final String JSON_RESPONSES = "responses";
+	public static final String JSON_RESPONSES = "responses";
 
 	
 	@Override
 	public void exportProject(Project project, File f) {
+		
+		//TODO: Add Connection support
 		
 		/*
 		 * Basic Project Information
@@ -101,15 +105,6 @@ public class JsonIO implements JDialogueIO{
 			nodeBuilder.add(JSON_NODE_X, node.getX());
 			nodeBuilder.add(JSON_NODE_Y, node.getY());
 			
-			//Record in-connector
-			DialogueNodeConnector inConnector = node.getInConnector();
-			nodeBuilder.add(JSON_IN_CONNECTOR_UID, inConnector.getUID());
-			
-			//TODO:
-			/*if (inConnector.getConnectedTo() != null) {
-				nodeBuilder.add(JSON_IN_CONNECTOR_CONNECTED_TO_UID, inConnector.getConnectedTo().getUID());
-			}*/
-			
 			/*
 			 * Text Node Data
 			 */
@@ -122,14 +117,6 @@ public class JsonIO implements JDialogueIO{
 				DialogueTextNode textNode = (DialogueTextNode) node;
 				nodeBuilder.add(JSON_TEXT, textNode.getText());
 				
-				//Out-connector UID and connection UID
-				DialogueNodeConnector outConnector = textNode.getOutConnector();
-				nodeBuilder.add(JSON_OUT_CONNECTOR_UID, outConnector.getUID());
-				
-				//TODO:
-				/*if (outConnector.getConnectedTo() != null) {
-					nodeBuilder.add(JSON_OUT_CONNECTOR_CONNECTED_TO_UID, outConnector.getConnectedTo().getUID());
-				}*/
 			}
 			
 			/*
@@ -152,15 +139,6 @@ public class JsonIO implements JDialogueIO{
 					
 					//Response text
 					responseBuilder.add(JSON_TEXT, response.getText());
-					
-					//Response out connector and connection UID
-					DialogueNodeConnector outConnector = response.getOutConnector();
-					responseBuilder.add(JSON_OUT_CONNECTOR_UID, outConnector.getUID());
-					
-					//TODO:
-					/*if (outConnector.getConnectedTo() != null) {
-						responseBuilder.add(JSON_OUT_CONNECTOR_CONNECTED_TO_UID, outConnector.getConnectedTo().getUID());
-					}*/
 					
 					//Store in responsesBuilder
 					responsesBuilder.add(responseBuilder);
@@ -221,7 +199,7 @@ public class JsonIO implements JDialogueIO{
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return new ExtensionFilter("JDialogue JSON Files (*.json)", ".json");
+		return new ExtensionFilter("JDialogue JSON Files (*.json)", "*.json");
 	}
 
 	@Override

@@ -52,7 +52,7 @@ public class SerializerIO implements JDialogueIO {
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return new ExtensionFilter("JDialogue Files (*.dialogue)", ".dialogue");
+		return new ExtensionFilter("JDialogue Files (*.dialogue)", "*.dialogue");
 	}
 
 	@Override

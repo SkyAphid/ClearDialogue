@@ -12,6 +12,9 @@ public abstract class DialogueNode implements Serializable {
 	
 	private static final long serialVersionUID = 9061233295902786274L;
 
+	//Store the Project object for reference (I.E. seeing if a DialogueNode is a part of Project X when deserialized into a game)
+	private Project project;
+	
 	//Give every node a unique ID for potential saving/loading/usage purposes
 	private String uid = new UID().toString();
 	
@@ -23,12 +26,17 @@ public abstract class DialogueNode implements Serializable {
 	//Connector so that other nodes can input into this one
 	private DialogueNodeConnector inConnector;
 
-	public DialogueNode(String name, double x, double y) {
+	public DialogueNode(Project project, String name, double x, double y) {
+		this.project = project;
 		this.name = name;
 		this.x = x;
 		this.y = y;
 
-		inConnector = new DialogueNodeConnector(this);
+		inConnector = new DialogueNodeConnector(project, this);
+	}
+	
+	public Project getProject() {
+		return project;
 	}
 
 	public String getUID() {
@@ -70,8 +78,11 @@ public abstract class DialogueNode implements Serializable {
 	public DialogueNodeConnector getInConnector() {
 		return inConnector;
 	}
-
-	public void setInConnector(DialogueNodeConnector inConnector) {
-		this.inConnector = inConnector;
+	
+	/**
+	 * Disconnect all connectors (for when nodes are deleted)
+	 */
+	public void disconnectAllConnectors() {
+		inConnector.disconnectAll();
 	}
 }

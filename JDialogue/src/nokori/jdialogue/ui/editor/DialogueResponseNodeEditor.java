@@ -75,6 +75,12 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 			}
 		}
 		
+		oldResponses.removeAll(dialogueNode.getResponses());
+		
+		for (int i = 0; i < oldResponses.size(); i++) {
+			oldResponses.get(i).getOutConnector().disconnectAll();
+		}
+		
 		super.dispose(core, node, dialogueNodePane, background);
 	}
 }

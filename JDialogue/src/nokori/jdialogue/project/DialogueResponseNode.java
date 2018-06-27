@@ -1,5 +1,6 @@
 package nokori.jdialogue.project;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -18,17 +19,26 @@ public class DialogueResponseNode extends DialogueNode {
 	 */
 	private ArrayList<Response> responses = new ArrayList<Response>();
 
-	public DialogueResponseNode(String name, double x, double y) {
-		super(name, x, y);
+	public DialogueResponseNode(Project project, String name, double x, double y) {
+		super(project, name, x, y);
 
 		addResponse("Default Response");
+	}
+	
+	@Override
+	public void disconnectAllConnectors() {
+		super.disconnectAllConnectors();
+		
+		for (int i = 0; i < responses.size(); i++) {
+			responses.get(i).getOutConnector().disconnectAll();
+		}
 	}
 
 	/**
 	 * Shortcut function for adding a new response to this node
 	 */
 	public void addResponse(String text) {
-		responses.add(new Response(text, new DialogueNodeConnector(this)));
+		responses.add(new Response(text, new DialogueNodeConnector(getProject(), this)));
 	}
 
 	public void clearResponses() {
@@ -39,7 +49,10 @@ public class DialogueResponseNode extends DialogueNode {
 		return responses;
 	}
 
-	public class Response {
+	public class Response implements Serializable {
+		
+		private static final long serialVersionUID = 7097284104250711558L;
+		
 		private String text;
 		private DialogueNodeConnector outConnector;
 
@@ -63,5 +76,5 @@ public class DialogueResponseNode extends DialogueNode {
 		public void setOutConnector(DialogueNodeConnector outConnector) {
 			this.outConnector = outConnector;
 		}
-	};
+	}
 }

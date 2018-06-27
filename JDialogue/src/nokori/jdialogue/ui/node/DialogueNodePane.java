@@ -1,28 +1,29 @@
 package nokori.jdialogue.ui.node;
 
 import javafx.animation.FadeTransition;
-import javafx.animation.FillTransition;
 import javafx.animation.RotateTransition;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
-import javafx.scene.Scene;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
 import nokori.jdialogue.ui.Button;
-import nokori.jdialogue.ui.pannable_pane.PannablePane;
+import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -41,18 +42,15 @@ public abstract class DialogueNodePane extends StackPane {
 	public static final int HEIGHT = 200;
 	public static final int TITLE_HEIGHT = 40;
 	
-	//Connector information that all nodes should have in-common
-	public static final int CONNECTOR_RADIUS = 20;
-	
-	public static final Color outConnectorColor = Color.rgb(52, 205, 112);
-	public static final Color inConnectorColor = Color.rgb(228, 80, 65);
+	private JDialogueCore core;
 	
 	//Instances
 	protected DialogueNode node;
 	private Rectangle outline, background;
-	private Text title;
+	private Label title;
 
 	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont) {
+		this.core = core;
 		this.node = node;
 		
 		//Outline for highlighting node
@@ -70,32 +68,15 @@ public abstract class DialogueNodePane extends StackPane {
 		background.setMouseTransparent(true);
 		
 		//In-Connector
-		Arc connector = new Arc();
-		connector.setFill(inConnectorColor);
-		connector.setRadiusX(CONNECTOR_RADIUS);
-		connector.setRadiusY(CONNECTOR_RADIUS);
-		connector.setStartAngle(90);
-		connector.setLength(180);
-		
-		connector.setOnMouseClicked(event -> {
-			connectorClicked(event, core, connector, node.getInConnector());
-		});
-		
-		connector.setOnMouseEntered(event -> {
-			connectorHighlightTransition(core.getScene(), connector, inConnectorColor, true);
-		});
-		
-		connector.setOnMouseExited(event -> {
-			connectorHighlightTransition(core.getScene(), connector, inConnectorColor, false);
-		});
-		
-		StackPane.setAlignment(connector, Pos.CENTER_LEFT);
-		StackPane.setMargin(connector, new Insets(0, 0, 0, -CONNECTOR_RADIUS));
+		DialogueNodeConnectorArc connectorArc = new DialogueNodeConnectorArc(core, this, ConnectorType.IN, node.getInConnector());
 		
 		//Title text
-		title = new Text(node.getName());
+		title = new Label(node.getName());
+		title.setMaxWidth(WIDTH - 20f);
+		title.setMaxHeight(TITLE_HEIGHT); 
 		title.setFont(titleFont);
-		title.setFill(Color.BLACK);
+		title.setTextFill(Color.BLACK);
+		title.setWrapText(false);
 		title.setMouseTransparent(true);
 		
 		StackPane.setAlignment(title, Pos.TOP_CENTER);
@@ -114,7 +95,7 @@ public abstract class DialogueNodePane extends StackPane {
 		StackPane.setMargin(separator, new Insets(TITLE_HEIGHT, 0, 0, 0));
 		
 		//Configure pane
-		getChildren().addAll(background, connector, title, separator, outline);
+		getChildren().addAll(background, connectorArc, title, separator, outline);
 		
 		setOnMouseEntered(event -> {
 			FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
@@ -146,13 +127,28 @@ public abstract class DialogueNodePane extends StackPane {
 		fadeTransition.play();
 	}
 	
+	@Override
+	protected void layoutChildren() {
+		super.layoutChildren();
+	
+		//Updates connectors if the pane changes
+		Platform.runLater(() -> {
+			core.updateConnectors(null);
+		});
+	}
+	
 	/**
 	 * Refresh nodes to have the latest Node data
+	 * 
+	 * Called by DialogueNodeEditor when it closes
 	 */
 	public void refresh(JDialogueCore core) {
 		title.setText(node.getName());
 	}
 	
+	/**
+	 * Checks if the right mouse button is clicking on this node, indicating a deletion request
+	 */
 	protected boolean checkDispose(MouseEvent event, JDialogueCore core) {
 		if (event.getClickCount() > 1 && event.getButton() == MouseButton.SECONDARY) {
 			dispose(core);
@@ -184,70 +180,48 @@ public abstract class DialogueNodePane extends StackPane {
 		});
 	}
 	
+	/**
+	 * Modify background height of the pane (used primarily by DialogueResponseNodePane)
+	 */
 	public void setBackgroundHeight(int height) {
 		outline.setHeight(height);
 		background.setHeight(height);
 	}
 	
-	public DialogueNode getNode() {
-		return node;
+	/**
+	 * Tries to fetch the DialogueNodeConnectorArc for the inputted connector
+	 */
+	public DialogueNodeConnectorArc getDialogueNodeConnectorArcOf(DialogueNodeConnector connector) {
+		return getDialogueNodeConnectorArcOf(connector, getChildren());
 	}
 
-	protected void connectorClicked(MouseEvent event, JDialogueCore core, Arc connectorNode, DialogueNodeConnector connector) {
-		PannablePane pannablePane = core.getPannablePane();
-		
-		if (core.getSelectedConnector() == null) {
-			connector.disconnectAll();
+	private DialogueNodeConnectorArc getDialogueNodeConnectorArcOf(DialogueNodeConnector connector, ObservableList<Node> children) {
+		for (int i = 0; i < children.size(); i++) {
+			Node node = children.get(i);
 			
-			//Select the connector
-			core.setSelectedConnector(new ConnectorSelection(this, connectorNode, connector));
-			//System.out.println("Selected connector belonging to " + connector.getParent().getName());
+			DialogueNodeConnectorArc arc = null;
 			
-			//Update old connectors to delete any that may have just been disconnected
-			core.updateConnectors(event);
-			
-			event.consume();
-		}else {
-			ConnectorSelection selected = core.getSelectedConnector();
-			
-			Arc selectedNode = selected.getConnectorNode();
-			DialogueNodeConnector selectedConnector = selected.getConnector();
-			
-			if (selectedConnector != connector) {
-				
-				//Connect the connectors
-				selectedConnector.connect(connector);
-			
-				//Add UI representation of connection
-				BoundLine line = new BoundLine(selectedNode, selectedConnector, connectorNode, connector);
-				core.addConnectorLine(line);
-
-				line.update(event, pannablePane);
+			if (node instanceof DialogueNodeConnectorArc) {
+				arc = (DialogueNodeConnectorArc) node;
 			}
 			
-			//Reset selection
-			core.setSelectedConnector(null);
+			if (node instanceof Region) {
+				arc = getDialogueNodeConnectorArcOf(connector, ((Region) node).getChildrenUnmodifiable());
+			}
 			
-			//System.out.println("Connected " + connector.getParent().getName() + " and " + selected.getConnector().getParent().getName());
+			if (node instanceof Group) {
+				arc = getDialogueNodeConnectorArcOf(connector, ((Group) node).getChildren());
+			}
+		
+			if (arc != null && arc.getDialogueNodeConnector() == connector) {
+				return arc;
+			}
 		}
+		
+		return null;
 	}
 	
-	/**
-	 * Convenience function for highlighting nodes when selected
-	 */
-	public static void connectorHighlightTransition(Scene scene, Arc node, Color originalColor, boolean highlighted) {
-		FillTransition fillTransition = new FillTransition(Duration.millis(Button.FADE_TIME), node);
-		
-		if (highlighted) {
-			fillTransition.setFromValue(originalColor);
-			fillTransition.setToValue(originalColor.brighter().brighter());
-			scene.setCursor(Cursor.HAND);
-		}else {
-			fillTransition.setFromValue(originalColor.brighter().brighter());
-			fillTransition.setToValue(originalColor);
-			scene.setCursor(Cursor.DEFAULT);
-		}
-		
-		fillTransition.play();
+	public DialogueNode getDialogueNode() {
+		return node;
 	}
 }
