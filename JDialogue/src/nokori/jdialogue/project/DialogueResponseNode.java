@@ -41,10 +41,6 @@ public class DialogueResponseNode extends DialogueNode {
 		responses.add(new Response(text, new DialogueNodeConnector(getProject(), this)));
 	}
 
-	public void clearResponses() {
-		responses.clear();
-	}
-
 	public ArrayList<Response> getResponses() {
 		return responses;
 	}

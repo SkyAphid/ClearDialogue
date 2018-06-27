@@ -18,6 +18,7 @@ import javax.json.stream.JsonGenerator;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser.ExtensionFilter;
+import nokori.jdialogue.project.Connection;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
 import nokori.jdialogue.project.DialogueResponseNode;
@@ -52,9 +53,9 @@ public class JsonIO implements JDialogueIO{
 	/*
 	 * Connection JSON tags
 	 */
-	public static final String JSON_CONNECTION = "connection";
-	public static final String JSON_CONNECTOR_1 = "connector1";
-	public static final String JSON_CONNECTOR_2 = "connector2";
+	public static final String JSON_CONNECTIONS = "connections";
+	public static final String JSON_CONNECTOR_1_UID = "connector1UID";
+	public static final String JSON_CONNECTOR_2_UID = "connector2UID";
 	
 	/*
 	 * Dialogue Node Type JSON tags
@@ -72,9 +73,7 @@ public class JsonIO implements JDialogueIO{
 	
 	@Override
 	public void exportProject(Project project, File f) {
-		
-		//TODO: Add Connection support
-		
+
 		/*
 		 * Basic Project Information
 		 */
@@ -151,6 +150,28 @@ public class JsonIO implements JDialogueIO{
 		}
 		
 		projectBuilder.add(JSON_NODES, nodes);
+		
+		/*
+		 * 
+		 * Connections
+		 * 
+		 */
+		
+		JsonArrayBuilder connections = Json.createArrayBuilder();
+		
+		for (int i = 0; i < project.getNumConnections(); i++) {
+			Connection connection = project.getConnection(i);
+			
+			JsonObjectBuilder connectionBuilder = Json.createObjectBuilder();
+			
+			//Record basic data
+			connectionBuilder.add(JSON_CONNECTOR_1_UID, connection.getConnector1().getUID());
+			connectionBuilder.add(JSON_CONNECTOR_2_UID, connection.getConnector2().getUID());
+			
+			connections.add(connectionBuilder);
+		}
+		
+		projectBuilder.add(JSON_CONNECTIONS, connections);
 		
 		JsonObject export = projectBuilder.build();
 		
