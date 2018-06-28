@@ -8,12 +8,16 @@ import javafx.scene.input.MouseEvent;
 /**
  * Listeners for making the nodes draggable via left mouse button. Considers if
  * parent is zoomed.
+ * 
+ * Found here:
+ * https://stackoverflow.com/questions/32220042/pick-and-move-a-node-in-a-pannable-zoomable-pane
+ * 
  */
 public class NodeGestures {
 
 	private DragContext nodeDragContext = new DragContext();
 
-	PannablePane pannablePane;
+	private PannablePane pannablePane;
 
 	public NodeGestures(PannablePane pannablePane) {
 		this.pannablePane = pannablePane;

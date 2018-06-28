@@ -18,7 +18,11 @@ public class DialogueResponseNode extends DialogueNode {
 	 * node.
 	 */
 	private ArrayList<Response> responses = new ArrayList<Response>();
-
+	
+	public DialogueResponseNode(Project project, String uid, String name, String tag, double x, double y) {
+		super(project, uid, name, tag, x, y);
+	}
+	
 	public DialogueResponseNode(Project project, String name, double x, double y) {
 		super(project, name, x, y);
 
@@ -26,8 +30,20 @@ public class DialogueResponseNode extends DialogueNode {
 	}
 	
 	@Override
+	public ArrayList<DialogueNodeConnector> getAllConnectors() {
+		ArrayList<DialogueNodeConnector> connectors = new ArrayList<DialogueNodeConnector>();
+		connectors.add(getInConnector());
+		
+		for (int i = 0; i < responses.size(); i++) {
+			connectors.add(responses.get(i).getOutConnector());
+		}
+		
+		return connectors;
+	}
+	
+	@Override
 	public void disconnectAllConnectors() {
-		super.disconnectAllConnectors();
+		getInConnector().disconnectAll();
 		
 		for (int i = 0; i < responses.size(); i++) {
 			responses.get(i).getOutConnector().disconnectAll();
@@ -35,10 +51,14 @@ public class DialogueResponseNode extends DialogueNode {
 	}
 
 	/**
-	 * Shortcut function for adding a new response to this node
+	 * Shortcut function for adding a new response to this node.
 	 */
 	public void addResponse(String text) {
 		responses.add(new Response(text, new DialogueNodeConnector(getProject(), this)));
+	}
+	
+	public void addResponse(String text, String outConnectorUID) {
+		responses.add(new Response(text, new DialogueNodeConnector(getProject(), this, outConnectorUID)));
 	}
 
 	public ArrayList<Response> getResponses() {

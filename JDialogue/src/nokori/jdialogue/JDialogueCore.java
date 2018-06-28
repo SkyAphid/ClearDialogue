@@ -2,14 +2,19 @@ package nokori.jdialogue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.swing.UIManager;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -23,9 +28,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import nokori.jdialogue.io.JDialogueIO;
-import nokori.jdialogue.io.JsonIO;
-import nokori.jdialogue.io.SerializerIO;
+import nokori.jdialogue.io.JDialogueJsonIO;
+import nokori.jdialogue.io.JDialogueSerializerIO;
 import nokori.jdialogue.project.Connection;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
@@ -53,11 +59,15 @@ import nokori.jdialogue.ui.pannable_pane.SceneGestures;
  * UI design inspired by Yarn:
  * https://github.com/InfiniteAmmoInc/Yarn
  * 
+ * And Monologue:
+ * https://github.com/nospoone/monologue
+ * 
  * I apologize in advance for weird uses of JavaFX, this was my first time using it, 
  * but I wanted to make something that works right out of the box and this was my best bet.
  * 
  * The system is pretty customizable, so if you see anything you don't like, 
- * it should be pretty easy to plug and play the various parts.
+ * it should be pretty easy to plug and play the various parts. I.E. you could totally 
+ * rip out this UI and make a replacement, since I've detached the actual project data.
  * 
  * When in doubt, read the comments
  * 
@@ -100,6 +110,7 @@ public class JDialogueCore extends Application {
 	private NodeGestures nodeGestures;
 	
 	private Scene scene;
+	private SceneGestures sceneGestures;
 	
 	//styling
 	public static final int BUTTON_START_X = 20;
@@ -118,7 +129,10 @@ public class JDialogueCore extends Application {
 	private Font monaco12 = Font.loadFont("file:Monaco.ttf", 14);
 	
 	//Project data
-	private Project project = new Project(-PANNABLE_PANE_WIDTH/2, -PANNABLE_PANE_HEIGHT/2, 1.0);
+	private Project project;
+	
+	//UI components
+	private TextField projectNameField;
 	
 	//Connector management
 	protected ArrayList<BoundLine> connectorLines = new ArrayList<BoundLine>();
@@ -149,6 +163,12 @@ public class JDialogueCore extends Application {
 				new Image("file:icons/icon_32x32.png"),
 				new Image("file:icons/icon_24x24.png"),
 				new Image("file:icons/icon_16x16.png"));
+		
+		/*
+		 * Default Project
+		 */
+		
+		newProject();
 		
 		/*
 		 * Program UI containers
@@ -203,22 +223,22 @@ public class JDialogueCore extends Application {
 		scene.getStylesheets().add("file:scrollbar_style.css");
 		
 		//Configure pannable pane mouse gestures
-        SceneGestures sceneGestures = new SceneGestures(pannablePane) {
-        	@Override
-        	public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
-        		//Drag the grabbing hand when you pane the screen
-        		scene.setCursor(Cursor.CLOSED_HAND);
-        		
-        		//Set viewport memory
-        		project.setViewportX(newTranslateX);
-        		project.setViewportY(newTranslateY);
-        	}
-        	
-        	@Override
-        	public void mouseScrolled(ScrollEvent event, double newScale) {
-        		project.setViewportScale(newScale);
-        	}
-        };
+		sceneGestures = new SceneGestures(pannablePane) {
+			@Override
+			public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
+				// Drag the grabbing hand when you pane the screen
+				scene.setCursor(Cursor.CLOSED_HAND);
+
+				// Set viewport memory
+				project.setViewportX(newTranslateX);
+				project.setViewportY(newTranslateY);
+			}
+
+			@Override
+			public void mouseScrolled(ScrollEvent event, double newScale) {
+				project.setViewportScale(newScale);
+			}
+		};
         
         //PannablePane event handlers (panning/zooming)
         scene.setOnMouseDragged(sceneGestures.getOnMouseDraggedEventHandler());
@@ -322,33 +342,53 @@ public class JDialogueCore extends Application {
 		uiPane.getChildren().add(text);
 	}
 	
+
+	private static final String NEW_PROJECT = "NEW PROJECT";
+	private static final String SAVE = "SAVE...";
+	private static final String OPEN = "OPEN...";
+	private static final String EXPORT_JSON = "EXPORT JSON...";
+	private static final String IMPORT_JSON = "IMPORT JSON...";
+	
 	/**
 	 * Button for activating save/load settings and any other settings added in the future
 	 */
 	private void addMenuButton(Stage stage) {
-		//Add new import/export options here and add functionality below
 		String[] options = {
-				"SAVE...",
-				"OPEN...",
-				"EXPORT JSON...",
-				"IMPORT JSON..."
+				NEW_PROJECT,
+				SAVE,
+				OPEN,
+				EXPORT_JSON,
+				IMPORT_JSON
 		};
 		
 		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
-				switch(optionIndex) {
-				case 0:
-					exportProject(stage, new SerializerIO());
+				switch(optionName) {
+				case NEW_PROJECT:
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Start New Project");
+					alert.setHeaderText("Start new project? Unsaved changes will be lost.");
+					((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
+					
+					Optional<ButtonType> result = alert.showAndWait();
+					
+					if (result.get() == ButtonType.OK){
+						newProject();
+					}
+					
 					break;
-				case 1:
-					importProject(stage, new SerializerIO());
+				case SAVE:
+					exportProject(stage, new JDialogueSerializerIO());
 					break;
-				case 2:
-					exportProject(stage, new JsonIO());
+				case OPEN:
+					importProject(stage, new JDialogueSerializerIO());
 					break;
-				case 3:
-					importProject(stage, new JsonIO());
+				case EXPORT_JSON:
+					exportProject(stage, new JDialogueJsonIO());
+					break;
+				case IMPORT_JSON:
+					importProject(stage, new JDialogueJsonIO());
 					break;
 				}
 			}
@@ -362,6 +402,24 @@ public class JDialogueCore extends Application {
 	}
 	
 	/**
+	 * Initialize a default project
+	 */
+	private void newProject() {
+		boolean projectNull = (project == null);
+		
+		if (!projectNull) {
+			pannablePane.getChildren().clear();
+		}
+		
+		//project = new Project(-PANNABLE_PANE_WIDTH/10, -PANNABLE_PANE_HEIGHT/2, 1.0);
+		project = new Project(0.0, 0.0, 1.0);
+		
+		if (!projectNull) {
+			refreshAfterImport();
+		}
+	}
+	
+	/**
 	 * Opens an export dialog for the selected JDialogueIO and runs it once a file is selected
 	 */
 	private void exportProject(Stage stage, JDialogueIO behavior) {
@@ -370,11 +428,21 @@ public class JDialogueCore extends Application {
 		fileChooser.setInitialDirectory(new File("."));
 		fileChooser.setInitialFileName(project.getName() + "." + behavior.getTypeName());
 		fileChooser.getExtensionFilters().add(behavior.getExtensionFilter());
-		
+
 		File f = fileChooser.showSaveDialog(stage);
 		
 		if (f != null) {
-			behavior.exportProject(project, f);
+			try {
+				behavior.exportProject(project, f);
+			} catch (Exception e) {
+				e.printStackTrace();
+				
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Caught " + e.getClass().getSimpleName());
+				alert.setHeaderText("Failed to export project.");
+				alert.setContentText(e.getMessage());
+				alert.showAndWait();
+			}
 		}
 	}
 	
@@ -390,9 +458,22 @@ public class JDialogueCore extends Application {
 		File f = fileChooser.showOpenDialog(stage);
 
 		if (f != null) {
-			pannablePane.getChildren().clear();
-			project = behavior.importProject(f);
-			refreshAfterImport();
+			try {
+				Project project = behavior.importProject(f);
+				
+				pannablePane.getChildren().clear();
+				this.project = project;
+				refreshAfterImport();
+				
+			} catch(Exception e) {
+				e.printStackTrace();
+				
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Caught " + e.getClass().getSimpleName());
+				alert.setHeaderText("Failed to import project.");
+				alert.setContentText(e.getMessage());
+				alert.showAndWait();
+			}
 		}
 	}
 	
@@ -403,6 +484,8 @@ public class JDialogueCore extends Application {
 		pannablePane.setTranslateX(project.getViewportX());
 		pannablePane.setTranslateY(project.getViewportY());
 		pannablePane.setScale(project.getViewportScale());
+		
+		projectNameField.setText(project.getName());
 
 		//Build all of the DialogueNodePanes (graphical representation of node)
 		for (int i = 0; i < project.getNumNodes(); i++) {
@@ -464,17 +547,25 @@ public class JDialogueCore extends Application {
 			
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
-				double nodeX = -pannablePane.getTranslateX() + uiPane.widthProperty().get()/2 - DialogueNodePane.WIDTH/2;
-				double nodeY = -pannablePane.getTranslateY() + uiPane.heightProperty().get()/2 - DialogueNodePane.HEIGHT/2;
+				//Yeah, I know right
+				Window window = scene.getWindow();
+				double screenCenterX = (window.getX() + window.getWidth()/2);
+				double screenCenterY = (window.getY() + window.getHeight()/2);
 				
+				Point2D point = pannablePane.screenToLocal(screenCenterX, screenCenterY);
+				
+				double nodeX = point.getX() - DialogueNodePane.WIDTH/2;
+				double nodeY = point.getY() - DialogueNodePane.HEIGHT/2;
+				
+				//Create node
 				DialogueNode node = null;
 				
 				switch(optionIndex) {
 				case 0:
-					node = new DialogueTextNode(project, "New Dialogue", nodeX, nodeY);
+					node = new DialogueTextNode(project, "Dialogue", nodeX, nodeY);
 					break;
 				case 1:
-					node = new DialogueResponseNode(project, "New Response", nodeX, nodeY);
+					node = new DialogueResponseNode(project, "Response", nodeX, nodeY);
 					break;
 				}
 				
@@ -588,36 +679,36 @@ public class JDialogueCore extends Application {
 	private void addProjectNameField() {
 		int buttonX = BUTTON_START_X + ((BUTTON_WIDTH + 10) * 2);
 		
-		ButtonSkeleton projectNameField = new ButtonSkeleton(300, BUTTON_HEIGHT, shadow);
+		ButtonSkeleton projectNameFieldButton = new ButtonSkeleton(300, BUTTON_HEIGHT, shadow);
 		
 		//Project name text field
-		TextField textField = new TextField(project.getName());
-		textField.setFont(replicaProRegular20);
-		textField.setBackground(Background.EMPTY);
-		textField.setStyle("-fx-text-inner-color: " + Button.getTextColorCode() + "; -fx-border-color: " + Button.getTextColorCode() + "; -fx-border-width: 0 0 1 0;");
-		textField.setLayoutX(Button.BUTTON_MARGIN_X);
-		textField.setLayoutY(6); //manually measured
+		projectNameField = new TextField(project.getName());
+		projectNameField.setFont(replicaProRegular20);
+		projectNameField.setBackground(Background.EMPTY);
+		projectNameField.setStyle("-fx-text-inner-color: " + Button.getTextColorCode() + "; -fx-border-color: " + Button.getTextColorCode() + "; -fx-border-width: 0 0 1 0;");
+		projectNameField.setLayoutX(Button.BUTTON_MARGIN_X);
+		projectNameField.setLayoutY(6); //manually measured
 		
 		//Update project name 
-		textField.textProperty().addListener((o, oldText, newText) -> {
+		projectNameField.textProperty().addListener((o, oldText, newText) -> {
 			project.setName(newText);
 		});
 		
 		//having enter cancel out the focus gives a feeling of confirmation
-		textField.setOnKeyPressed(event -> {
+		projectNameField.setOnKeyPressed(event -> {
 			if (event.getCode() == KeyCode.ENTER) {
 				uiPane.requestFocus();
 			}
 		});
 
 		//Add to button skeleton
-		projectNameField.getChildren().add(textField);
+		projectNameFieldButton.getChildren().add(projectNameField);
 		
 		//Add to pane
-		projectNameField.setLayoutX(buttonX);
-		projectNameField.setLayoutY(BUTTON_Y);
+		projectNameFieldButton.setLayoutX(buttonX);
+		projectNameFieldButton.setLayoutY(BUTTON_Y);
 		
-		uiPane.getChildren().add(projectNameField);
+		uiPane.getChildren().add(projectNameFieldButton);
 	}
 
 	public Scene getScene() {

@@ -2,6 +2,7 @@ package nokori.jdialogue.project;
 
 import java.io.Serializable;
 import java.rmi.server.UID;
+import java.util.ArrayList;
 
 /**
  * 
@@ -20,18 +21,30 @@ public abstract class DialogueNode implements Serializable {
 	
 	//Basic user-settable information
 	private String name;
-	private String tag = "No Tag";
+	private String tag;
 	private double x, y;
 	
 	//Connector so that other nodes can input into this one
 	private DialogueNodeConnector inConnector;
 
+	public DialogueNode(Project project, String uid, String name, String tag, double x, double y) {
+		this.project = project;
+		this.uid = uid;
+		this.name = name;
+		this.tag = tag;
+		this.x = x;
+		this.y = y;
+	}
+	
 	public DialogueNode(Project project, String name, double x, double y) {
 		this.project = project;
 		this.name = name;
 		this.x = x;
 		this.y = y;
-
+		
+		uid = new UID().toString();
+		tag = "No Tag";
+		
 		inConnector = new DialogueNodeConnector(project, this);
 	}
 	
@@ -75,14 +88,23 @@ public abstract class DialogueNode implements Serializable {
 		this.y = y;
 	}
 
+	public void setInConnector(DialogueNodeConnector inConnector) {
+		this.inConnector = inConnector;
+	}
+
 	public DialogueNodeConnector getInConnector() {
 		return inConnector;
 	}
 	
 	/**
-	 * Disconnect all connectors (for when nodes are deleted)
+	 * Utility function for getting all DialogueNodeConnectors that this DialogueNode has.
 	 */
-	public void disconnectAllConnectors() {
-		inConnector.disconnectAll();
-	}
+	public abstract ArrayList<DialogueNodeConnector> getAllConnectors();
+	
+	/**
+	 * Disconnect all connectors (for when nodes are deleted).
+	 * 
+	 * If you extend this, remember to call getInConnector().disconnectAll()!!
+	 */
+	public abstract void disconnectAllConnectors();
 }

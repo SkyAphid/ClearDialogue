@@ -17,7 +17,7 @@ public class DialogueNodeConnector implements Serializable {
 	
 	private static final long serialVersionUID = -1047642658457698535L;
 	
-	private String uid = new UID().toString();
+	private String uid;
 	
 	private Project project;
 	private DialogueNode parent;
@@ -25,9 +25,17 @@ public class DialogueNodeConnector implements Serializable {
 	/**
 	 * @param parent the DialogueNode that this connector is stored in
 	 */
-	public DialogueNodeConnector(Project project, DialogueNode parent) {
+	public DialogueNodeConnector(Project project, DialogueNode parent, String uid) {
 		this.project = project;
 		this.parent = parent;
+		this.uid = uid;
+	}
+	
+	/**
+	 * @param parent the DialogueNode that this connector is stored in
+	 */
+	public DialogueNodeConnector(Project project, DialogueNode parent) {
+		this(project, parent, new UID().toString());
 	}
 	
 	public String getUID() {
@@ -65,5 +73,26 @@ public class DialogueNodeConnector implements Serializable {
 	
 	public boolean isConnected(DialogueNodeConnector connector) {
 		return project.isConnected(this, connector);
+	}
+	
+	/**
+	 * Get the DialogueNodeConnector that this one is connected to. 
+	 * 
+	 * Note: it finds the first instance of a connection with this connector and returns that. 
+	 * If you're scanning an In-Connector (can have multiple connections), then use the Project and 
+	 * iterate through the Connections manually.
+	 * 
+	 * @return
+	 */
+	public DialogueNodeConnector getConnectedTo() {
+		for (int i = 0; i < project.getNumConnections(); i++) {
+			Connection c = project.getConnection(i);
+			
+			if (c.contains(this)) {
+				return c.getOther(this);
+			}
+		}
+		
+		return null;
 	}
 }

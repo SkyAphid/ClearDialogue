@@ -112,8 +112,8 @@ public abstract class DialogueNodeEditor extends StackPane {
 		tagField.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
 		
 		//Update node name 
-		tagField.setOnKeyPressed(event -> {
-			node.setTag(tagField.getText());
+		tagField.textProperty().addListener((o, oldText, newText) -> {
+			node.setTag(newText);
 		});
 		
 		//having enter cancel out the focus gives a feeling of confirmation

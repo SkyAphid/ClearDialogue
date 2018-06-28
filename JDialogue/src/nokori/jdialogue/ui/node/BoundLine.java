@@ -14,7 +14,7 @@ import nokori.jdialogue.ui.pannable_pane.PannablePane;
 /**
  * Creates a Line that's attached to two Nodes.
  * 
- * I know this entire implementation is questionable but this was the prettiest and only solution I could get to work properly
+ * I know this entire implementation is questionable but this was the prettiest and only solution I could get to work properly.
  * 
  * Pulled from
  * https://stackoverflow.com/questions/43115807/how-to-draw-line-between-two-nodes-placed-in-different-panes-regions

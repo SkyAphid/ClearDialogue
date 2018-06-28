@@ -12,7 +12,7 @@ import javafx.scene.layout.Pane;
  */
 public class PannablePane extends Pane {
 
-	DoubleProperty scale = new SimpleDoubleProperty(1.0);
+	private DoubleProperty scale = new SimpleDoubleProperty(1.0);
 
 	/**
 	 * We limit the width and height to prevent headaches regarding node placement and configuring

@@ -6,6 +6,10 @@ import javafx.scene.input.ScrollEvent;
 
 /**
  * Listeners for making the scene's canvas draggable and zoomable
+ * 
+ * Found here:
+ * https://stackoverflow.com/questions/32220042/pick-and-move-a-node-in-a-pannable-zoomable-pane
+ * 
  */
 public class SceneGestures {
 
@@ -14,10 +18,14 @@ public class SceneGestures {
 
 	private DragContext sceneDragContext = new DragContext();
 
-	PannablePane pannablePane;
+	private PannablePane pannablePane;
 
 	public SceneGestures(PannablePane pannablePane) {
 		this.pannablePane = pannablePane;
+	}
+
+	public DragContext getSceneDragContext() {
+		return sceneDragContext;
 	}
 
 	public EventHandler<MouseEvent> getOnMousePressedEventHandler() {

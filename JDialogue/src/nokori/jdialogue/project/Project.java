@@ -12,7 +12,7 @@ public class Project implements Serializable {
 	private static final long serialVersionUID = -8369866434879310100L;
 	
 	//The name of the project
-	private String name = "Default Project";
+	private String name;
 	
 	//Remember viewport data for next use
 	private double viewportX, viewportY, viewportScale;
@@ -23,10 +23,15 @@ public class Project implements Serializable {
 	//All connections between the various nodes are stored here
 	private ArrayList<Connection> connections = new ArrayList<Connection>();
 	
-	public Project(double viewportX, double viewportY, double viewportScale) {
+	public Project(String name, double viewportX, double viewportY, double viewportScale) {
+		this.name = name;
 		this.viewportX = viewportX;
 		this.viewportY = viewportY;
 		this.viewportScale = viewportScale;
+	}
+	
+	public Project(double viewportX, double viewportY, double viewportScale) {
+		this("Default Project", viewportX, viewportY, viewportScale);
 	}
 
 	public String getName() {
@@ -85,6 +90,29 @@ public class Project implements Serializable {
 		return nodes.size();
 	}
 	
+
+	/**
+	 * Find a DialogueNode in the Project with the tag.
+	 * 
+	 * @param tag - the tag to search for
+	 * @param exactMatch - if true, it will only return a node that equals() the input. Otherwise, contains() will be used.
+	 * @return the DialogueNode that meets the criteria, returns null if a match is not found
+	 */
+	public DialogueNode findNodeWithTag(String tag, boolean exactMatch) {
+		for (int i = 0; i < nodes.size(); i++) {
+			DialogueNode node = nodes.get(i);
+			String nodeTag = node.getTag();
+			
+			boolean hasTag = (exactMatch ? nodeTag.equals(tag) : nodeTag.contains(tag));
+			
+			if (hasTag) {
+				return node;
+			}
+		}
+		
+		return null;
+	}
+	
 	/*
 	 * 
 	 * Connections are managed by the Project so that we have a singular location for
@@ -106,6 +134,9 @@ public class Project implements Serializable {
 		return connections.size();
 	}
 	
+	/**
+	 * Disconnects all connections between the two connectors.
+	 */
 	public void disconnect(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
 		for (int i = 0; i < connections.size(); i++) {
 			Connection c = connections.get(i);
@@ -118,7 +149,7 @@ public class Project implements Serializable {
 	}
 	
 	/**
-	 * Delete all Connections to this connector
+	 * Delete all Connections to this connector.
 	 */
 	public void disconnectAll(DialogueNodeConnector connector) {
 		for (int i = 0; i < connections.size(); i++) {
@@ -132,7 +163,7 @@ public class Project implements Serializable {
 	}
 	
 	/**
-	 * Checks if the two connectors have a Connection
+	 * Checks if the two connectors have a Connection.
 	 */
 	public boolean isConnected(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
 		for (int i = 0; i < connections.size(); i++) {
@@ -147,7 +178,7 @@ public class Project implements Serializable {
 	}
 	
 	/**
-	 * Checks if a similar Connection already exists
+	 * Checks if a similar Connection already exists.
 	 */
 	public boolean connectionExists(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
 		for (int i = 0; i < connections.size(); i++) {
@@ -159,5 +190,24 @@ public class Project implements Serializable {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Utility function for fetching a DialogueNodeConnector with its UID.
+	 */
+	public DialogueNodeConnector getDialogueNodeConnector(String uid) {
+		for (int i = 0; i < nodes.size(); i++) {
+			ArrayList<DialogueNodeConnector> connectors = nodes.get(i).getAllConnectors();
+			
+			for (int j = 0; j < connectors.size(); j++) {
+				DialogueNodeConnector connector = connectors.get(j);
+				
+				if (connector.getUID().equals(uid)) {
+					return connector;
+				}
+			}
+		}
+		
+		return null;
 	}
 }
