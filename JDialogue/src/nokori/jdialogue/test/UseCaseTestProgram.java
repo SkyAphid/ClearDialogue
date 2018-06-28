@@ -38,6 +38,7 @@ public class UseCaseTestProgram {
 			Project project = new JDialogueSerializerIO().importProject(testDialogue);
 			
 			//Find the starting node (where the dialogue starts)
+			//This tag is arbitrary, but you can use this system to start from any node in the project.
 			DialogueNode start = project.findNodeWithTag("start", true);
 			
 			//If start found, begin dialogue.
