@@ -81,7 +81,7 @@ import nokori.jdialogue.ui.pannable_pane.SceneGestures;
  * 2) Make a DialogueNodePane extension that implements your custom DialogueNode (example: DialogueTextNodePane)
  * 3) Make a DialogueNodeEditor extension that implements your custom DialogueNode (example: DialogueTextNodeEditor)
  * 4) Hook up to JDialogueCore: addNodeButton(), addDialogueNode()
- * 5) Add support to various ExporterImporter behaviors (unless you use the serializer, in which case, it'll just werk)
+ * 5) Add support to various JDialogueIO behaviors (unless you use the serializer, in which case, it'll just werk)
  * 
  * ------------------------------------------------------------------------------
  * 
