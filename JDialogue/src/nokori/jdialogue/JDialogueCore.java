@@ -549,7 +549,7 @@ public class JDialogueCore extends Application {
 				REFACTOR
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOLS", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOL", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
