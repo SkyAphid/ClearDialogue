@@ -6,7 +6,6 @@ import java.util.Scanner;
 
 import nokori.jdialogue.io.JDialogueSerializerIO;
 import nokori.jdialogue.project.DialogueNode;
-import nokori.jdialogue.project.DialogueNodeConnector;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.project.DialogueTextNode;
@@ -68,7 +67,7 @@ public class UseCaseTestProgram {
 			
 			System.out.println(textNode.getText());
 			
-			runNode(scanner, getNextNode(textNode.getOutConnector()));
+			runNode(scanner, textNode.getOutConnector().getNodeConnectedTo());
 		}
 		
 		//If a response node, print its responses and let the player input a selection
@@ -89,7 +88,7 @@ public class UseCaseTestProgram {
 				//If the responseIndex is valid, use it, otherwise, run the node again
 				if (responseIndex >= 0 && responseIndex < responses.size()) {
 					
-					runNode(scanner, getNextNode(responses.get(responseIndex).getOutConnector()));
+					runNode(scanner, responses.get(responseIndex).getOutConnector().getNodeConnectedTo());
 					
 				} else {
 					
@@ -104,20 +103,6 @@ public class UseCaseTestProgram {
 				//Run the same node again if the input was invalid.
 				runNode(scanner, node);
 			}
-		}
-	}
-	
-	/**
-	 * Gets the DialogueNode of the connector that the passed in connector is connected to. Tongue twister. Lol
-	 * 
-	 * @param connector
-	 * @return
-	 */
-	public DialogueNode getNextNode(DialogueNodeConnector connector) {
-		if (connector != null && connector.getConnectedTo() != null) {
-			return connector.getConnectedTo().getParent();
-		} else {
-			return null;
 		}
 	}
 }

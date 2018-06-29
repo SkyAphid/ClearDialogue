@@ -95,4 +95,14 @@ public class DialogueNodeConnector implements Serializable {
 		
 		return null;
 	}
+	
+	/**
+	 * Shortcut version of getConnectedTo(), where the equivalent is getConnectedTo().getParent(). 
+	 * 
+	 * Returns null if not connected to anything.
+	 */
+	public DialogueNode getNodeConnectedTo() {
+		DialogueNodeConnector connector = getConnectedTo();
+		return (connector != null ? connector.getParent() : null);
+	} 
 }
