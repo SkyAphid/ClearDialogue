@@ -35,11 +35,7 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 		textArea.insertText(0, defaultText);
 		textArea.setWrapText(false);
 		textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
-		
-		//I don't know why the font size is inconsistent for RichTextFX
-		//On top of that, the font is thinner in RichTextFX than it is normal JavaFX
-		//The inconsistencies bother me but yolo420blazeit
-		textArea.setStyle("-fx-font-family: " + textFont.getName() + "; -fx-font-size: " + (textFont.getSize()-4) + "pt; -fx-font-weight: normal; -fx-font-style: normal;");
+		textArea.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize());
 		
 		//Virtual scroll pane
 		VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<StyleClassedTextArea>(textArea);

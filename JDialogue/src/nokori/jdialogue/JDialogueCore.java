@@ -1,8 +1,12 @@
 package nokori.jdialogue;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.swing.UIManager;
 import javafx.application.Application;
@@ -26,6 +30,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -52,7 +57,8 @@ import nokori.jdialogue.ui.node.DialogueTextNodePane;
 import nokori.jdialogue.ui.pannable_pane.NodeGestures;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
 import nokori.jdialogue.ui.pannable_pane.SceneGestures;
-import nokori.jdialogue.ui.util.RefactorTool;
+import nokori.jdialogue.ui.util.ReplaceTool;
+import nokori.jdialogue.ui.util.ReplaceTool.ReplaceMode;
 import nokori.jdialogue.ui.util.UIUtil;
 
 /**
@@ -84,6 +90,7 @@ import nokori.jdialogue.ui.util.UIUtil;
  * 3) Make a DialogueNodeEditor extension that implements your custom DialogueNode (example: DialogueTextNodeEditor)
  * 4) Hook up to JDialogueCore: addNodeButton(), addDialogueNode()
  * 5) Add support to various JDialogueIO behaviors (unless you use the serializer, in which case, it'll just werk)
+ * 6) Optional: add support to RefactorTool
  * 
  * ------------------------------------------------------------------------------
  * 
@@ -126,9 +133,9 @@ public class JDialogueCore extends Application {
 	
 	private DropShadow shadow;
 	
-	private Font replicaProRegular20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/ReplicaProRegular.otf"), 20);
-	private Font replicaProLight20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/ReplicaProLight.otf"), 20);
-	private Font monaco12 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/Monaco.ttf"), 14);
+	private Font robotoRegular20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/RobotoRegular.ttf"), 20);
+	private Font robotoLight20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/RobotoLight.ttf"), 20);
+	private Font markazi12 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/Markazi.ttf"), 22);
 	
 	//Project data
 	private Project project;
@@ -334,7 +341,7 @@ public class JDialogueCore extends Application {
 		int offsetY = 20;
 		
 		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " | Hold LMB = Drag/Pan | 2xLMB = Edit Node | 2xRMB = Delete Node");
-		text.setFont(replicaProRegular20);
+		text.setFont(robotoRegular20);
 		text.setFill(Color.LIGHTGRAY.darker());
 		text.setX(20);
 		text.setY(WINDOW_HEIGHT - offsetY);
@@ -350,6 +357,7 @@ public class JDialogueCore extends Application {
 	
 
 	private static final String NEW_PROJECT = "NEW PROJECT";
+	private static final String SELECT_PROJECT_DIRECTORY = "PROJECT DIR...";
 	private static final String SAVE = "SAVE...";
 	private static final String OPEN = "OPEN...";
 	private static final String EXPORT_JSON = "EXPORT JSON...";
@@ -361,13 +369,14 @@ public class JDialogueCore extends Application {
 	private void addMenuButton(Stage stage) {
 		String[] options = {
 				NEW_PROJECT,
+				SELECT_PROJECT_DIRECTORY,
 				SAVE,
 				OPEN,
 				EXPORT_JSON,
 				IMPORT_JSON
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", robotoRegular20, robotoLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
 				switch(optionName) {
@@ -383,6 +392,9 @@ public class JDialogueCore extends Application {
 						newProject();
 					}
 					
+					break;
+				case SELECT_PROJECT_DIRECTORY:
+					setProjectDirectory(stage);
 					break;
 				case SAVE:
 					exportProject(stage, new JDialogueSerializerIO());
@@ -425,12 +437,69 @@ public class JDialogueCore extends Application {
 	}
 	
 	/**
+	 * Set the Project directory (where the FileChoosers will open to by default)
+	 */
+	private void setProjectDirectory(Stage stage) {
+		File f = new File("project_directory.ini");
+		
+		Properties props = new Properties();
+		
+		if(f.exists()){
+			try {
+				props.load(new FileReader(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String projectDirectory = props.getProperty("projectDir");
+		
+		File defaultLocation = (projectDirectory != null ? new File(projectDirectory) : new File("."));
+
+		DirectoryChooser fileChooser = new DirectoryChooser();
+		fileChooser.setTitle("Select Project Directory");
+		fileChooser.setInitialDirectory(defaultLocation);
+
+		File dir = fileChooser.showDialog(stage);
+
+		props.setProperty("projectDir", dir.getPath());
+		
+		try{
+			f.createNewFile();
+			FileOutputStream fos = new FileOutputStream(f);
+			props.store(fos, "");
+			fos.flush();
+			fos.close();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
+	
+	public File getProjectDirectory() {
+		File f = new File("project_directory.ini");
+		
+		Properties props = new Properties();
+		
+		if(f.exists()){
+			try {
+				props.load(new FileReader(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String projectDirectory = props.getProperty("projectDir");
+		
+		return (projectDirectory != null ? new File(projectDirectory) : new File("."));
+	}
+	
+	/**
 	 * Opens an export dialog for the selected JDialogueIO and runs it once a file is selected
 	 */
 	private void exportProject(Stage stage, JDialogueIO behavior) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save " + behavior.getTypeName() + " file");
-		fileChooser.setInitialDirectory(new File("."));
+		fileChooser.setInitialDirectory(getProjectDirectory());
 		fileChooser.setInitialFileName(project.getName() + "." + behavior.getTypeName());
 		fileChooser.getExtensionFilters().add(behavior.getExtensionFilter());
 
@@ -457,7 +526,7 @@ public class JDialogueCore extends Application {
 	private void importProject(Stage stage, JDialogueIO behavior) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open " + behavior.getTypeName() + " file");
-		fileChooser.setInitialDirectory(new File("."));
+		fileChooser.setInitialDirectory(getProjectDirectory());
 		fileChooser.getExtensionFilters().add(behavior.getExtensionFilter());
 		
 		File f = fileChooser.showOpenDialog(stage);
@@ -537,7 +606,8 @@ public class JDialogueCore extends Application {
 		return null;
 	}
 	
-	private static final String REFACTOR = "REFACTOR...";
+	private static final String REPLACE = "REPLACE...";
+	private static final String MULTIREPLACE = "MULTI-REPLACE...";
 	
 	/**
 	 * Button for adding various tools to the editor
@@ -546,16 +616,30 @@ public class JDialogueCore extends Application {
 		int buttonX = BUTTON_START_X + BUTTON_WIDTH + 10;
 		
 		String[] options = { 
-				REFACTOR
+				REPLACE,
+				MULTIREPLACE
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOL", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOL", robotoRegular20, robotoLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
 				switch(optionName) {
-				case REFACTOR:
-					RefactorTool.run(stage);
+				case REPLACE:
+					ReplaceTool.run(stage, getProjectDirectory(), project, ReplaceMode.LOCAL);
+					
+					//Refresh various info inside panes to reflect the new changes
+					for (int i = 0; i < getChildren().size(); i++) {
+						Node n = getChildren().get(i);
+						
+						if (n instanceof DialogueNodePane) {
+							((DialogueNodePane) n).refresh(JDialogueCore.this);
+						}
+					}
+					
+					break;
+				case MULTIREPLACE:
+					ReplaceTool.run(stage, getProjectDirectory(), project, ReplaceMode.MULTI);
 					break;
 				}
 			}
@@ -582,7 +666,7 @@ public class JDialogueCore extends Application {
 				RESPONSE
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "+NODE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "+NODE", robotoRegular20, robotoLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
@@ -630,11 +714,11 @@ public class JDialogueCore extends Application {
 		DialogueNodePane dialogueNodePane = null;
 		
 		if (dialogueNode instanceof DialogueTextNode) {
-			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, replicaProRegular20, monaco12);
+			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, robotoRegular20, markazi12);
 		}
 		
 		if (dialogueNode instanceof DialogueResponseNode) {
-			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, replicaProRegular20, monaco12, 45);
+			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, robotoRegular20, markazi12, 45);
 		}
 		
 		if (dialogueNodePane != null) {
@@ -726,7 +810,7 @@ public class JDialogueCore extends Application {
 		
 		//Project name text field
 		projectNameField = new TextField(project.getName());
-		projectNameField.setFont(replicaProRegular20);
+		projectNameField.setFont(robotoRegular20);
 		projectNameField.setBackground(Background.EMPTY);
 		projectNameField.setStyle("-fx-text-inner-color: " + Button.getTextColorCode() + "; -fx-border-color: " + Button.getTextColorCode() + "; -fx-border-width: 0 0 1 0;");
 		projectNameField.setLayoutX(Button.BUTTON_MARGIN_X);

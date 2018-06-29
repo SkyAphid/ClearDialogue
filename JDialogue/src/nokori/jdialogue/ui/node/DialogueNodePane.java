@@ -80,7 +80,7 @@ public abstract class DialogueNodePane extends StackPane {
 		title.setMouseTransparent(true);
 		
 		StackPane.setAlignment(title, Pos.TOP_CENTER);
-		StackPane.setMargin(title, new Insets(10, 0, 0, 0));
+		StackPane.setMargin(title, new Insets(5, 0, 0, 0));
 		
 		//Separator
 		Line separator = new Line();

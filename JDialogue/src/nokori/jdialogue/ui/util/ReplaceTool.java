@@ -36,16 +36,56 @@ import nokori.jdialogue.project.Project;
  * It supports all supported filetypes of JDialogue, including .dialogue and .json.
  *
  */
-public class RefactorTool {
-	public static void run(Stage stage) {
+public class ReplaceTool {
+	public enum ReplaceMode {
+		MULTI("Each Project will be imported, and the contained DialogueNodes will be modified."
+				+ "\nAll exact instances of the \"Find\" input will be replaced with the \"Replace with\" input."
+				+ "\nThe modified Project files will be backed up before saving the new versions."
+				+ "\n\nExample of backup: YourProject.dialogue.backup"), 
+		LOCAL("Each DialogueNode within this single Project will be modified."
+				+"\nAll exact instances of the \"Find\" input will be replaced with the \"Replace with\" input.");
+		
+		private String desc;
+		
+		private ReplaceMode(String desc) {
+			this.desc = desc;
+		}
+		
+		public String getDesc() {
+			return desc;
+		}
+	};
+	
+	public static void run(Stage stage, File projectDir, Project project, ReplaceMode mode) {
+		switch(mode) {
+		case MULTI:
+			multiReplace(stage, projectDir);
+			break;
+		case LOCAL:
+		default:
+			projectReplace(stage, projectDir, project);
+			break;
+		}
+	}
+	
+	private static void projectReplace(Stage stage, File projectDir, Project project) {
+		Pair<String, String> refactorInfo = openReplaceDialog(stage, ReplaceMode.LOCAL);
+		
+		if (refactorInfo != null) {
+			replace(project, refactorInfo.getKey(), refactorInfo.getValue());
+			showInformation(stage, "Replace successful.");
+		}
+	}
+	
+	private static void multiReplace(Stage stage, File projectDir) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Select Project Files");
-		fileChooser.setInitialDirectory(new File("."));
+		fileChooser.setInitialDirectory(projectDir);
 		
 		List<File> files = fileChooser.showOpenMultipleDialog(stage);
 
 		if (files != null && !files.isEmpty()) {
-			Pair<String, String> refactorInfo = openRefactorDialog(stage);
+			Pair<String, String> refactorInfo = openReplaceDialog(stage, ReplaceMode.MULTI);
 			
 			if (refactorInfo == null) {
 				return;
@@ -68,45 +108,25 @@ public class RefactorTool {
 						String extension = fileExtensions.get(j).substring(1, fileExtensions.get(j).length());
 						
 						if (f.getName().endsWith(extension)) {
-							refactor(f, ioTypes[i], refactorInfo.getKey(), refactorInfo.getValue());
+							replace(f, ioTypes[i], refactorInfo.getKey(), refactorInfo.getValue());
 							continue fileLoop;
 						}
 					}
 				}
 			}
 			
-			showInformation(stage, "Refactor successful.");
+			showInformation(stage, "Multi-Replace successful.");
 		}
 	}
 	
 	/**
 	 * Refactors the project file with the following parameters
 	 */
-	private static void refactor(File f, JDialogueIO io, String find, String replace) {
+	private static void replace(File f, JDialogueIO io, String find, String replace) {
 		try {
 			Project project = io.importProject(f);
 			
-			for (int i = 0; i < project.getNumNodes(); i++) {
-				DialogueNode node = project.getNode(i);
-				
-				node.setName(node.getName().replace(find, replace));
-				node.setTag(node.getTag().replace(find, replace));
-				
-				if (node instanceof DialogueTextNode) {
-					DialogueTextNode textNode = (DialogueTextNode) node;
-					textNode.setText(textNode.getText().replace(find, replace));
-				}
-				
-				if (node instanceof DialogueResponseNode) {
-					DialogueResponseNode responseNode = (DialogueResponseNode) node;
-					
-					for (int j = 0; j < responseNode.getResponses().size(); j++) {
-						Response response = responseNode.getResponses().get(j);
-						
-						response.setText(response.getText().replaceAll(find, replace));
-					}
-				}
-			}
+			replace(project, find, replace);
 			
 			//It should exist but I'm just being thorough
 			if(f.exists()) {
@@ -127,25 +147,46 @@ public class RefactorTool {
 		}
 	}
 	
+	private static void replace(Project project, String find, String replace) {
+		for (int i = 0; i < project.getNumNodes(); i++) {
+			DialogueNode node = project.getNode(i);
+			
+			node.setName(node.getName().replace(find, replace));
+			node.setTag(node.getTag().replace(find, replace));
+			
+			if (node instanceof DialogueTextNode) {
+				DialogueTextNode textNode = (DialogueTextNode) node;
+				textNode.setText(textNode.getText().replace(find, replace));
+			}
+			
+			if (node instanceof DialogueResponseNode) {
+				DialogueResponseNode responseNode = (DialogueResponseNode) node;
+				
+				for (int j = 0; j < responseNode.getResponses().size(); j++) {
+					Response response = responseNode.getResponses().get(j);
+					
+					response.setText(response.getText().replaceAll(find, replace));
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Opens a dialog that asks what the user wants to be found and replaced in the various project files
 	 * 
 	 * Pulled from: http://code.makery.ch/blog/javafx-dialogs-official/
 	 */
-	private static Pair<String, String> openRefactorDialog(Stage stage) {
+	private static Pair<String, String> openReplaceDialog(Stage stage, ReplaceMode mode) {
 		// Create the custom dialog.
 		Dialog<Pair<String, String>> dialog = new Dialog<>();
-		dialog.setTitle("Refactor Projects");
-		dialog.setHeaderText("Each Project will be imported, and the contained DialogueNodes will be modified."
-				+ "\nAll exact instances of the \"Find\" input will be replaced with the \"Replace with\" input."
-				+ "\nThe modified Project files will be backed up before saving the new versions."
-				+ "\n\nExample of backup: YourProject.dialogue.backup");
+		dialog.setTitle("Replace");
+		dialog.setHeaderText(mode.getDesc());
 		
 		//Set icons
 		((Stage) dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
 		
 		// Set the button types.
-		ButtonType confirmButtonType = new ButtonType("Refactor", ButtonData.OK_DONE);
+		ButtonType confirmButtonType = new ButtonType("Start", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
 		// Create the username and password labels and fields.
@@ -199,7 +240,7 @@ public class RefactorTool {
 	 */
 	private static void showInformation(Stage stage, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Refactor Information");
+		alert.setTitle("Replace Information");
 		alert.setHeaderText(message);
 		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
 		

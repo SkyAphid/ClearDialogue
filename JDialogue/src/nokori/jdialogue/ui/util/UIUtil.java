@@ -1,7 +1,6 @@
 package nokori.jdialogue.ui.util;
 
 import java.io.InputStream;
-
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
