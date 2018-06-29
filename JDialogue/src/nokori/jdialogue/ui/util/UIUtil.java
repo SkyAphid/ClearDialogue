@@ -1,4 +1,6 @@
-package nokori.jdialogue.util;
+package nokori.jdialogue.ui.util;
+
+import java.io.InputStream;
 
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Rectangle;
@@ -7,17 +9,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 /**
- * Because JavaFX is arbitrarily difficult to use
- * 
- * Pulled from:
- * https://stackoverflow.com/questions/32237048/javafx-fontmetrics
- *
+ * Various utilities to make the UI code cleaner
  */
-public class FontUtil {
+public class UIUtil {
 	/**
-	 * Return string width/height. 
+	 * Return string width/height.
 	 * 
-	 * Yay for not having rudimentary basic functionality built in!
+	 * Because JavaFX is arbitrarily difficult to use
+	 * 
+	 * Pulled from: https://stackoverflow.com/questions/32237048/javafx-fontmetrics
 	 * 
 	 * @param font
 	 * @param s
@@ -37,5 +37,14 @@ public class FontUtil {
 	    //System.out.println(s + " Text size: " + intersectionBounds.getWidth() + ", " + intersectionBounds.getHeight());
 	    
 	    return intersectionBounds;
+	}
+	
+	/**
+	 * Quick access to a file within the JAR
+	 * @param packagePath
+	 * @return
+	 */
+	public static InputStream loadFromPackage(String packagePath) {
+		return UIUtil.class.getClassLoader().getResourceAsStream(packagePath);
 	}
 }

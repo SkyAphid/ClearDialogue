@@ -1,4 +1,4 @@
-package nokori.jdialogue.util;
+package nokori.jdialogue.ui.util;
 
 import javafx.animation.Transition;
 import javafx.scene.shape.Rectangle;

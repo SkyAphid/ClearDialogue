@@ -7,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Arc;
 import javafx.scene.text.Font;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueResponseNode;
@@ -119,7 +118,7 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 		PannablePane pannablePane = core.getPannablePane();
 		
 		for (int i = 0; i < connectorGroup.getChildren().size(); i++) {
-			Arc connector = (Arc) connectorGroup.getChildren().get(i);
+			DialogueNodeConnectorArc connector = (DialogueNodeConnectorArc) connectorGroup.getChildren().get(i);
 			Response response = responses.get(i);
 			
 			for (int j = 0; j < pannablePane.getChildren().size(); j++) {

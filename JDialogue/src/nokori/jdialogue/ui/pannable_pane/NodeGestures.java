@@ -88,7 +88,7 @@ public class NodeGestures {
 	 * @param newY
 	 * @return
 	 */
-	private boolean clampToParentBounds(Node node) {
+	public boolean clampToParentBounds(Node node) {
 
         Bounds parentBounds = pannablePane.getLayoutBounds();
         Bounds childBounds = node.getBoundsInLocal();

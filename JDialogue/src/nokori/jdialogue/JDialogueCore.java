@@ -52,6 +52,8 @@ import nokori.jdialogue.ui.node.DialogueTextNodePane;
 import nokori.jdialogue.ui.pannable_pane.NodeGestures;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
 import nokori.jdialogue.ui.pannable_pane.SceneGestures;
+import nokori.jdialogue.ui.util.RefactorTool;
+import nokori.jdialogue.ui.util.UIUtil;
 
 /**
  * The Core of this program, containing the GUI.
@@ -124,9 +126,9 @@ public class JDialogueCore extends Application {
 	
 	private DropShadow shadow;
 	
-	private Font replicaProRegular20 = Font.loadFont("file:ReplicaProRegular.otf", 20);
-	private Font replicaProLight20 = Font.loadFont("file:ReplicaProLight.otf", 20);
-	private Font monaco12 = Font.loadFont("file:Monaco.ttf", 14);
+	private Font replicaProRegular20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/ReplicaProRegular.otf"), 20);
+	private Font replicaProLight20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/ReplicaProLight.otf"), 20);
+	private Font monaco12 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/Monaco.ttf"), 14);
 	
 	//Project data
 	private Project project;
@@ -155,14 +157,17 @@ public class JDialogueCore extends Application {
 	@Override
 	public void start(Stage stage) {
 		stage.getIcons().addAll(
-				new Image("file:icons/icon_512x512.png"),
-				new Image("file:icons/icon_256x256.png"),
-				new Image("file:icons/icon_128x128.png"),
-				new Image("file:icons/icon_64x64.png"),
-				new Image("file:icons/icon_48x48.png"),
-				new Image("file:icons/icon_32x32.png"),
-				new Image("file:icons/icon_24x24.png"),
-				new Image("file:icons/icon_16x16.png"));
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_512x512.png")),
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_256x256.png")),
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_128x128.png")),
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_64x64.png")),
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_48x48.png")),
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_32x32.png")),
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_24x24.png")),
+				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_16x16.png")));
+		
+		stage.setMinWidth(WINDOW_WIDTH);
+		stage.setMinHeight(WINDOW_HEIGHT);
 		
 		/*
 		 * Default Project
@@ -220,7 +225,7 @@ public class JDialogueCore extends Application {
 		
 		//Scene
 		scene = new Scene(uiPane, WINDOW_WIDTH, WINDOW_HEIGHT);
-		scene.getStylesheets().add("file:scrollbar_style.css");
+		scene.getStylesheets().add(getClass().getClassLoader().getResource("nokori/jdialogue/css/scrollbar_style.css").toExternalForm());
 		
 		//Configure pannable pane mouse gestures
 		sceneGestures = new SceneGestures(pannablePane) {
@@ -289,6 +294,7 @@ public class JDialogueCore extends Application {
 		addBackground();
 		addProgramInfo();
 		addMenuButton(stage);
+		addToolsButton(stage);
 		addNodeButton();
 		addProjectNameField();
 
@@ -411,8 +417,7 @@ public class JDialogueCore extends Application {
 			pannablePane.getChildren().clear();
 		}
 		
-		//project = new Project(-PANNABLE_PANE_WIDTH/10, -PANNABLE_PANE_HEIGHT/2, 1.0);
-		project = new Project(0.0, 0.0, 1.0);
+		project = new Project(0.0, -PANNABLE_PANE_HEIGHT/2, 1.0);
 		
 		if (!projectNull) {
 			refreshAfterImport();
@@ -532,15 +537,49 @@ public class JDialogueCore extends Application {
 		return null;
 	}
 	
+	private static final String REFACTOR = "REFACTOR...";
+	
+	/**
+	 * Button for adding various tools to the editor
+	 */
+	private void addToolsButton(Stage stage) {
+		int buttonX = BUTTON_START_X + BUTTON_WIDTH + 10;
+		
+		String[] options = { 
+				REFACTOR
+		};
+		
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOLS", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+			
+			@Override
+			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
+				switch(optionName) {
+				case REFACTOR:
+					RefactorTool.run(stage);
+					break;
+				}
+			}
+		};
+		
+		//Add to pane
+		button.setLayoutX(buttonX);
+		button.setLayoutY(BUTTON_Y);
+		
+		uiPane.getChildren().add(button);
+	}
+	
+	private static final String DIALOGUE = "DIALOGUE...";
+	private static final String RESPONSE = "RESPONSE...";
+	
 	/**
 	 * Button for adding new story nodes, easily expanded (see below)
 	 */
 	private void addNodeButton() {
-		int buttonX = BUTTON_START_X + BUTTON_WIDTH + 10;
+		int buttonX = BUTTON_START_X + ((BUTTON_WIDTH + 10) * 2);
 		
 		String[] options = { 
-				"DIALOGUE...",
-				"RESPONSE..."
+				DIALOGUE,
+				RESPONSE
 		};
 		
 		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "+NODE", replicaProRegular20, replicaProLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
@@ -560,11 +599,11 @@ public class JDialogueCore extends Application {
 				//Create node
 				DialogueNode node = null;
 				
-				switch(optionIndex) {
-				case 0:
+				switch(optionName) {
+				case DIALOGUE:
 					node = new DialogueTextNode(project, "Dialogue", nodeX, nodeY);
 					break;
-				case 1:
+				case RESPONSE:
 					node = new DialogueResponseNode(project, "Response", nodeX, nodeY);
 					break;
 				}
@@ -606,7 +645,11 @@ public class JDialogueCore extends Application {
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_PRESSED, nodeGestures.getOnMousePressedEventHandler());
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_DRAGGED, nodeGestures.getOnMouseDraggedEventHandler());
 	        
+			//Add to parent
 			pannablePane.getChildren().add(dialogueNodePane);
+			
+	        //Clamp it inside of the workspace
+			nodeGestures.clampToParentBounds(dialogueNodePane);
 		} else {
 			throw new MissingDialogueNodePaneError(dialogueNode);
 		}
@@ -677,7 +720,7 @@ public class JDialogueCore extends Application {
 	 * Project name field for customizing the name of the Project
 	 */
 	private void addProjectNameField() {
-		int buttonX = BUTTON_START_X + ((BUTTON_WIDTH + 10) * 2);
+		int buttonX = BUTTON_START_X + ((BUTTON_WIDTH + 10) * 3);
 		
 		ButtonSkeleton projectNameFieldButton = new ButtonSkeleton(300, BUTTON_HEIGHT, shadow);
 		

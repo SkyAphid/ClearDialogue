@@ -1,6 +1,5 @@
 package nokori.jdialogue.ui.node;
 
-import javafx.scene.shape.Arc;
 import nokori.jdialogue.project.DialogueNodeConnector;
 
 /**
@@ -10,11 +9,11 @@ import nokori.jdialogue.project.DialogueNodeConnector;
 public class ConnectorSelection {
 	
 	private DialogueNodePane parent;
-	private Arc connectorNode;
+	private DialogueNodeConnectorArc connectorNode;
 	private DialogueNodeConnector connector;
 	private BoundLine followingConnectorLine;
 	
-	public ConnectorSelection(DialogueNodePane parent, Arc connectorNode, DialogueNodeConnector connector) {
+	public ConnectorSelection(DialogueNodePane parent, DialogueNodeConnectorArc connectorNode, DialogueNodeConnector connector) {
 		this.parent = parent;
 		this.connectorNode = connectorNode;
 		this.connector = connector;
@@ -26,7 +25,7 @@ public class ConnectorSelection {
 		return parent;
 	}
 
-	public Arc getConnectorNode() {
+	public DialogueNodeConnectorArc getConnectorNode() {
 		return connectorNode;
 	}
 

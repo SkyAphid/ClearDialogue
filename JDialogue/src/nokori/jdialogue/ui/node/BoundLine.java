@@ -6,9 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Arc;
 import javafx.scene.shape.CubicCurve;
 import nokori.jdialogue.project.DialogueNodeConnector;
+import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
 
 /**
@@ -21,7 +21,7 @@ import nokori.jdialogue.ui.pannable_pane.PannablePane;
  */
 public class BoundLine extends CubicCurve {
 
-	private Arc node1, node2;
+	private DialogueNodeConnectorArc node1, node2;
 	private DialogueNodeConnector connector1, connector2;
 	
 	private boolean followMouseMode = false;
@@ -29,7 +29,7 @@ public class BoundLine extends CubicCurve {
 	/**
 	 * Connect a single node to the mouse
 	 */
-	public BoundLine(Arc node1, DialogueNodeConnector connector1) {
+	public BoundLine(DialogueNodeConnectorArc node1, DialogueNodeConnector connector1) {
 		this(node1, connector1, null, null);
 		followMouseMode = true;
 	}
@@ -37,7 +37,7 @@ public class BoundLine extends CubicCurve {
 	/**
 	 * Connect two nodes together.
 	 */
-	public BoundLine(Arc node1, DialogueNodeConnector connector1, Arc node2, DialogueNodeConnector connector2) {
+	public BoundLine(DialogueNodeConnectorArc node1, DialogueNodeConnector connector1, DialogueNodeConnectorArc node2, DialogueNodeConnector connector2) {
 		
 		setNode1(node1, connector1);
 		setNode2(node2, connector2);
@@ -49,12 +49,12 @@ public class BoundLine extends CubicCurve {
 		setMouseTransparent(true);
 	}
 	
-	public void setNode1(Arc node1, DialogueNodeConnector connector1) {
+	public void setNode1(DialogueNodeConnectorArc node1, DialogueNodeConnector connector1) {
 		this.node1 = node1;
 		this.connector1 = connector1;
 	}
 	
-	public void setNode2(Arc node2, DialogueNodeConnector connector2) {
+	public void setNode2(DialogueNodeConnectorArc node2, DialogueNodeConnector connector2) {
 		this.node2 = node2;
 		this.connector2 = connector2;
 	}
@@ -105,11 +105,24 @@ public class BoundLine extends CubicCurve {
 			n2Y = n2Center.getY();
 		}
 		
-		double n1ControlX = ((n2X - n1X) > 0 ? n1X + 50 : n1X - 50);
+		double ndx = (n2X - n1X);
+		
+		double n1ControlX = (ndx > 0 ? n1X + 50 : n1X - 50);
 		double n1ControlY = n1Y;
 		
-		double n2ControlX = ((n2X - n1X) < 0 ? n2X + 50 : n2X - 50);
+		double n2ControlX = (ndx < 0 ? n2X + 50 : n2X - 50);
 		double n2ControlY = n2Y;
+		
+		boolean looping = 
+				(ndx > 0 && node1.getConnectorType() == ConnectorType.IN && node2.getConnectorType() == ConnectorType.OUT 
+				|| ndx < 0 && node1.getConnectorType() == ConnectorType.OUT && node2.getConnectorType() == ConnectorType.IN);
+		
+		if (looping) {
+			n1ControlX = (ndx > 0 ? n1X - 100 : n1X + 100);
+			n2ControlX = (ndx < 0 ? n2X - 100 : n2X + 100);
+			n1ControlY = n1Y + node1.getParent().getBoundsInLocal().getHeight() * 1.5;
+			n2ControlY = n2Y + node2.getParent().getBoundsInLocal().getHeight() * 1.5;
+		}
 		
 		/*
 		 * Update Line

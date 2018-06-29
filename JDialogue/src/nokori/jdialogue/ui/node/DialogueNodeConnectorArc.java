@@ -47,38 +47,45 @@ public class DialogueNodeConnectorArc extends Arc{
 		}
 	};
 	
+	private ConnectorType connectorType;
+	
 	private DialogueNodeConnector connector;
 	
 	public DialogueNodeConnectorArc(JDialogueCore core, DialogueNodePane pane, ConnectorType type, DialogueNodeConnector connector) {
 		this(core, pane, type, connector, CONNECTOR_RADIUS);
 	}
 	
-	public DialogueNodeConnectorArc(JDialogueCore core, DialogueNodePane pane, ConnectorType type, DialogueNodeConnector connector, int connectorRadius) {
+	public DialogueNodeConnectorArc(JDialogueCore core, DialogueNodePane pane, ConnectorType connectorType, DialogueNodeConnector connector, int connectorRadius) {
+		this.connectorType = connectorType;
 		this.connector = connector;
 		
 		setRadiusX(connectorRadius);
 		setRadiusY(connectorRadius);
 		
-		setFill(type.color);
-		setStartAngle(type.startAngle);
-		setLength(type.length);
+		setFill(connectorType.color);
+		setStartAngle(connectorType.startAngle);
+		setLength(connectorType.length);
 	
 		setOnMouseEntered(event -> {
-			connectorHighlightTransition(core.getScene(), this, type.color, true);
+			connectorHighlightTransition(core.getScene(), this, connectorType.color, true);
 		});
 		
 		setOnMouseExited(event -> {
-			connectorHighlightTransition(core.getScene(), this, type.color, false);
+			connectorHighlightTransition(core.getScene(), this, connectorType.color, false);
 		});
 		
 		setOnMouseClicked(event -> {
 			connectorClicked(event, core, pane);
 		});
 		
-		StackPane.setAlignment(this, type.pos);
-		StackPane.setMargin(this, type.insets);
+		StackPane.setAlignment(this, connectorType.pos);
+		StackPane.setMargin(this, connectorType.insets);
 	}
 	
+	public ConnectorType getConnectorType() {
+		return connectorType;
+	}
+
 	private void connectorClicked(MouseEvent event, JDialogueCore core, DialogueNodePane pane) {
 		PannablePane pannablePane = core.getPannablePane();
 		
@@ -96,7 +103,7 @@ public class DialogueNodeConnectorArc extends Arc{
 		}else {
 			ConnectorSelection selected = core.getSelectedConnector();
 			
-			Arc selectedNode = selected.getConnectorNode();
+			DialogueNodeConnectorArc selectedNode = selected.getConnectorNode();
 			DialogueNodeConnector selectedConnector = selected.getConnector();
 			
 			if (selectedConnector != connector) {

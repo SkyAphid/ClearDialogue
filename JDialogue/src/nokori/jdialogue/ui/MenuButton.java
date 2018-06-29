@@ -10,8 +10,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import nokori.jdialogue.util.FontUtil;
-import nokori.jdialogue.util.RectangleResizeHeightTransition;
+import nokori.jdialogue.ui.util.RectangleResizeHeightTransition;
+import nokori.jdialogue.ui.util.UIUtil;
 
 public class MenuButton extends Button{
 	
@@ -52,7 +52,7 @@ public class MenuButton extends Button{
 			option.setMouseTransparent(true);
 			
 			option.setX(BUTTON_MARGIN_X);
-			option.setY(y + optionIncrementH/2 + FontUtil.getStringBounds(optionsFont, options[i]).getHeight()/2);
+			option.setY(y + optionIncrementH/2 + UIUtil.getStringBounds(optionsFont, options[i]).getHeight()/2);
 
 			/*
 			 * Highlight
