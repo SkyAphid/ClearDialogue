@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.Properties;
 
 import javax.swing.UIManager;
+
+import org.fxmisc.richtext.InlineCssTextArea;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
@@ -16,7 +18,6 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.effect.DropShadow;
@@ -141,7 +142,7 @@ public class JDialogueCore extends Application {
 	private Project project;
 	
 	//UI components
-	private TextField projectNameField;
+	private InlineCssTextArea projectNameField;
 	
 	//Connector management
 	protected ArrayList<BoundLine> connectorLines = new ArrayList<BoundLine>();
@@ -559,8 +560,8 @@ public class JDialogueCore extends Application {
 		pannablePane.setTranslateY(project.getViewportY());
 		pannablePane.setScale(project.getViewportScale());
 		
-		projectNameField.setText(project.getName());
-
+		projectNameField.replaceText(project.getName());
+		
 		//Build all of the DialogueNodePanes (graphical representation of node)
 		for (int i = 0; i < project.getNumNodes(); i++) {
 			DialogueNode node = project.getNode(i);
@@ -805,20 +806,38 @@ public class JDialogueCore extends Application {
 	 */
 	private void addProjectNameField() {
 		int buttonX = BUTTON_START_X + ((BUTTON_WIDTH + 10) * 3);
+		int buttonW = 300;
 		
-		ButtonSkeleton projectNameFieldButton = new ButtonSkeleton(300, BUTTON_HEIGHT, shadow);
+		ButtonSkeleton projectNameFieldButton = new ButtonSkeleton(buttonW, BUTTON_HEIGHT, shadow);
 		
 		//Project name text field
-		projectNameField = new TextField(project.getName());
-		projectNameField.setFont(robotoRegular20);
-		projectNameField.setBackground(Background.EMPTY);
-		projectNameField.setStyle("-fx-text-inner-color: " + Button.getTextColorCode() + "; -fx-border-color: " + Button.getTextColorCode() + "; -fx-border-width: 0 0 1 0;");
+		projectNameField = new InlineCssTextArea();
+		projectNameField.replaceText(project.getName());
+		
+		projectNameField.setMinWidth(buttonW - 40);
+		projectNameField.setMaxWidth(buttonW - 40);
+		projectNameField.setMaxHeight(BUTTON_HEIGHT - 20); 
+		
 		projectNameField.setLayoutX(Button.BUTTON_MARGIN_X);
-		projectNameField.setLayoutY(6); //manually measured
+		projectNameField.setLayoutY(13); //manually measured
+		
+		projectNameField.setBackground(Background.EMPTY);
+		projectNameField.setWrapText(false);
+		
+		String fontStyle 	= "-fx-font-family: '" + robotoRegular20.getFamily() + "'; -fx-font-size: " + robotoRegular20.getSize() + ";";
+		String borderStyle 	= "-fx-border-color: " + Button.getTextColorCode() + "; -fx-border-width: 0 0 1 0;";
+		
+		projectNameField.setStyle(fontStyle + borderStyle);
+		
+		//[muffled sighs in the distance]
+		projectNameField.setStyle(0, projectNameField.getText().length(), fontStyle + borderStyle + "-fx-fill: " + Button.getTextColorCode() + ";");
 		
 		//Update project name 
 		projectNameField.textProperty().addListener((o, oldText, newText) -> {
 			project.setName(newText);
+			
+			//[even louder muffled sighs in the distance]
+			projectNameField.setStyle(0, projectNameField.getText().length(), fontStyle + borderStyle + "-fx-fill: " + Button.getTextColorCode() + ";");
 		});
 		
 		//having enter cancel out the focus gives a feeling of confirmation

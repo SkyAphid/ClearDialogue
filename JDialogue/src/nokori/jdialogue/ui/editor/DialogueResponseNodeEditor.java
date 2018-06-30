@@ -3,8 +3,8 @@ package nokori.jdialogue.ui.editor;
 import java.util.ArrayList;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.StyleClassedTextArea;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
@@ -18,7 +18,7 @@ import nokori.jdialogue.ui.node.DialogueNodePane;
 
 public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 
-	private StyleClassedTextArea textArea;
+	private InlineCssTextArea textArea;
 
 	public DialogueResponseNodeEditor(JDialogueCore core, DialogueResponseNode node, DialogueNodePane pane, Font titleFont, Font textFont) {
 		super(core, node, pane, titleFont);
@@ -31,14 +31,14 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 		}
 
 		//Make a TextArea that's numbered to show the response num
-		textArea = new StyleClassedTextArea();
-		textArea.insertText(0, defaultText);
+		textArea = new InlineCssTextArea();
+		textArea.replaceText(defaultText);
 		textArea.setWrapText(false);
 		textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
 		textArea.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize());
 		
 		//Virtual scroll pane
-		VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<StyleClassedTextArea>(textArea);
+		VirtualizedScrollPane<InlineCssTextArea> scrollPane = new VirtualizedScrollPane<InlineCssTextArea>(textArea);
 		
 		StackPane.setAlignment(scrollPane, Pos.CENTER);
 		StackPane.setMargin(scrollPane, new Insets(START_BODY_Y, 20, 20, 20));

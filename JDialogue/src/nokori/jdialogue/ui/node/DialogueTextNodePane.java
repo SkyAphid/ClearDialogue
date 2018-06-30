@@ -30,7 +30,7 @@ public class DialogueTextNodePane extends DialogueNodePane{
 
 		//Body Text Viewer
 		body = new StyleClassedTextArea();
-		body.insertText(0, node.getText());
+		body.replaceText(node.getText());
 		body.setMaxWidth(WIDTH - 20f);
 		body.setMaxHeight(HEIGHT - TITLE_HEIGHT - 20f); 
 		body.setWrapText(true);
@@ -60,7 +60,6 @@ public class DialogueTextNodePane extends DialogueNodePane{
 	@Override
 	public void refresh(JDialogueCore core) {
 		super.refresh(core);
-		body.clear();
-		body.insertText(0, ((DialogueTextNode) node).getText());
+		body.replaceText(((DialogueTextNode) node).getText());
 	}
 }

@@ -1,6 +1,6 @@
 package nokori.jdialogue.ui.editor;
 
-import org.fxmisc.richtext.StyleClassedTextArea;
+import org.fxmisc.richtext.InlineCssTextArea;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
@@ -52,6 +52,12 @@ public abstract class DialogueNodeEditor extends StackPane {
 				dispose(core, node, pane, background);
 			}
 		});
+		
+		background.setOnMouseDragged(event -> {
+			if (!disposing) {
+				dispose(core, node, pane, background);
+			}
+		});
 
 		FadeTransition backgroundFaderTransition = new FadeTransition(Duration.millis(FADE_TIME), background);
 		backgroundFaderTransition.setFromValue(0.0);
@@ -81,8 +87,8 @@ public abstract class DialogueNodeEditor extends StackPane {
 		 * Name field
 		 */
 		
-		StyleClassedTextArea textField = new StyleClassedTextArea();
-		textField.insertText(0, node.getName());
+		InlineCssTextArea textField = new InlineCssTextArea();
+		textField.replaceText(node.getName());
 		textField.setBackground(Background.EMPTY);
 		textField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
 				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
@@ -109,8 +115,8 @@ public abstract class DialogueNodeEditor extends StackPane {
 		 * Tag field
 		 */
 		
-		StyleClassedTextArea tagField = new StyleClassedTextArea();
-		tagField.insertText(0, node.getTag());
+		InlineCssTextArea tagField = new InlineCssTextArea();
+		tagField.replaceText(node.getTag());
 		tagField.setBackground(Background.EMPTY);
 		tagField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
 				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");

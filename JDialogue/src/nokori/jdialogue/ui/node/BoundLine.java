@@ -113,15 +113,16 @@ public class BoundLine extends CubicCurve {
 		double n2ControlX = (ndx < 0 ? n2X + 50 : n2X - 50);
 		double n2ControlY = n2Y;
 		
-		boolean looping = 
-				(ndx > 0 && node1.getConnectorType() == ConnectorType.IN && node2.getConnectorType() == ConnectorType.OUT 
-				|| ndx < 0 && node1.getConnectorType() == ConnectorType.OUT && node2.getConnectorType() == ConnectorType.IN);
-		
-		if (looping) {
-			n1ControlX = (ndx > 0 ? n1X - 100 : n1X + 100);
-			n2ControlX = (ndx < 0 ? n2X - 100 : n2X + 100);
-			n1ControlY = n1Y + node1.getParent().getBoundsInLocal().getHeight() * 1.5;
-			n2ControlY = n2Y + node2.getParent().getBoundsInLocal().getHeight() * 1.5;
+		if (node1 != null && node2 != null) {
+			boolean looping = (ndx > 0 && node1.getConnectorType() == ConnectorType.IN && node2.getConnectorType() == ConnectorType.OUT 
+					|| ndx < 0 && node1.getConnectorType() == ConnectorType.OUT && node2.getConnectorType() == ConnectorType.IN);
+			
+			if (looping) {
+				n1ControlX = (ndx > 0 ? n1X - 100 : n1X + 100);
+				n2ControlX = (ndx < 0 ? n2X - 100 : n2X + 100);
+				n1ControlY = n1Y + node1.getParent().getBoundsInLocal().getHeight() * 1.5;
+				n2ControlY = n2Y + node2.getParent().getBoundsInLocal().getHeight() * 1.5;
+			}
 		}
 		
 		/*

@@ -11,6 +11,10 @@ public class Project implements Serializable {
 	
 	private static final long serialVersionUID = -8369866434879310100L;
 	
+	//Version information, this is to help bring old files up to date in the future if needed.
+	public static final int CURRENT_VERSION = 1;
+	private int version;
+	
 	//The name of the project
 	private String name;
 	
@@ -23,7 +27,8 @@ public class Project implements Serializable {
 	//All connections between the various nodes are stored here
 	private ArrayList<Connection> connections = new ArrayList<Connection>();
 	
-	public Project(String name, double viewportX, double viewportY, double viewportScale) {
+	public Project(int version, String name, double viewportX, double viewportY, double viewportScale) {
+		this.version = version;
 		this.name = name;
 		this.viewportX = viewportX;
 		this.viewportY = viewportY;
@@ -31,7 +36,11 @@ public class Project implements Serializable {
 	}
 	
 	public Project(double viewportX, double viewportY, double viewportScale) {
-		this("Default Project", viewportX, viewportY, viewportScale);
+		this(CURRENT_VERSION, "Default Project", viewportX, viewportY, viewportScale);
+	}
+	
+	public int getVersion() {
+		return version;
 	}
 
 	public String getName() {

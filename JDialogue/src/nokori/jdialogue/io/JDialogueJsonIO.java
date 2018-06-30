@@ -35,6 +35,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 	/*
 	 * Project JSON tags
 	 */
+	public static final String JSON_PROJECT_VERSION = "projectVersion";
 	public static final String JSON_PROJECT_NAME = "projectName";
 	public static final String JSON_PROJECT_VIEWPORT_X = "projectViewportX";
 	public static final String JSON_PROJECT_VIEWPORT_Y = "projectViewportY";
@@ -88,6 +89,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 		JsonObjectBuilder projectBuilder = Json.createObjectBuilder();
 		
 		projectBuilder.add(JSON_PROJECT_NAME, project.getName());
+		projectBuilder.add(JSON_PROJECT_VERSION, project.getVersion());
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_X, project.getViewportX());
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_Y, project.getViewportY());
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_SCALE, project.getViewportScale());
@@ -214,12 +216,14 @@ public class JDialogueJsonIO implements JDialogueIO{
 		 */
 		JsonObject projectObject = jsonReader.readObject();
 
+		int projectVersion = projectObject.getInt(JSON_PROJECT_VERSION);
+		
 		String projectName = projectObject.getString(JSON_PROJECT_NAME);
 		double viewportX = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_X).doubleValue();
 		double viewportY = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_Y).doubleValue();
 		double viewportScale = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_SCALE).doubleValue();
 
-		Project project = new Project(projectName, viewportX, viewportY, viewportScale);
+		Project project = new Project(projectVersion, projectName, viewportX, viewportY, viewportScale);
 
 		/*
 		 * Node Data

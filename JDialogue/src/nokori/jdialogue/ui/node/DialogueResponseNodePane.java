@@ -90,17 +90,17 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 			 * Label
 			 */
 			
-			StyleClassedTextArea label = new StyleClassedTextArea();
-			label.insertText(0, response.getText());
-			label.setMinWidth(WIDTH - 20f);
-			label.setMaxWidth(WIDTH - 20f);
-			label.setEditable(false);
-			label.setMouseTransparent(true);
-			label.setBackground(Background.EMPTY);
-			label.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
-			label.setLayoutY(y);
+			StyleClassedTextArea responseText = new StyleClassedTextArea();
+			responseText.replaceText(response.getText());
+			responseText.setMinWidth(WIDTH - 20f);
+			responseText.setMaxWidth(WIDTH - 20f);
+			responseText.setEditable(false);
+			responseText.setMouseTransparent(true);
+			responseText.setBackground(Background.EMPTY);
+			responseText.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
+			responseText.setLayoutY(y);
 			
-			responseGroup.getChildren().add(label);
+			responseGroup.getChildren().add(responseText);
 		}
 		
 		responseGroup.setTranslateY(TITLE_HEIGHT + 15);

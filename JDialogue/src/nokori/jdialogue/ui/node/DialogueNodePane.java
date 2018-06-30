@@ -72,7 +72,7 @@ public abstract class DialogueNodePane extends StackPane {
 		
 		//Title text
 		title = new StyleClassedTextArea();
-		title.insertText(0, node.getName());
+		title.replaceText(node.getName());
 		title.setMaxWidth(WIDTH - 20f);
 		title.setMaxHeight(TITLE_HEIGHT); 
 		title.setWrapText(false);
@@ -134,8 +134,7 @@ public abstract class DialogueNodePane extends StackPane {
 	 * Called by DialogueNodeEditor when it closes
 	 */
 	public void refresh(JDialogueCore core) {
-		title.clear();
-		title.insertText(0, node.getName());
+		title.replaceText(node.getName());
 	}
 	
 	/**
