@@ -2,11 +2,12 @@ package nokori.jdialogue.ui.node;
 
 import java.util.ArrayList;
 
+import org.fxmisc.richtext.StyleClassedTextArea;
+
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.Background;
 import javafx.scene.text.Font;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueResponseNode;
@@ -23,7 +24,7 @@ import nokori.jdialogue.ui.pannable_pane.PannablePane;
  */
 public class DialogueResponseNodePane extends DialogueNodePane{
 	
-	private Group labelGroup = null;
+	private Group responseGroup = null;
 	private Group connectorGroup = null;
 	
 	private Font textFont;
@@ -54,15 +55,15 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 		super.refresh(core);
 		
 		//Remove old connectors and labels to replace with new ones
-		if (labelGroup != null) {
-			getChildren().remove(labelGroup);
+		if (responseGroup != null) {
+			getChildren().remove(responseGroup);
 		}
 		
 		if (connectorGroup != null) {
 			getChildren().remove(connectorGroup);
 		}
 		
-		labelGroup = new Group();
+		responseGroup = new Group();
 		connectorGroup = new Group();
 		
 		ArrayList<Response> responses = ((DialogueResponseNode) node).getResponses();
@@ -89,23 +90,25 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 			 * Label
 			 */
 			
-			Label label = new Label(response.getText());
-			label.setFont(textFont);
+			StyleClassedTextArea label = new StyleClassedTextArea();
+			label.insertText(0, response.getText());
+			label.setMinWidth(WIDTH - 20f);
 			label.setMaxWidth(WIDTH - 20f);
-			label.setTextFill(Color.BLACK);
+			label.setEditable(false);
 			label.setMouseTransparent(true);
-			
+			label.setBackground(Background.EMPTY);
+			label.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
 			label.setLayoutY(y);
 			
-			labelGroup.getChildren().add(label);
+			responseGroup.getChildren().add(label);
 		}
 		
-		labelGroup.setTranslateY(TITLE_HEIGHT/2);
+		responseGroup.setTranslateY(TITLE_HEIGHT + 15);
 		
 		connectorGroup.setTranslateX(WIDTH/2 + (int) (incrementH * 0.18));
 		connectorGroup.setTranslateY(TITLE_HEIGHT/2);
 		
-		getChildren().add(labelGroup);
+		getChildren().add(responseGroup);
 		getChildren().add(connectorGroup);
 		
 		setBackgroundHeight(extendedH);

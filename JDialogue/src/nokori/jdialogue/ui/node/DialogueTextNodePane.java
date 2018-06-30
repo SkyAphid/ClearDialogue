@@ -1,11 +1,11 @@
 package nokori.jdialogue.ui.node;
 
+import org.fxmisc.richtext.StyleClassedTextArea;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueTextNode;
@@ -20,7 +20,7 @@ import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
  */
 public class DialogueTextNodePane extends DialogueNodePane{
 	
-	private Label body;
+	private StyleClassedTextArea body;
 	
 	public DialogueTextNodePane(JDialogueCore core, DialogueTextNode node, DropShadow shadow, Font titleFont, Font textFont) {
 		super(core, node, shadow, titleFont);
@@ -29,13 +29,15 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		DialogueNodeConnectorArc outConnector = new DialogueNodeConnectorArc(core, this, ConnectorType.OUT, node.getOutConnector());
 
 		//Body Text Viewer
-		body = new Label(node.getText());
+		body = new StyleClassedTextArea();
+		body.insertText(0, node.getText());
 		body.setMaxWidth(WIDTH - 20f);
 		body.setMaxHeight(HEIGHT - TITLE_HEIGHT - 20f); 
-		body.setFont(textFont);
-		body.setTextFill(Color.BLACK);
 		body.setWrapText(true);
+		body.setEditable(false);
 		body.setMouseTransparent(true);
+		
+		body.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
 		
 		StackPane.setAlignment(body, Pos.BOTTOM_CENTER);
 		StackPane.setMargin(body, new Insets(0, 10, 10, 10));
@@ -58,6 +60,7 @@ public class DialogueTextNodePane extends DialogueNodePane{
 	@Override
 	public void refresh(JDialogueCore core) {
 		super.refresh(core);
-		body.setText(((DialogueTextNode) node).getText());
+		body.clear();
+		body.insertText(0, ((DialogueTextNode) node).getText());
 	}
 }

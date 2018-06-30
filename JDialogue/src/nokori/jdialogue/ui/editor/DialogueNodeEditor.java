@@ -1,11 +1,12 @@
 package nokori.jdialogue.ui.editor;
 
+import org.fxmisc.richtext.StyleClassedTextArea;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
@@ -80,10 +81,12 @@ public abstract class DialogueNodeEditor extends StackPane {
 		 * Name field
 		 */
 		
-		TextField textField = new TextField(node.getName());
-		textField.setFont(titleFont);
+		StyleClassedTextArea textField = new StyleClassedTextArea();
+		textField.insertText(0, node.getName());
 		textField.setBackground(Background.EMPTY);
-		textField.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+		textField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
+				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+		textField.setMaxHeight(30);
 		
 		//Update node name 
 		textField.textProperty().addListener((o, oldText, newText) -> {
@@ -106,10 +109,12 @@ public abstract class DialogueNodeEditor extends StackPane {
 		 * Tag field
 		 */
 		
-		TextField tagField = new TextField(node.getTag());
-		tagField.setFont(titleFont);
+		StyleClassedTextArea tagField = new StyleClassedTextArea();
+		tagField.insertText(0, node.getTag());
 		tagField.setBackground(Background.EMPTY);
-		tagField.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+		tagField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
+				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+		tagField.setMaxHeight(30);
 		
 		//Update node name 
 		tagField.textProperty().addListener((o, oldText, newText) -> {

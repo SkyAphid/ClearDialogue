@@ -3,6 +3,7 @@ package nokori.jdialogue.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -199,7 +200,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 		jsonWriter.writeObject(export);
 		jsonWriter.close();
 
-		Files.write(f.toPath(), stringWriter.toString().getBytes(), StandardOpenOption.CREATE);
+		Files.write(f.toPath(), stringWriter.toString().getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
 	}
 	
 	@Override

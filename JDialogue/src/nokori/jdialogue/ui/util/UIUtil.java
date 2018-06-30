@@ -14,7 +14,7 @@ public class UIUtil {
 	/**
 	 * Return string width/height.
 	 * 
-	 * Because JavaFX is arbitrarily difficult to use
+	 * Hurrah for hacked functionality
 	 * 
 	 * Pulled from: https://stackoverflow.com/questions/32237048/javafx-fontmetrics
 	 * 

@@ -1,5 +1,7 @@
 package nokori.jdialogue.ui.node;
 
+import org.fxmisc.richtext.StyleClassedTextArea;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
@@ -8,14 +10,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
@@ -40,14 +40,14 @@ public abstract class DialogueNodePane extends StackPane {
 	//Basic background dimension data that all nodes should share in-common
 	public static final int WIDTH = 200;
 	public static final int HEIGHT = 200;
-	public static final int TITLE_HEIGHT = 40;
+	public static final int TITLE_HEIGHT = 30;
 	
 	private JDialogueCore core;
 	
 	//Instances
 	protected DialogueNode node;
 	private Rectangle outline, background;
-	private Label title;
+	private StyleClassedTextArea title;
 
 	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont) {
 		this.core = core;
@@ -71,31 +71,22 @@ public abstract class DialogueNodePane extends StackPane {
 		DialogueNodeConnectorArc connectorArc = new DialogueNodeConnectorArc(core, this, ConnectorType.IN, node.getInConnector());
 		
 		//Title text
-		title = new Label(node.getName());
+		title = new StyleClassedTextArea();
+		title.insertText(0, node.getName());
 		title.setMaxWidth(WIDTH - 20f);
 		title.setMaxHeight(TITLE_HEIGHT); 
-		title.setFont(titleFont);
-		title.setTextFill(Color.BLACK);
 		title.setWrapText(false);
+		title.setEditable(false);
 		title.setMouseTransparent(true);
 		
+		title.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
+				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+		
 		StackPane.setAlignment(title, Pos.TOP_CENTER);
-		StackPane.setMargin(title, new Insets(5, 0, 0, 0));
-		
-		//Separator
-		Line separator = new Line();
-		separator.setFill(Color.BLACK);
-		separator.setStartX(background.getLayoutX());
-		separator.setStartY(background.getLayoutY());
-		separator.endXProperty().bind(background.layoutXProperty().add(WIDTH - 20));
-		separator.endYProperty().bind(background.layoutYProperty());
-		separator.setMouseTransparent(true);
-		
-		StackPane.setAlignment(separator, Pos.TOP_CENTER);
-		StackPane.setMargin(separator, new Insets(TITLE_HEIGHT, 0, 0, 0));
+		StackPane.setMargin(title, new Insets(10, 0, 0, 0));
 		
 		//Configure pane
-		getChildren().addAll(background, connectorArc, title, separator, outline);
+		getChildren().addAll(background, connectorArc, title, outline);
 		
 		setOnMouseEntered(event -> {
 			FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
@@ -143,7 +134,8 @@ public abstract class DialogueNodePane extends StackPane {
 	 * Called by DialogueNodeEditor when it closes
 	 */
 	public void refresh(JDialogueCore core) {
-		title.setText(node.getName());
+		title.clear();
+		title.insertText(0, node.getName());
 	}
 	
 	/**
