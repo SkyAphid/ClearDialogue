@@ -829,14 +829,13 @@ public class JDialogueCore extends Application {
 		
 		projectNameField.setStyle(fontStyle + borderStyle);
 		
-		//[muffled sighs in the distance]
+		//I couldn't find a better solution, just using -fx-fill doesn't do anything
 		projectNameField.setStyle(0, projectNameField.getText().length(), fontStyle + borderStyle + "-fx-fill: " + Button.getTextColorCode() + ";");
 		
 		//Update project name 
 		projectNameField.textProperty().addListener((o, oldText, newText) -> {
 			project.setName(newText);
 			
-			//[even louder muffled sighs in the distance]
 			projectNameField.setStyle(0, projectNameField.getText().length(), fontStyle + borderStyle + "-fx-fill: " + Button.getTextColorCode() + ";");
 		});
 		
