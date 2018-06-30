@@ -845,6 +845,9 @@ public class JDialogueCore extends Application {
 				uiPane.requestFocus();
 			}
 		});
+		
+		//Hack fix for not being able to disable multi-line
+		UIUtil.disableMultiLineShortcuts(projectNameField);
 
 		//Add to button skeleton
 		projectNameFieldButton.getChildren().add(projectNameField);

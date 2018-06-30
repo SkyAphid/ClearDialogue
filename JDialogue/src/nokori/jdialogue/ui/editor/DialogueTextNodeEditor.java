@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueTextNode;
 import nokori.jdialogue.ui.node.DialogueNodePane;
+import nokori.jdialogue.ui.util.UIUtil;
 
 public class DialogueTextNodeEditor extends DialogueNodeEditor {
 
@@ -25,6 +26,8 @@ public class DialogueTextNodeEditor extends DialogueNodeEditor {
 		textArea.textProperty().addListener((o, oldText, newText) -> {
 			node.setText(newText);
 		});
+		
+		UIUtil.disableMultiLineShortcuts(textArea);
 		
 		VirtualizedScrollPane<InlineCssTextArea> scrollPane = new VirtualizedScrollPane<InlineCssTextArea>(textArea);
 		

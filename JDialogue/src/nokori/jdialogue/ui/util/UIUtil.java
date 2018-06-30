@@ -7,6 +7,15 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import static javafx.scene.input.KeyCode.*;
+import static javafx.scene.input.KeyCombination.*;
+import static org.fxmisc.wellbehaved.event.EventPattern.*;
+
+import javafx.event.Event;
+import org.fxmisc.richtext.InlineCssTextArea;
+import org.fxmisc.wellbehaved.event.InputMap;
+import org.fxmisc.wellbehaved.event.Nodes;
+
 /**
  * Various utilities to make the UI code cleaner
  */
@@ -45,5 +54,14 @@ public class UIUtil {
 	 */
 	public static InputStream loadFromPackage(String packagePath) {
 		return UIUtil.class.getClassLoader().getResourceAsStream(packagePath);
+	}
+	
+	/**
+	 * RichTextFX doesn't have TextFields
+	 */
+	
+	public static void disableMultiLineShortcuts(InlineCssTextArea area) {
+		InputMap<Event> map = InputMap.consume(anyOf(keyPressed(ENTER, SHORTCUT_ANY, SHIFT_ANY)));
+		Nodes.addInputMap(area, map);
 	}
 }

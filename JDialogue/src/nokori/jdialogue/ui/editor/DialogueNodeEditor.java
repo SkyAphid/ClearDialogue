@@ -17,6 +17,7 @@ import javafx.util.Duration;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.ui.node.DialogueNodePane;
+import nokori.jdialogue.ui.util.UIUtil;
 
 /**
  * This is a basic editor that is compatible with any type of DialogueNode.
@@ -87,29 +88,31 @@ public abstract class DialogueNodeEditor extends StackPane {
 		 * Name field
 		 */
 		
-		InlineCssTextArea textField = new InlineCssTextArea();
-		textField.replaceText(node.getName());
-		textField.setBackground(Background.EMPTY);
-		textField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
+		InlineCssTextArea nameField = new InlineCssTextArea();
+		nameField.replaceText(node.getName());
+		nameField.setBackground(Background.EMPTY);
+		nameField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
 				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
-		textField.setMaxHeight(30);
+		nameField.setMaxHeight(30);
 		
 		//Update node name 
-		textField.textProperty().addListener((o, oldText, newText) -> {
+		nameField.textProperty().addListener((o, oldText, newText) -> {
 			node.setName(newText);
 		});
 		
 		//having enter cancel out the focus gives a feeling of confirmation
-		textField.setOnKeyPressed(event -> {
+		nameField.setOnKeyPressed(event -> {
 			if (event.getCode() == KeyCode.ENTER) {
 				core.getUIPane().requestFocus();
 			}
 		});
 		
-		StackPane.setAlignment(textField, Pos.TOP_LEFT);
-		StackPane.setMargin(textField, new Insets(20, 20, 20, 20));
+		StackPane.setAlignment(nameField, Pos.TOP_LEFT);
+		StackPane.setMargin(nameField, new Insets(20, 20, 20, 20));
 		
-		getChildren().add(textField);
+		UIUtil.disableMultiLineShortcuts(nameField);
+		
+		getChildren().add(nameField);
 		
 		/*
 		 * Tag field
@@ -137,6 +140,8 @@ public abstract class DialogueNodeEditor extends StackPane {
 		
 		StackPane.setAlignment(tagField, Pos.TOP_LEFT);
 		StackPane.setMargin(tagField, new Insets(70, 20, 20, 20));
+		
+		UIUtil.disableMultiLineShortcuts(tagField);
 		
 		getChildren().add(tagField);
 		
