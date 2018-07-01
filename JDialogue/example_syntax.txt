@@ -1,0 +1,11 @@
+//This is an example syntax file. 
+//JDialogue will ignore empty spaces like below:
+
+//And it also will ignore comment lines like this that start with //
+//Here are some examples of tags, but you can customize them to work however you want:
+
+[[PLAYER_NAME]]
+$PLAYER_NAME
+[PLAYER_NAME]
+-PLAYER_NAME-
+
