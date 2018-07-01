@@ -189,8 +189,11 @@ public class JDialogueJsonIO implements JDialogueIO{
 		
 		projectBuilder.add(JSON_CONNECTIONS_ARRAY, connections);
 		
-		JsonObject export = projectBuilder.build();
+		/*
+		 * Final Export / Write file
+		 */
 		
+		JsonObject export = projectBuilder.build();
 
 		StringWriter stringWriter = new StringWriter();
 
