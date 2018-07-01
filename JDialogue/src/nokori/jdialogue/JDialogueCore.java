@@ -770,7 +770,7 @@ public class JDialogueCore extends Application {
 
 		String syntaxLocation = props.getProperty("syntaxFile");
 		
-		File defaultLocation = (syntaxLocation != null ? new File(syntaxLocation) : new File("."));
+		File defaultLocation = (syntaxLocation != null ? new File(syntaxLocation).getParentFile() : new File("."));
 
 		//Open the directory filechooser
 		FileChooser fileChooser = new FileChooser();
