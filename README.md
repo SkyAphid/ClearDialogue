@@ -1,7 +1,7 @@
 # JDialogue
 Java-based branching dialogue editor for video games that supports basic Java serialization along with JSON-based exports/imports. The code is fully commented with various instructions how to easily expand the functionality.
 
-![jdialogue](https://user-images.githubusercontent.com/6147299/42066577-e221e816-7b06-11e8-8c18-81f8b8e446ba.PNG)
+![jdialogue](https://user-images.githubusercontent.com/6147299/42131509-f931a60e-7cc8-11e8-8282-5f5d8dc4cd2d.png)
 
 ## Features
 - Supports both normal dialogue and dialogue responses
@@ -9,6 +9,7 @@ Java-based branching dialogue editor for video games that supports basic Java se
 - Supports Java serialization/deserialization
 - Supports JSON exporting/importing
 - Has a Refactor tool for find -> replace in multiple JDialogue Projects
+- Supports implementing custom syntax highlighting (I.E. highlighting text commands from your particular engine)
 - Includes test applications in the source code showing how to implement JDialogue into your games
 - Lightweight and simple to use
 - Code-base is highly customizable, fully commented, and easy to modify
