@@ -60,7 +60,7 @@ public class UIUtil {
 	}
 	
 	/**
-	 * RichTextFX doesn't have TextFields
+	 * RichTextFX doesn't have TextFields (yet)
 	 */
 	
 	public static void disableMultiLineShortcuts(InlineCssTextArea area) {
