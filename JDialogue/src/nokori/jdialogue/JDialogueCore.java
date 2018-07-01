@@ -716,16 +716,18 @@ public class JDialogueCore extends Application {
 
 		File dir = fileChooser.showDialog(stage);
 
-		props.setProperty("projectDir", dir.getPath());
-		
-		try{
-			f.createNewFile();
-			FileOutputStream fos = new FileOutputStream(f);
-			props.store(fos, "");
-			fos.flush();
-			fos.close();
-		}catch(Exception ex){
-			ex.printStackTrace();
+		if (dir != null) {
+			props.setProperty("projectDir", dir.getPath());
+			
+			try{
+				f.createNewFile();
+				FileOutputStream fos = new FileOutputStream(f);
+				props.store(fos, "");
+				fos.flush();
+				fos.close();
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
 		}
 	}
 	
