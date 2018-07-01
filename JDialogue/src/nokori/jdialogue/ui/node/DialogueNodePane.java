@@ -1,6 +1,6 @@
 package nokori.jdialogue.ui.node;
 
-import org.fxmisc.richtext.StyleClassedTextArea;
+import org.fxmisc.richtext.InlineCssTextArea;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.RotateTransition;
@@ -24,6 +24,7 @@ import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
+import nokori.jdialogue.ui.util.UIUtil;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -47,7 +48,7 @@ public abstract class DialogueNodePane extends StackPane {
 	//Instances
 	protected DialogueNode node;
 	private Rectangle outline, background;
-	private StyleClassedTextArea title;
+	private InlineCssTextArea title;
 
 	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont) {
 		this.core = core;
@@ -71,7 +72,7 @@ public abstract class DialogueNodePane extends StackPane {
 		DialogueNodeConnectorArc connectorArc = new DialogueNodeConnectorArc(core, this, ConnectorType.IN, node.getInConnector());
 		
 		//Title text
-		title = new StyleClassedTextArea();
+		title = new InlineCssTextArea();
 		title.replaceText(node.getName());
 		title.setMaxWidth(WIDTH - 20f);
 		title.setMaxHeight(TITLE_HEIGHT); 
@@ -80,7 +81,7 @@ public abstract class DialogueNodePane extends StackPane {
 		title.setMouseTransparent(true);
 		
 		title.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
-				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+				  	 + "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
 		
 		StackPane.setAlignment(title, Pos.TOP_CENTER);
 		StackPane.setMargin(title, new Insets(10, 0, 0, 0));
@@ -135,6 +136,7 @@ public abstract class DialogueNodePane extends StackPane {
 	 */
 	public void refresh(JDialogueCore core) {
 		title.replaceText(node.getName());
+		UIUtil.computeHighlighting(title, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 	}
 	
 	/**

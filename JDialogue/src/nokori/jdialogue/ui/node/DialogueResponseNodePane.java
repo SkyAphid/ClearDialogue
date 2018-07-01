@@ -2,8 +2,7 @@ package nokori.jdialogue.ui.node;
 
 import java.util.ArrayList;
 
-import org.fxmisc.richtext.StyleClassedTextArea;
-
+import org.fxmisc.richtext.InlineCssTextArea;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
@@ -15,6 +14,7 @@ import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.ui.editor.DialogueResponseNodeEditor;
 import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
+import nokori.jdialogue.ui.util.UIUtil;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -90,15 +90,17 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 			 * Label
 			 */
 			
-			StyleClassedTextArea responseText = new StyleClassedTextArea();
+			InlineCssTextArea responseText = new InlineCssTextArea();
 			responseText.replaceText(response.getText());
 			responseText.setMinWidth(WIDTH - 20f);
 			responseText.setMaxWidth(WIDTH - 20f);
 			responseText.setEditable(false);
 			responseText.setMouseTransparent(true);
 			responseText.setBackground(Background.EMPTY);
-			responseText.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
 			responseText.setLayoutY(y);
+			
+			responseText.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
+			UIUtil.computeHighlighting(responseText, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 			
 			responseGroup.getChildren().add(responseText);
 		}

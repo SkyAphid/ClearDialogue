@@ -1,6 +1,8 @@
 package nokori.jdialogue.ui.util;
 
 import java.io.InputStream;
+import java.time.Duration;
+
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -15,6 +17,7 @@ import javafx.event.Event;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
+import org.reactfx.Subscription;
 
 /**
  * Various utilities to make the UI code cleaner
@@ -63,5 +66,45 @@ public class UIUtil {
 	public static void disableMultiLineShortcuts(InlineCssTextArea area) {
 		InputMap<Event> map = InputMap.consume(anyOf(keyPressed(ENTER, SHORTCUT_ANY, SHIFT_ANY)));
 		Nodes.addInputMap(area, map);
+	}
+	
+	/**
+	 * Adds a syntax subscription to the text area that will highlight tags. Be sure to dispose it when your done with unsubscribe()!
+	 * @param textArea
+	 */
+	public static  Subscription addSyntaxSubscription(InlineCssTextArea textArea, String[] keywords, String colorFillCode) {
+		return textArea.multiPlainChanges().successionEnds(Duration.ofMillis(100))
+				.subscribe(ignore -> computeHighlighting(textArea, keywords, colorFillCode));
+	}
+	
+	/**
+	 * Compute highlighting for InlineCssTextAreas
+	 * @param textArea
+	 */
+	public static void computeHighlighting(InlineCssTextArea textArea, String[] keywords, String colorFillCode) {
+		String text = textArea.getText();
+		
+		textArea.setStyle(0, textArea.getLength(), "");
+		
+		for (int i = 0; i < keywords.length; i++) {
+			String keyword = keywords[i];
+			
+			if (keyword.trim().isEmpty() || keyword.startsWith("//")) continue;
+			
+			boolean containsKeywords = true;
+			int lastEnd = 0;
+			
+			while(containsKeywords) {
+				int start = text.indexOf(keyword, lastEnd);
+				int end = start + keyword.length();
+				
+				if (start >= 0) {
+					textArea.setStyle(start, end, "-fx-fill: " + colorFillCode + ";");
+					lastEnd = end;
+				}else {
+					containsKeywords = false;
+				}
+			}
+		}
 	}
 }

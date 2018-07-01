@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.reactfx.Subscription;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
@@ -15,10 +17,12 @@ import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.ui.node.DialogueNodePane;
+import nokori.jdialogue.ui.util.UIUtil;
 
 public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 
 	private InlineCssTextArea textArea;
+	private Subscription sub;
 
 	public DialogueResponseNodeEditor(JDialogueCore core, DialogueResponseNode node, DialogueNodePane pane, Font titleFont, Font textFont) {
 		super(core, node, pane, titleFont);
@@ -32,10 +36,16 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 
 		//Make a TextArea that's numbered to show the response num
 		textArea = new InlineCssTextArea();
-		textArea.replaceText(defaultText);
 		textArea.setWrapText(false);
 		textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
-		textArea.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize());
+		
+		textArea.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
+		
+		//Syntax
+		sub = UIUtil.addSyntaxSubscription(textArea, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		
+		//Set text
+		textArea.replaceText(defaultText);
 		
 		//Virtual scroll pane
 		VirtualizedScrollPane<InlineCssTextArea> scrollPane = new VirtualizedScrollPane<InlineCssTextArea>(textArea);
@@ -47,6 +57,9 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 	}
 
 	protected void dispose(JDialogueCore core, DialogueNode node, DialogueNodePane dialogueNodePane, Rectangle background) {
+		//Dispose subscription
+		sub.unsubscribe();
+		
 		//On dispose, sync the dialogueNode with the new data
 		DialogueResponseNode dialogueNode = ((DialogueResponseNode) node);
 		

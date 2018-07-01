@@ -1,6 +1,7 @@
 package nokori.jdialogue.ui.editor;
 
 import org.fxmisc.richtext.InlineCssTextArea;
+import org.reactfx.Subscription;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
@@ -33,6 +34,8 @@ public abstract class DialogueNodeEditor extends StackPane {
 	private static final int EDITOR_SIZE_OFFSET_Y = 150;
 	
 	public static final int START_BODY_Y = 130;
+	
+	private Subscription nameFieldSub, tagFieldSub;
 	
 	private boolean disposing = false;
 
@@ -89,10 +92,7 @@ public abstract class DialogueNodeEditor extends StackPane {
 		 */
 		
 		InlineCssTextArea nameField = new InlineCssTextArea();
-		nameField.replaceText(node.getName());
 		nameField.setBackground(Background.EMPTY);
-		nameField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
-				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
 		nameField.setMaxHeight(30);
 		
 		//Update node name 
@@ -107,10 +107,20 @@ public abstract class DialogueNodeEditor extends StackPane {
 			}
 		});
 		
+		UIUtil.disableMultiLineShortcuts(nameField);
+		
+		//Style/Syntax
+		nameField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
+			 	 		 + "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+		
+		nameFieldSub = UIUtil.addSyntaxSubscription(nameField, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		
+		//Set text
+		nameField.replaceText(node.getName());
+		
+		//Alignmnet/Placement
 		StackPane.setAlignment(nameField, Pos.TOP_LEFT);
 		StackPane.setMargin(nameField, new Insets(20, 20, 20, 20));
-		
-		UIUtil.disableMultiLineShortcuts(nameField);
 		
 		getChildren().add(nameField);
 		
@@ -119,10 +129,7 @@ public abstract class DialogueNodeEditor extends StackPane {
 		 */
 		
 		InlineCssTextArea tagField = new InlineCssTextArea();
-		tagField.replaceText(node.getTag());
 		tagField.setBackground(Background.EMPTY);
-		tagField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
-				+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
 		tagField.setMaxHeight(30);
 		
 		//Update node name 
@@ -138,10 +145,20 @@ public abstract class DialogueNodeEditor extends StackPane {
 			}
 		});
 		
+		UIUtil.disableMultiLineShortcuts(tagField);
+		
+		//Style/Syntax
+		tagField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
+						+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+		
+		tagFieldSub = UIUtil.addSyntaxSubscription(tagField, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		
+		//Set text
+		tagField.replaceText(node.getTag());
+		
+		//Alignment
 		StackPane.setAlignment(tagField, Pos.TOP_LEFT);
 		StackPane.setMargin(tagField, new Insets(70, 20, 20, 20));
-		
-		UIUtil.disableMultiLineShortcuts(tagField);
 		
 		getChildren().add(tagField);
 		
@@ -169,6 +186,9 @@ public abstract class DialogueNodeEditor extends StackPane {
 	 * Begin "disposing" this editor: animate closing it and then remove it from the core
 	 */
 	protected void dispose(JDialogueCore core, DialogueNode node, DialogueNodePane dialogueNodePane, Rectangle background) {
+		nameFieldSub.unsubscribe();
+		tagFieldSub.unsubscribe();
+		
 		setMouseTransparent(true);
 		
 		//Update the node pane with the new data

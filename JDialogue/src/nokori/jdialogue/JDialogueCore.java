@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
@@ -49,6 +50,7 @@ import nokori.jdialogue.throwable.MissingDialogueNodePaneError;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.ButtonSkeleton;
 import nokori.jdialogue.ui.MenuButton;
+import nokori.jdialogue.ui.TextViewerMenu;
 import nokori.jdialogue.ui.node.BoundLine;
 import nokori.jdialogue.ui.node.ConnectorSelection;
 import nokori.jdialogue.ui.node.DialogueNodeConnectorArc;
@@ -107,11 +109,15 @@ public class JDialogueCore extends Application {
 	private static final String PROGRAM_NAME = "JDialogue";
 	private static final String PROGRAM_VERSION = "Rev. 1";
 	
-	//window settings
+	/*
+	 * window settings
+	 */
 	private static final int WINDOW_WIDTH = 1280;
 	private static final int WINDOW_HEIGHT = 720;
 
-	//display data
+	/*
+	 * display data
+	 */
 	private Pane uiPane;
 	
 	private static final int PANNABLE_PANE_WIDTH = 10_000;
@@ -122,7 +128,16 @@ public class JDialogueCore extends Application {
 	private Scene scene;
 	private SceneGestures sceneGestures;
 	
-	//styling
+	/*
+	 * Syntax
+	 */
+	
+	public static final String SYNTAX_HIGHLIGHT_COLOR = "coral";
+	private String[] syntax = null;
+	
+	/*
+	 * styling
+	 */
 	public static final int BUTTON_START_X = 20;
 	public static final int BUTTON_Y = 20;
 	public static final int BUTTON_WIDTH = 200;
@@ -138,16 +153,21 @@ public class JDialogueCore extends Application {
 	private Font robotoLight20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/RobotoLight.ttf"), 20);
 	private Font markazi12 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/Markazi.ttf"), 22);
 	
-	//Project data
+	/*
+	 * Project data
+	 */
 	private Project project;
 	
-	//UI components
+	/*
+	 * UI components
+	 */
 	private InlineCssTextArea projectNameField;
 	
-	//Connector management
+	/*
+	 * Connector management
+	 */
 	protected ArrayList<BoundLine> connectorLines = new ArrayList<BoundLine>();
 	private ConnectorSelection selectedConnector = null;
-	
 	
 	public static void main(String[] args) {
 		try {
@@ -176,6 +196,12 @@ public class JDialogueCore extends Application {
 		
 		stage.setMinWidth(WINDOW_WIDTH);
 		stage.setMinHeight(WINDOW_HEIGHT);
+		
+		/*
+		 * Load syntax
+		 */
+		
+		loadSyntax();
 		
 		/*
 		 * Default Project
@@ -256,7 +282,7 @@ public class JDialogueCore extends Application {
         //PannablePane event handlers (panning/zooming)
         scene.setOnMouseDragged(sceneGestures.getOnMouseDraggedEventHandler());
         scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
-		scene.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
+        scene.addEventHandler(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
         
         //Reset the cursor when you panning panning
         scene.setOnMouseClicked(event -> {
@@ -318,6 +344,65 @@ public class JDialogueCore extends Application {
 	}
 	
 	/**
+	 * Loads user syntax for highlighting text in JDialogue. Will help the user with error checking their game-specific tags.
+	 */
+	private void loadSyntax() {
+		/*
+		 * Get user-set syntax location (if it exists)
+		 */
+		File f = new File("syntax_directory.ini");
+		
+		Properties props = new Properties();
+		
+		if(f.exists()){
+			try {
+				props.load(new FileReader(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String projectDirectory = props.getProperty("syntaxFile");
+		
+		/*
+		 * Load the syntax file
+		 */
+		
+		File syntaxFile = (projectDirectory != null ? new File(projectDirectory) : new File("example_syntax.txt"));
+		
+		if (syntaxFile != null && syntaxFile.exists()) {
+			try {
+				//Read the syntax file, split it by new lines
+				String s = new String(Files.readAllBytes(syntaxFile.toPath()));
+				syntax = s.split("\n");
+				
+				//Remove the new lines after (uses a non-OS specific version)
+				for (int i = 0; i < syntax.length; i++) {
+					syntax[i] = syntax[i].replaceAll("[\\r\\n]", "");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else {
+			System.err.println("Syntax file not found.");
+		}
+		
+		/*
+		 * Refresh the various nodes with the new syntax information
+		 */
+		
+		if (pannablePane != null) {
+			for (int i = 0; i < pannablePane.getChildren().size(); i++) {
+				Node n = pannablePane.getChildren().get(i);
+				
+				if (n instanceof DialogueNodePane) {
+					((DialogueNodePane) n).refresh(this);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Initialize backshadows to be re-used throughout UI
 	 */
 	private void initializeShadows() {
@@ -356,7 +441,6 @@ public class JDialogueCore extends Application {
 		uiPane.getChildren().add(text);
 	}
 	
-
 	private static final String NEW_PROJECT = "NEW PROJECT";
 	private static final String SELECT_PROJECT_DIRECTORY = "PROJECT DIR...";
 	private static final String SAVE = "SAVE...";
@@ -435,63 +519,6 @@ public class JDialogueCore extends Application {
 		if (!projectNull) {
 			refreshAfterImport();
 		}
-	}
-	
-	/**
-	 * Set the Project directory (where the FileChoosers will open to by default)
-	 */
-	private void setProjectDirectory(Stage stage) {
-		File f = new File("project_directory.ini");
-		
-		Properties props = new Properties();
-		
-		if(f.exists()){
-			try {
-				props.load(new FileReader(f));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		String projectDirectory = props.getProperty("projectDir");
-		
-		File defaultLocation = (projectDirectory != null ? new File(projectDirectory) : new File("."));
-
-		DirectoryChooser fileChooser = new DirectoryChooser();
-		fileChooser.setTitle("Select Project Directory");
-		fileChooser.setInitialDirectory(defaultLocation);
-
-		File dir = fileChooser.showDialog(stage);
-
-		props.setProperty("projectDir", dir.getPath());
-		
-		try{
-			f.createNewFile();
-			FileOutputStream fos = new FileOutputStream(f);
-			props.store(fos, "");
-			fos.flush();
-			fos.close();
-		}catch(Exception ex){
-			ex.printStackTrace();
-		}
-	}
-	
-	public File getProjectDirectory() {
-		File f = new File("project_directory.ini");
-		
-		Properties props = new Properties();
-		
-		if(f.exists()){
-			try {
-				props.load(new FileReader(f));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		String projectDirectory = props.getProperty("projectDir");
-		
-		return (projectDirectory != null ? new File(projectDirectory) : new File("."));
 	}
 	
 	/**
@@ -609,6 +636,8 @@ public class JDialogueCore extends Application {
 	
 	private static final String REPLACE = "REPLACE...";
 	private static final String MULTIREPLACE = "MULTI-REPLACE...";
+	private static final String VIEW_SYNTAX = "VIEW SYNTAX";
+	private static final String SET_SYNTAX = "SET SYNTAX...";
 	
 	/**
 	 * Button for adding various tools to the editor
@@ -618,7 +647,9 @@ public class JDialogueCore extends Application {
 		
 		String[] options = { 
 				REPLACE,
-				MULTIREPLACE
+				MULTIREPLACE,
+				VIEW_SYNTAX,
+				SET_SYNTAX
 		};
 		
 		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOL", robotoRegular20, robotoLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
@@ -642,6 +673,12 @@ public class JDialogueCore extends Application {
 				case MULTIREPLACE:
 					ReplaceTool.run(stage, getProjectDirectory(), project, ReplaceMode.MULTI);
 					break;
+				case VIEW_SYNTAX:
+					uiPane.getChildren().add(new TextViewerMenu(JDialogueCore.this, markazi12, syntax));
+					break;
+				case SET_SYNTAX:
+					setSyntax(stage);
+					break;
 				}
 			}
 		};
@@ -651,6 +688,116 @@ public class JDialogueCore extends Application {
 		button.setLayoutY(BUTTON_Y);
 		
 		uiPane.getChildren().add(button);
+	}
+	
+	/**
+	 * Set the Project directory (where the FileChoosers will open to by default)
+	 */
+	private void setProjectDirectory(Stage stage) {
+		File f = new File("project_directory.ini");
+		
+		Properties props = new Properties();
+		
+		if(f.exists()){
+			try {
+				props.load(new FileReader(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String projectDirectory = props.getProperty("projectDir");
+		
+		File defaultLocation = (projectDirectory != null ? new File(projectDirectory) : new File("."));
+
+		DirectoryChooser fileChooser = new DirectoryChooser();
+		fileChooser.setTitle("Select Project Directory");
+		fileChooser.setInitialDirectory(defaultLocation);
+
+		File dir = fileChooser.showDialog(stage);
+
+		props.setProperty("projectDir", dir.getPath());
+		
+		try{
+			f.createNewFile();
+			FileOutputStream fos = new FileOutputStream(f);
+			props.store(fos, "");
+			fos.flush();
+			fos.close();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Get the set directory for saving projects (convenience)
+	 */
+	public File getProjectDirectory() {
+		File f = new File("project_directory.ini");
+		
+		Properties props = new Properties();
+		
+		if(f.exists()){
+			try {
+				props.load(new FileReader(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String projectDirectory = props.getProperty("projectDir");
+		
+		return (projectDirectory != null ? new File(projectDirectory) : new File("."));
+	}
+	
+	/**
+	 * Set the location of the syntax file to load at startup
+	 * @param stage
+	 */
+	private void setSyntax(Stage stage) {
+		//Try to get the current directory first so that the filechooser will open in that location
+		File f = new File("syntax_directory.ini");
+		
+		Properties props = new Properties();
+		
+		if(f.exists()){
+			try {
+				props.load(new FileReader(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String syntaxLocation = props.getProperty("syntaxFile");
+		
+		File defaultLocation = (syntaxLocation != null ? new File(syntaxLocation) : new File("."));
+
+		//Open the directory filechooser
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Select Syntax File");
+		fileChooser.setInitialDirectory(defaultLocation);
+
+		//Select the syntax file
+		File file = fileChooser.showOpenDialog(stage);
+
+		if (file != null && file.exists()) {
+			//If the file is valid, record the location
+			props.setProperty("syntaxFile", file.getAbsolutePath());
+			
+			//Save the location
+			try{
+				f.createNewFile();
+				FileOutputStream fos = new FileOutputStream(f);
+				props.store(fos, "");
+				fos.flush();
+				fos.close();
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
+			
+			//Reload the current syntax
+			loadSyntax();
+		}
 	}
 	
 	private static final String DIALOGUE = "DIALOGUE...";
@@ -806,7 +953,7 @@ public class JDialogueCore extends Application {
 	 */
 	private void addProjectNameField() {
 		int buttonX = BUTTON_START_X + ((BUTTON_WIDTH + 10) * 3);
-		int buttonW = 300;
+		int buttonW = 500;
 		
 		ButtonSkeleton projectNameFieldButton = new ButtonSkeleton(buttonW, BUTTON_HEIGHT, shadow);
 		
@@ -830,13 +977,11 @@ public class JDialogueCore extends Application {
 		projectNameField.setStyle(fontStyle + borderStyle);
 		
 		//I couldn't find a better solution, just using -fx-fill doesn't do anything
-		projectNameField.setStyle(0, projectNameField.getText().length(), fontStyle + borderStyle + "-fx-fill: " + Button.getTextColorCode() + ";");
+		projectNameField.setStyle(0, projectNameField.getText().length(), "-fx-fill: " + Button.getTextColorCode() + ";");
 		
 		//Update project name 
 		projectNameField.textProperty().addListener((o, oldText, newText) -> {
 			project.setName(newText);
-			
-			projectNameField.setStyle(0, projectNameField.getText().length(), fontStyle + borderStyle + "-fx-fill: " + Button.getTextColorCode() + ";");
 		});
 		
 		//having enter cancel out the focus gives a feeling of confirmation
@@ -859,6 +1004,16 @@ public class JDialogueCore extends Application {
 		uiPane.getChildren().add(projectNameFieldButton);
 	}
 
+	/*
+	 * 
+	 * GETTERS
+	 * 
+	 */
+	
+	public String[] getSyntax() {
+		return syntax;
+	}
+	
 	public Scene getScene() {
 		return scene;
 	}
