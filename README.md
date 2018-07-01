@@ -29,5 +29,5 @@ JDialogue is a branching dialogue editor for video games.
 As long as you have [Java8 or above installed](https://java.com/en/), JDialogue should work right out of the box. All used APIs are included with JDialogue, and are [credited in the license.](https://github.com/SkyAphid/JDialogue/blob/master/LICENSE)
 
 ## Implementing JDialogue in Your Game
-- For examples of importing/exporting JDialogue files, check `nokori.jdialogue.io`
-- For examples of implementing JDialogue into your game, see `nokori.jdialogue.test`
+- For examples of importing/exporting JDialogue files, check [`nokori.jdialogue.io`](https://github.com/SkyAphid/JDialogue/tree/master/JDialogue/src/nokori/jdialogue/io)
+- For examples of implementing JDialogue into your game, see [`nokori.jdialogue.test`](https://github.com/SkyAphid/JDialogue/tree/master/JDialogue/src/nokori/jdialogue/test)
