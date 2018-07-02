@@ -1,5 +1,5 @@
 # JDialogue
-JDialogue is a branching dialogue editor for video games.
+JDialogue is a branching dialogue editor for video games. Designed to be extremely flexible and work with any type of game engine.
 
 ![jdialogue](https://user-images.githubusercontent.com/6147299/42131561-41b0f9e2-7cca-11e8-8491-1df63f9432c1.PNG)
 
