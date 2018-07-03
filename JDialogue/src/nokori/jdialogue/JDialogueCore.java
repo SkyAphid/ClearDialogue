@@ -120,7 +120,7 @@ public class JDialogueCore extends Application {
 	 */
 	private Pane uiPane;
 	
-	private static final int PANNABLE_PANE_WIDTH = 10_000;
+	private static final int PANNABLE_PANE_WIDTH = 20_000;
 	private static final int PANNABLE_PANE_HEIGHT = 10_000;
 	private PannablePane pannablePane;
 	private NodeGestures nodeGestures;
