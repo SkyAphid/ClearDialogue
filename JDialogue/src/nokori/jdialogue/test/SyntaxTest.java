@@ -28,7 +28,7 @@ public class SyntaxTest extends Application {
 		 Subscription cleanupWhenNoLongerNeedIt = textArea
 	                .multiPlainChanges()
 	                .successionEnds(Duration.ofMillis(100))
-	                .subscribe(ignore -> computeHighlighting(textArea));
+	                .subscribe(ignore -> computeHighlighting(textArea, KEYWORDS, "coral"));
 
 		textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
 		
@@ -44,13 +44,15 @@ public class SyntaxTest extends Application {
 		});
 	}
 
-	private static void computeHighlighting(InlineCssTextArea codeArea) {
-		String text = codeArea.getText();
+	public static void computeHighlighting(InlineCssTextArea textArea, String[] keywords, String colorFillCode) {
+		String text = textArea.getText();
 		
-		codeArea.setStyle(0, codeArea.getLength(), "");
+		textArea.setStyle(0, textArea.getLength(), "");
 		
-		for (int i = 0; i < KEYWORDS.length; i++) {
-			String keyword = KEYWORDS[i];
+		for (int i = 0; i < keywords.length; i++) {
+			String keyword = keywords[i];
+			
+			if (keyword.trim().isEmpty() || keyword.startsWith("//")) continue;
 			
 			boolean containsKeywords = true;
 			int lastEnd = 0;
@@ -60,7 +62,7 @@ public class SyntaxTest extends Application {
 				int end = start + keyword.length();
 				
 				if (start >= 0) {
-					codeArea.setStyle(start, end, "-fx-fill: coral;");
+					textArea.setStyle(start, end, "-fx-fill: " + colorFillCode + ";");
 					lastEnd = end;
 				}else {
 					containsKeywords = false;
