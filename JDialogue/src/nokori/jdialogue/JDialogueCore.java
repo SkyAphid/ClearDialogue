@@ -527,9 +527,9 @@ public class JDialogueCore extends Application {
 	private void exportProject(Stage stage, JDialogueIO behavior) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save " + behavior.getTypeName() + " file");
-		fileChooser.setInitialDirectory(getProjectDirectory());
 		fileChooser.setInitialFileName(project.getName() + "." + behavior.getTypeName());
 		fileChooser.getExtensionFilters().add(behavior.getExtensionFilter());
+		fileChooser.setInitialDirectory(getProjectDirectory());
 
 		File f = fileChooser.showSaveDialog(stage);
 		
@@ -554,8 +554,8 @@ public class JDialogueCore extends Application {
 	private void importProject(Stage stage, JDialogueIO behavior) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open " + behavior.getTypeName() + " file");
-		fileChooser.setInitialDirectory(getProjectDirectory());
 		fileChooser.getExtensionFilters().add(behavior.getExtensionFilter());
+		fileChooser.setInitialDirectory(getProjectDirectory());
 		
 		File f = fileChooser.showOpenDialog(stage);
 
@@ -706,9 +706,17 @@ public class JDialogueCore extends Application {
 			}
 		}
 
+		File defaultLocation = new File(".");
+		
 		String projectDirectory = props.getProperty("projectDir");
 		
-		File defaultLocation = (projectDirectory != null ? new File(projectDirectory) : new File("."));
+		if (projectDirectory != null) {
+			File location = new File(projectDirectory);
+			
+			if (location.exists()) {
+				defaultLocation = location;
+			}
+		}
 
 		DirectoryChooser fileChooser = new DirectoryChooser();
 		fileChooser.setTitle("Select Project Directory");
@@ -749,7 +757,15 @@ public class JDialogueCore extends Application {
 
 		String projectDirectory = props.getProperty("projectDir");
 		
-		return (projectDirectory != null ? new File(projectDirectory) : new File("."));
+		if (projectDirectory != null) {
+			File dir = new File(projectDirectory);
+			
+			if (dir.exists()) {
+				return dir;
+			}
+		}
+		
+		return new File(".");
 	}
 	
 	/**
@@ -770,15 +786,26 @@ public class JDialogueCore extends Application {
 			}
 		}
 
+		File defaultLocation = new File(".");
+		
 		String syntaxLocation = props.getProperty("syntaxFile");
 		
-		File defaultLocation = (syntaxLocation != null ? new File(syntaxLocation).getParentFile() : new File("."));
+		if (syntaxLocation != null) {
+			File location = new File(syntaxLocation).getParentFile();
+			
+			if (location.exists()) {
+				defaultLocation = location;
+			}
+		}
 
 		//Open the directory filechooser
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Select Syntax File");
-		fileChooser.setInitialDirectory(defaultLocation);
-
+		
+		if (defaultLocation.exists()) {
+			fileChooser.setInitialDirectory(defaultLocation);
+		}
+		
 		//Select the syntax file
 		File file = fileChooser.showOpenDialog(stage);
 

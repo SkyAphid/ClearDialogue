@@ -2,6 +2,7 @@ package nokori.jdialogue.ui.util;
 
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.List;
 
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Rectangle;
@@ -15,6 +16,9 @@ import static org.fxmisc.wellbehaved.event.EventPattern.*;
 
 import javafx.event.Event;
 import org.fxmisc.richtext.InlineCssTextArea;
+import org.fxmisc.richtext.model.PlainTextChange;
+import org.fxmisc.richtext.util.UndoUtils;
+import org.fxmisc.undo.UndoManager;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
 import org.reactfx.Subscription;
@@ -73,6 +77,12 @@ public class UIUtil {
 	 * @param textArea
 	 */
 	public static  Subscription addSyntaxSubscription(InlineCssTextArea textArea, String[] keywords, String colorFillCode) {
+		
+		//Sets up the UndoManager to not undo text highlighting when CTRL-Z is pressed
+		UndoManager<List<PlainTextChange>> um = UndoUtils.plainTextUndoManager(textArea);
+		textArea.setUndoManager(um);
+		
+		//Applies the subscription
 		return textArea.multiPlainChanges().successionEnds(Duration.ofMillis(100))
 				.subscribe(ignore -> computeHighlighting(textArea, keywords, colorFillCode));
 	}
