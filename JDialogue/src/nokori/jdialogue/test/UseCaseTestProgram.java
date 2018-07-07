@@ -38,7 +38,7 @@ public class UseCaseTestProgram {
 			
 			//Find the starting node (where the dialogue starts)
 			//This tag is arbitrary, but you can use this system to start from any node in the project.
-			DialogueNode start = project.findNodeWithTag("$DIALOGUE_START", true);
+			DialogueNode start = project.findNodeWithTag("$DIALOGUE_START", true).pop();
 			
 			//If start found, begin dialogue.
 			if (start != null) {

@@ -2,6 +2,7 @@ package nokori.jdialogue.project;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * This class represents the Project, containing a list of all the nodes that the user has made, along with the project name.
@@ -101,25 +102,72 @@ public class Project implements Serializable {
 	
 
 	/**
-	 * Find a DialogueNode in the Project with the tag.
+	 * Find DialogueNodes in the Project with the given tag.
 	 * 
 	 * @param tag - the tag to search for
 	 * @param exactMatch - if true, it will only return a node that equals() the input. Otherwise, contains() will be used.
 	 * @return the DialogueNode that meets the criteria, returns null if a match is not found
 	 */
-	public DialogueNode findNodeWithTag(String tag, boolean exactMatch) {
+	public Stack<DialogueNode> findNodeWithTag(String tag, boolean exactMatch) {
+		return findNode(new SearchRule() {
+
+			@Override
+			public boolean check(DialogueNode node) {
+				String nodeTag = node.getTag();
+				
+				boolean hasTag = (exactMatch ? nodeTag.equals(tag) : nodeTag.contains(tag));
+				
+				if (hasTag) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Find a DialogueNode in the Project with the given name.
+	 * 
+	 * @param name - the name to search for
+	 * @param exactMatch - if true, it will only return a node that equals() the input. Otherwise, contains() will be used.
+	 * @return the DialogueNode that meets the criteria, returns null if a match is not found
+	 */
+	public Stack<DialogueNode> findNodeWithName(String name, boolean exactMatch) {
+		return findNode(new SearchRule() {
+
+			@Override
+			public boolean check(DialogueNode node) {
+				String nodeName = node.getName();
+				
+				boolean hasName = (exactMatch ? nodeName.equals(name) : nodeName.contains(name));
+				
+				if (hasName) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
+	}
+	
+	public Stack<DialogueNode> findNode(SearchRule rule) {
+		
+		Stack<DialogueNode> found = new Stack<DialogueNode>();
+		
 		for (int i = 0; i < nodes.size(); i++) {
 			DialogueNode node = nodes.get(i);
-			String nodeTag = node.getTag();
 			
-			boolean hasTag = (exactMatch ? nodeTag.equals(tag) : nodeTag.contains(tag));
-			
-			if (hasTag) {
-				return node;
+			if (rule.check(node)) {
+				found.push(node);
 			}
 		}
 		
-		return null;
+		return found;
+	}
+	
+	public interface SearchRule {
+		public boolean check(DialogueNode node);
 	}
 	
 	/*
