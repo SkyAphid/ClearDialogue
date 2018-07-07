@@ -151,6 +151,13 @@ public class Project implements Serializable {
 		});
 	}
 	
+	/**
+	 * This a general function for finding Nodes with specific conditions, used by findNodeWithTag() and findNodeWithName(). 
+	 * To make your own, simply pass in a custom SearchRule. 
+	 * 
+	 * @param rule
+	 * @return
+	 */
 	public Stack<DialogueNode> findNode(SearchRule rule) {
 		
 		Stack<DialogueNode> found = new Stack<DialogueNode>();
@@ -167,6 +174,15 @@ public class Project implements Serializable {
 	}
 	
 	public interface SearchRule {
+		/**
+		 * This DialogueNode is passed in by findNode as it iterates through all of the nodes in the Project.
+		 * 
+		 * Return true to add the DialogueNode to the list of DialogueNodes that pass your particular test. 
+		 * Return false to ignore it and continue.
+		 * 
+		 * @param node
+		 * @return
+		 */
 		public boolean check(DialogueNode node);
 	}
 	
