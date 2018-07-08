@@ -165,7 +165,7 @@ public class ReplaceTool {
 				for (int j = 0; j < responseNode.getResponses().size(); j++) {
 					Response response = responseNode.getResponses().get(j);
 					
-					response.setText(response.getText().replaceAll(find, replace));
+					response.setText(response.getText().replace(find, replace));
 				}
 			}
 		}
