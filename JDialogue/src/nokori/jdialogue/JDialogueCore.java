@@ -385,6 +385,7 @@ public class JDialogueCore extends Application {
 			}
 		}else {
 			System.err.println("Syntax file not found.");
+			syntax = new String[]{"//No syntax loaded"};
 		}
 		
 		/*
