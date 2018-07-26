@@ -31,3 +31,6 @@ As long as you have [Java8 or above installed](https://java.com/en/), JDialogue 
 ## Implementing JDialogue in Your Game
 - For examples of importing/exporting JDialogue files, check [`nokori.jdialogue.io`](https://github.com/SkyAphid/JDialogue/tree/master/JDialogue/src/nokori/jdialogue/io)
 - For examples of implementing JDialogue into your game, see [`nokori.jdialogue.test`](https://github.com/SkyAphid/JDialogue/tree/master/JDialogue/src/nokori/jdialogue/test)
+
+## Download
+[Get a runnable version of JDialogue on the releases page.](https://github.com/SkyAphid/JDialogue/releases)
