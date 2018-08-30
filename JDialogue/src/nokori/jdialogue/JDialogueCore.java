@@ -151,7 +151,7 @@ public class JDialogueCore extends Application {
 	
 	private Font robotoRegular20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/RobotoRegular.ttf"), 20);
 	private Font robotoLight20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/RobotoLight.ttf"), 20);
-	private Font markazi12 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/Markazi.ttf"), 22);
+	private Font markazi22 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/Markazi.ttf"), 22);
 	
 	/*
 	 * Project data
@@ -675,7 +675,7 @@ public class JDialogueCore extends Application {
 					ReplaceTool.run(stage, getProjectDirectory(), project, ReplaceMode.MULTI);
 					break;
 				case VIEW_SYNTAX:
-					uiPane.getChildren().add(new TextViewerMenu(JDialogueCore.this, markazi12, syntax));
+					uiPane.getChildren().add(new TextViewerMenu(JDialogueCore.this, markazi22, syntax));
 					break;
 				case SET_SYNTAX:
 					setSyntax(stage);
@@ -892,11 +892,11 @@ public class JDialogueCore extends Application {
 		DialogueNodePane dialogueNodePane = null;
 		
 		if (dialogueNode instanceof DialogueTextNode) {
-			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, robotoRegular20, markazi12);
+			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, robotoRegular20, markazi22);
 		}
 		
 		if (dialogueNode instanceof DialogueResponseNode) {
-			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, robotoRegular20, markazi12, 45);
+			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, robotoRegular20, markazi22, 45);
 		}
 		
 		if (dialogueNodePane != null) {
