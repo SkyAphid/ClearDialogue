@@ -26,7 +26,7 @@ JDialogue is a branching dialogue editor for video games. Designed to be extreme
 - Code-base has extremely detailed documentation that walks you through adding new functionality
 
 ## Dependencies
-As long as you have [Java8 or above installed](https://java.com/en/), JDialogue should work right out of the box. All used APIs are included with JDialogue, and are [credited in the license.](https://github.com/SkyAphid/JDialogue/blob/master/LICENSE)
+As long as you have [Java8 or above installed](https://java.com/en/), JDialogue should work right out of the box. All used APIs are included with JDialogue via Gradle, and are [credited in the license.](https://github.com/SkyAphid/JDialogue/blob/master/LICENSE)
 
 If you intend on pulling the project and working on it, you'll need to use JDK1.8.0_171, since that's what the project was made with. If you want to update the project to a newer Java version, [e-mail me](mailto:contact@nokoriware.com) and I'll get you hooked up to the project.
 
