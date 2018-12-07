@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: "java"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -14,7 +14,7 @@ dependencies {
 }
 
 sourceSets {
-	main.java.srcDirs=['src/']
+	main.java.srcDirs=["src/"]
 }
 
 jar {
@@ -30,14 +30,14 @@ jar {
 
 import org.gradle.plugins.ide.eclipse.model.AccessRule
 
-apply plugin: 'eclipse'
+apply plugin: "eclipse"
 
 eclipse {
     classpath {
         file {
             whenMerged {
-                def jre = entries.find { it.path.contains 'org.eclipse.jdt.launching.JRE_CONTAINER' }
-                jre.accessRules.add(new AccessRule('0', 'javafx/**'))
+                def jre = entries.find { it.path.contains "org.eclipse.jdt.launching.JRE_CONTAINER" }
+                jre.accessRules.add(new AccessRule("0", "javafx/**"))
             }
         }
     }
