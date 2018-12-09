@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.fxmisc.undo:undofx:2.1.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.fxmisc.undo/undofx/2.1.0/e50ee1e30ce5ac1817d35f56c79099201211c76c/undofx-2.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.fxmisc.undo/undofx/2.1.0/bd8d4480355e47f1cc1a77e17378a5c1def309ac/undofx-2.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

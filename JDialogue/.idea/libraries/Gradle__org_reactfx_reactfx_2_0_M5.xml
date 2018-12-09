@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.reactfx:reactfx:2.0-M5">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.reactfx/reactfx/2.0-M5/aa02bc40ebbb87a76d4b188516294612c8972b80/reactfx-2.0-M5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.reactfx/reactfx/2.0-M5/ac8e445dd40ceb48172c782144fb16c133f7743c/reactfx-2.0-M5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
