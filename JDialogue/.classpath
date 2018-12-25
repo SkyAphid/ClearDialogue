@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+	<classpathentry kind="src" output="bin" path="src">
 		<attributes>
 			<attribute name="gradle_scope" value="main"/>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
@@ -13,7 +13,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="javax.json-api-1.1.4.jar"/>
-	<classpathentry kind="lib" path="richtextfx-fat-0.9.2.jar"/>
+	<classpathentry kind="lib" path="lib/javax.json-api-1.1.4.jar"/>
+	<classpathentry kind="lib" path="lib/richtextfx-fat-0.9.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
