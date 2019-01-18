@@ -12,7 +12,6 @@ JDialogue is a branching dialogue editor for video games. Designed to be extreme
 - Lightweight and simple to use
 
 #### IO
-- Supports Java serialization/deserialization
 - Supports JSON exporting/importing
 - Has documented tools for how to add support for your own filetypes
 
