@@ -13,11 +13,21 @@ public class Project implements Serializable {
 	private static final long serialVersionUID = -8369866434879310100L;
 	
 	//Version information, this is to help bring old files up to date in the future if needed.
-	public static final int CURRENT_VERSION = 1;
+	public static final int CURRENT_VERSION = 2;
 	private int version;
 	
 	//The name of the project
 	private String name;
+	
+	//Canvas size
+	public static final int MINIMUM_CANVAS_WIDTH = 1_000;
+	public static final int MINIMUM_CANVAS_HEIGHT = 1_000;
+	
+	public static final int DEFAULT_CANVAS_WIDTH = 10_000;
+	public static final int DEFAULT_CANVAS_HEIGHT = 5_000;
+	
+	private int canvasWidth;
+	private int canvasHeight;
 	
 	//Remember viewport data for next use
 	private double viewportX, viewportY, viewportScale;
@@ -28,16 +38,18 @@ public class Project implements Serializable {
 	//All connections between the various nodes are stored here
 	private ArrayList<Connection> connections = new ArrayList<Connection>();
 	
-	public Project(int version, String name, double viewportX, double viewportY, double viewportScale) {
+	public Project(int version, String name, int canvasWidth, int canvasHeight, double viewportX, double viewportY, double viewportScale) {
 		this.version = version;
 		this.name = name;
+		this.canvasWidth = canvasWidth;
+		this.canvasHeight = canvasHeight;
 		this.viewportX = viewportX;
 		this.viewportY = viewportY;
 		this.viewportScale = viewportScale;
 	}
 	
-	public Project(double viewportX, double viewportY, double viewportScale) {
-		this(CURRENT_VERSION, "Default Project", viewportX, viewportY, viewportScale);
+	public Project() {
+		this(CURRENT_VERSION, "Default Project", DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT, 0.0, -DEFAULT_CANVAS_HEIGHT/2, 1.0);
 	}
 	
 	public int getVersion() {
@@ -52,6 +64,22 @@ public class Project implements Serializable {
 		this.name = name;
 	}
 	
+	public int getCanvasWidth() {
+		return canvasWidth;
+	}
+
+	public void setCanvasWidth(int canvasWidth) {
+		this.canvasWidth = canvasWidth;
+	}
+
+	public int getCanvasHeight() {
+		return canvasHeight;
+	}
+
+	public void setCanvasHeight(int canvasHeight) {
+		this.canvasHeight = canvasHeight;
+	}
+
 	public double getViewportX() {
 		return viewportX;
 	}

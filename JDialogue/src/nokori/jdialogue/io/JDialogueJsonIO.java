@@ -37,6 +37,9 @@ public class JDialogueJsonIO implements JDialogueIO{
 	 */
 	public static final String JSON_PROJECT_VERSION = "projectVersion";
 	public static final String JSON_PROJECT_NAME = "projectName";
+	public static final String JSON_PROJECT_CANVAS_WIDTH = "projectCanvasWidth";
+	public static final String JSON_PROJECT_CANVAS_HEIGHT = "projectCanvasHeight";
+	
 	public static final String JSON_PROJECT_VIEWPORT_X = "projectViewportX";
 	public static final String JSON_PROJECT_VIEWPORT_Y = "projectViewportY";
 	public static final String JSON_PROJECT_VIEWPORT_SCALE = "projectViewportScale";
@@ -89,7 +92,11 @@ public class JDialogueJsonIO implements JDialogueIO{
 		JsonObjectBuilder projectBuilder = Json.createObjectBuilder();
 		
 		projectBuilder.add(JSON_PROJECT_NAME, project.getName());
-		projectBuilder.add(JSON_PROJECT_VERSION, project.getVersion());
+		projectBuilder.add(JSON_PROJECT_VERSION, Project.CURRENT_VERSION);
+		
+		projectBuilder.add(JSON_PROJECT_CANVAS_WIDTH, project.getCanvasWidth());
+		projectBuilder.add(JSON_PROJECT_CANVAS_HEIGHT, project.getCanvasHeight());
+		
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_X, project.getViewportX());
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_Y, project.getViewportY());
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_SCALE, project.getViewportScale());
@@ -220,13 +227,18 @@ public class JDialogueJsonIO implements JDialogueIO{
 		JsonObject projectObject = jsonReader.readObject();
 
 		int projectVersion = projectObject.getInt(JSON_PROJECT_VERSION);
+		projectObject = compatibilityUpdates(projectVersion, projectObject);
 		
 		String projectName = projectObject.getString(JSON_PROJECT_NAME);
+		
+		int canvasWidth = projectObject.getInt(JSON_PROJECT_CANVAS_WIDTH);
+		int canvasHeight = projectObject.getInt(JSON_PROJECT_CANVAS_HEIGHT);
+		
 		double viewportX = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_X).doubleValue();
 		double viewportY = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_Y).doubleValue();
 		double viewportScale = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_SCALE).doubleValue();
 
-		Project project = new Project(projectVersion, projectName, viewportX, viewportY, viewportScale);
+		Project project = new Project(projectVersion, projectName, canvasWidth, canvasHeight, viewportX, viewportY, viewportScale);
 
 		/*
 		 * Node Data
@@ -341,5 +353,36 @@ public class JDialogueJsonIO implements JDialogueIO{
 	@Override
 	public String getTypeName() {
 		return "json";
+	}
+	
+	/**
+	 * This function runs through the JSON object on import and updates it with any new features added since the first version of JDialogue was released.
+	 */
+	private static JsonObject compatibilityUpdates(int version, JsonObject projectObject) {
+		JsonObject updatedProjectObject = projectObject;
+		
+		//Breaks purposefully left out so that it'll start at the current version and roll down all the way until the latest.
+		switch(version) {
+		case 1:
+			updatedProjectObject = version1CompatibilityUpdate(projectObject);
+		}
+		
+		return updatedProjectObject;
+	}
+	
+	/**
+	 * Updates the given project to Version 2 by adding the new canvas size settings and setting them to the old constant values.
+	 * 
+	 * @param projectObject
+	 */
+	private static JsonObject version1CompatibilityUpdate(JsonObject projectObject) {
+		JsonObjectBuilder projectBuilder = Json.createObjectBuilder(projectObject);
+		
+		projectBuilder.add(JSON_PROJECT_CANVAS_WIDTH, 20_000);
+		projectBuilder.add(JSON_PROJECT_CANVAS_HEIGHT, 10_000);
+		
+		System.out.println("Updated Project to Version 2");
+		
+		return projectBuilder.build();
 	}
 }

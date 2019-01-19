@@ -21,7 +21,6 @@ public class NodeGestures {
 
 	public NodeGestures(PannablePane pannablePane) {
 		this.pannablePane = pannablePane;
-
 	}
 
 	public EventHandler<MouseEvent> getOnMousePressedEventHandler() {

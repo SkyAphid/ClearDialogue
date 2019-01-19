@@ -38,7 +38,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import nokori.jdialogue.io.JDialogueIO;
 import nokori.jdialogue.io.JDialogueJsonIO;
-import nokori.jdialogue.io.JDialogueSerializerIO;
 import nokori.jdialogue.project.Connection;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
@@ -60,6 +59,7 @@ import nokori.jdialogue.ui.node.DialogueTextNodePane;
 import nokori.jdialogue.ui.pannable_pane.NodeGestures;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
 import nokori.jdialogue.ui.pannable_pane.SceneGestures;
+import nokori.jdialogue.ui.util.CanvasSizeTool;
 import nokori.jdialogue.ui.util.ReplaceTool;
 import nokori.jdialogue.ui.util.ReplaceTool.ReplaceMode;
 import nokori.jdialogue.ui.util.UIUtil;
@@ -92,7 +92,7 @@ import nokori.jdialogue.ui.util.UIUtil;
  * 2) Make a DialogueNodePane extension that implements your custom DialogueNode (example: DialogueTextNodePane)
  * 3) Make a DialogueNodeEditor extension that implements your custom DialogueNode (example: DialogueTextNodeEditor)
  * 4) Hook up to JDialogueCore: addNodeButton(), addDialogueNode()
- * 5) Add support to various JDialogueIO behaviors (unless you use the serializer, in which case, it'll just werk)
+ * 5) Add support to various JDialogueIO behaviors
  * 6) Optional: add support to RefactorTool
  * 
  * ------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ import nokori.jdialogue.ui.util.UIUtil;
 public class JDialogueCore extends Application {
 	
 	private static final String PROGRAM_NAME = "JDialogue";
-	private static final String PROGRAM_VERSION = "Rev. 1";
+	private static final String PROGRAM_VERSION = "Rev. 2";
 	
 	/*
 	 * window settings
@@ -120,8 +120,6 @@ public class JDialogueCore extends Application {
 	 */
 	private Pane uiPane;
 	
-	private static final int PANNABLE_PANE_WIDTH = 20_000;
-	private static final int PANNABLE_PANE_HEIGHT = 10_000;
 	private PannablePane pannablePane;
 	private NodeGestures nodeGestures;
 	
@@ -149,9 +147,9 @@ public class JDialogueCore extends Application {
 	
 	private DropShadow shadow;
 	
-	private Font robotoRegular20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/RobotoRegular.ttf"), 20);
-	private Font robotoLight20 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/RobotoLight.ttf"), 20);
-	private Font markazi22 = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/Markazi.ttf"), 22);
+	private Font sansRegular = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Regular.ttf"), 20);
+	private Font sansLight = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 20);
+	private Font serifRegular = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSerif-Regular.ttf"), 16);
 	
 	/*
 	 * Project data
@@ -224,7 +222,7 @@ public class JDialogueCore extends Application {
 		});
 		
 		//Pannable pane contains all of the nodes, can be panned and zoomed
-		pannablePane = new PannablePane(PANNABLE_PANE_WIDTH, PANNABLE_PANE_HEIGHT) {
+		pannablePane = new PannablePane(project.getCanvasWidth(), project.getCanvasHeight()) {
 			@Override
 			protected void layoutChildren() {
 				super.layoutChildren();
@@ -427,8 +425,10 @@ public class JDialogueCore extends Application {
 	private void addProgramInfo() {
 		int offsetY = 20;
 		
-		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " | Hold LMB = Drag/Pan | 2xLMB = Edit Node | 2xRMB = Delete Node");
-		text.setFont(robotoRegular20);
+		Font sansLightSmall = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 18);
+		
+		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " | Hold LMB = Drag/Pan | 2xLMB = Edit Node | 2xRMB = Delete Node | Scroll = Zoom In/Out on Mouse");
+		text.setFont(sansLightSmall);
 		text.setFill(Color.LIGHTGRAY.darker());
 		text.setX(20);
 		text.setY(WINDOW_HEIGHT - offsetY);
@@ -444,8 +444,6 @@ public class JDialogueCore extends Application {
 	
 	private static final String NEW_PROJECT = "NEW PROJECT";
 	private static final String SELECT_PROJECT_DIRECTORY = "PROJECT DIR...";
-	private static final String SAVE = "SAVE...";
-	private static final String OPEN = "OPEN...";
 	private static final String EXPORT_JSON = "EXPORT JSON...";
 	private static final String IMPORT_JSON = "IMPORT JSON...";
 	
@@ -456,13 +454,11 @@ public class JDialogueCore extends Application {
 		String[] options = {
 				NEW_PROJECT,
 				SELECT_PROJECT_DIRECTORY,
-				SAVE,
-				OPEN,
 				EXPORT_JSON,
 				IMPORT_JSON
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", robotoRegular20, robotoLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "FILE", sansRegular, sansLight, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
 				switch(optionName) {
@@ -471,6 +467,14 @@ public class JDialogueCore extends Application {
 					alert.setTitle("Start New Project");
 					alert.setHeaderText("Start new project? Unsaved changes will be lost.");
 					((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
+					
+					Platform.runLater(new Runnable() {
+					    @Override
+					    public void run() {
+							alert.setX(stage.getX() + stage.getWidth()/2 - alert.getWidth()/2);
+							alert.setY(stage.getY() + stage.getHeight()/2 - alert.getHeight()/2);
+					    }
+					});
 					
 					Optional<ButtonType> result = alert.showAndWait();
 					
@@ -481,12 +485,6 @@ public class JDialogueCore extends Application {
 					break;
 				case SELECT_PROJECT_DIRECTORY:
 					setProjectDirectory(stage);
-					break;
-				case SAVE:
-					exportProject(stage, new JDialogueSerializerIO());
-					break;
-				case OPEN:
-					importProject(stage, new JDialogueSerializerIO());
 					break;
 				case EXPORT_JSON:
 					exportProject(stage, new JDialogueJsonIO());
@@ -515,7 +513,7 @@ public class JDialogueCore extends Application {
 			pannablePane.getChildren().clear();
 		}
 		
-		project = new Project(0.0, -PANNABLE_PANE_HEIGHT/2, 1.0);
+		project = new Project();
 		
 		if (!projectNull) {
 			refreshAfterImport();
@@ -564,7 +562,6 @@ public class JDialogueCore extends Application {
 			try {
 				Project project = behavior.importProject(f);
 				
-				pannablePane.getChildren().clear();
 				this.project = project;
 				refreshAfterImport();
 				
@@ -583,38 +580,45 @@ public class JDialogueCore extends Application {
 	/**
 	 * After a Project is imported, run this to update the editor to contain its contents.
 	 */
-	private void refreshAfterImport() {
+	public void refreshAfterImport() {
+		pannablePane.getChildren().clear();
+		
+		pannablePane.setSize(project.getCanvasWidth(), project.getCanvasHeight());
 		pannablePane.setTranslateX(project.getViewportX());
 		pannablePane.setTranslateY(project.getViewportY());
 		pannablePane.setScale(project.getViewportScale());
 		
 		projectNameField.replaceText(project.getName());
 		
-		//Build all of the DialogueNodePanes (graphical representation of node)
-		for (int i = 0; i < project.getNumNodes(); i++) {
-			DialogueNode node = project.getNode(i);
-			createDialogueNodePane(node);
-		}
-
-		//Build all BoundLine objects for each Connection
-		for (int i = 0; i < project.getNumConnections(); i++) {
-			Connection connection = project.getConnection(i);
-			
-			DialogueNodeConnector connector1 = connection.getConnector1();
-			DialogueNodeConnector connector2 = connection.getConnector2();
-			
-			DialogueNodeConnectorArc arc1 = getDialogueNodeConnectorArcOf(connector1);
-			DialogueNodeConnectorArc arc2 = getDialogueNodeConnectorArcOf(connector2);
-			
-			if (arc1 != null && arc2 != null) {
-				BoundLine line = new BoundLine(arc1, connector1, arc2, connector2);
-
-				addConnectorLine(line);
-				
-			}else {
-				throw new MissingArcError("\n" + connector1.getParent().getName() + " -> " + arc1 + "\n" + connector2.getParent().getName() + " -> " + arc2);
+		pannablePane.requestLayout();
+		
+		Platform.runLater(() -> {
+			//Build all of the DialogueNodePanes (graphical representation of node)
+			for (int i = 0; i < project.getNumNodes(); i++) {
+				DialogueNode node = project.getNode(i);
+				createDialogueNodePane(node);
 			}
-		}
+
+			//Build all BoundLine objects for each Connection
+			for (int i = 0; i < project.getNumConnections(); i++) {
+				Connection connection = project.getConnection(i);
+				
+				DialogueNodeConnector connector1 = connection.getConnector1();
+				DialogueNodeConnector connector2 = connection.getConnector2();
+				
+				DialogueNodeConnectorArc arc1 = getDialogueNodeConnectorArcOf(connector1);
+				DialogueNodeConnectorArc arc2 = getDialogueNodeConnectorArcOf(connector2);
+				
+				if (arc1 != null && arc2 != null) {
+					BoundLine line = new BoundLine(arc1, connector1, arc2, connector2);
+
+					addConnectorLine(line);
+					
+				}else {
+					throw new MissingArcError("\n" + connector1.getParent().getName() + " -> " + arc1 + "\n" + connector2.getParent().getName() + " -> " + arc2);
+				}
+			}
+		});
 	}
 	
 	private DialogueNodeConnectorArc getDialogueNodeConnectorArcOf(DialogueNodeConnector connector) {
@@ -635,6 +639,7 @@ public class JDialogueCore extends Application {
 		return null;
 	}
 	
+	private static final String CANVAS_SIZE = "CANVAS SIZE...";
 	private static final String REPLACE = "REPLACE...";
 	private static final String MULTIREPLACE = "MULTI-REPLACE...";
 	private static final String VIEW_SYNTAX = "VIEW SYNTAX";
@@ -647,17 +652,21 @@ public class JDialogueCore extends Application {
 		int buttonX = BUTTON_START_X + BUTTON_WIDTH + 10;
 		
 		String[] options = { 
+				CANVAS_SIZE,
 				REPLACE,
 				MULTIREPLACE,
 				VIEW_SYNTAX,
 				SET_SYNTAX
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOL", robotoRegular20, robotoLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "TOOL", sansRegular, sansLight, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
 				switch(optionName) {
+				case CANVAS_SIZE:
+					new CanvasSizeTool().openCanvasSizeDialog(stage, JDialogueCore.this, project, pannablePane);
+					break;
 				case REPLACE:
 					ReplaceTool.run(stage, getProjectDirectory(), project, ReplaceMode.LOCAL);
 					
@@ -675,7 +684,7 @@ public class JDialogueCore extends Application {
 					ReplaceTool.run(stage, getProjectDirectory(), project, ReplaceMode.MULTI);
 					break;
 				case VIEW_SYNTAX:
-					uiPane.getChildren().add(new TextViewerMenu(JDialogueCore.this, markazi22, syntax));
+					uiPane.getChildren().add(new TextViewerMenu(JDialogueCore.this, serifRegular, syntax));
 					break;
 				case SET_SYNTAX:
 					setSyntax(stage);
@@ -844,7 +853,7 @@ public class JDialogueCore extends Application {
 				RESPONSE
 		};
 		
-		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "+NODE", robotoRegular20, robotoLight20, options, MENU_BUTTON_INCREMENT_HEIGHT) {
+		MenuButton button = new MenuButton(scene, BUTTON_WIDTH, BUTTON_HEIGHT, shadow, "+NODE", sansRegular, sansLight, options, MENU_BUTTON_INCREMENT_HEIGHT) {
 			
 			@Override
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
@@ -892,16 +901,16 @@ public class JDialogueCore extends Application {
 		DialogueNodePane dialogueNodePane = null;
 		
 		if (dialogueNode instanceof DialogueTextNode) {
-			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, robotoRegular20, markazi22);
+			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, sansRegular, serifRegular);
 		}
 		
 		if (dialogueNode instanceof DialogueResponseNode) {
-			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, robotoRegular20, markazi22, 45);
+			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, sansRegular, serifRegular, 45);
 		}
 		
 		if (dialogueNodePane != null) {
 			
-			//Add node to current instance (UI)
+			//Add node to current instance (UI) and add event handlers (NodeGestures.java) for dragging it around
 	        dialogueNodePane.setTranslateX(dialogueNode.getX());
 	        dialogueNodePane.setTranslateY(dialogueNode.getY());
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_PRESSED, nodeGestures.getOnMousePressedEventHandler());
@@ -1001,7 +1010,7 @@ public class JDialogueCore extends Application {
 		projectNameField.setBackground(Background.EMPTY);
 		projectNameField.setWrapText(false);
 		
-		String fontStyle 	= "-fx-font-family: '" + robotoRegular20.getFamily() + "'; -fx-font-size: " + robotoRegular20.getSize() + ";";
+		String fontStyle 	= "-fx-font-family: '" + sansRegular.getFamily() + "'; -fx-font-size: " + sansRegular.getSize() + ";";
 		String borderStyle 	= "-fx-border-color: " + Button.getTextColorCode() + "; -fx-border-width: 0 0 1 0;";
 		
 		projectNameField.setStyle(fontStyle + borderStyle);
@@ -1050,6 +1059,10 @@ public class JDialogueCore extends Application {
 
 	public PannablePane getPannablePane() {
 		return pannablePane;
+	}
+	
+	public NodeGestures getNodeGestures() {
+		return nodeGestures;
 	}
 	
 	public Pane getUIPane() {

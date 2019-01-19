@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import nokori.jdialogue.io.JDialogueSerializerIO;
+import nokori.jdialogue.io.JDialogueJsonIO;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueResponseNode.Response;
@@ -17,12 +17,9 @@ import nokori.jdialogue.project.Project;
  */
 public class UseCaseTestProgram {
 	public static void main(String[] args) {
-		
-		//This is a complex example of how conversations can be made with JDialogue
-		File testDialogue = new File("Hello World.dialogue");
-		
+
 		//This is a basic example of how conversations can be made to loop on themselves, like classic jRPGs
-		//File testDialogue = new File("ButThouMust.dialogue");
+		File testDialogue = new File("ButThouMust.dialogue");
 		
 		/*
 		 * Start program
@@ -34,7 +31,7 @@ public class UseCaseTestProgram {
 		
 		try{
 			//Load the project
-			Project project = new JDialogueSerializerIO().importProject(testDialogue);
+			Project project = new JDialogueJsonIO().importProject(testDialogue);
 			
 			//Find the starting node (where the dialogue starts)
 			//This tag is arbitrary, but you can use this system to start from any node in the project.

@@ -21,11 +21,11 @@ public class PannablePane extends Pane {
 		// add scale transform
 		scaleXProperty().bind(scale);
 		scaleYProperty().bind(scale);
-
-		setPrefSize(width, height);
-		setMinSize(width, height);
-		setMaxSize(width, height);
-
+		
+		//Set Size
+		setSize(width, height);
+		
+		//Set CSS
 		setStyle("-fx-border-color: gray; -fx-border-width: 5; -fx-border-style: segments(50) line-cap butt;");
 
 		// logging
@@ -34,6 +34,12 @@ public class PannablePane extends Pane {
 					+ (((event.getSceneX() - getBoundsInParent().getMinX()) / getScale()) + ", scale: " + getScale()));
 			System.out.println("canvas bounds: " + getBoundsInParent());
 		});*/
+	}
+	
+	public void setSize(int width, int height) {
+		setPrefSize(width, height);
+		setMinSize(width, height);
+		setMaxSize(width, height);
 	}
 
 	public double getScale() {

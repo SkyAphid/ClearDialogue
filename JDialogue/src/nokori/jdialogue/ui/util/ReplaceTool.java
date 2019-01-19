@@ -22,7 +22,6 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import nokori.jdialogue.io.JDialogueIO;
 import nokori.jdialogue.io.JDialogueJsonIO;
-import nokori.jdialogue.io.JDialogueSerializerIO;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueResponseNode.Response;
@@ -92,8 +91,7 @@ public class ReplaceTool {
 			}
 			
 			JDialogueIO[] ioTypes = {
-					new JDialogueJsonIO(),
-					new JDialogueSerializerIO()
+					new JDialogueJsonIO()
 			};
 			
 			//Searches files, for each file, check if it's compatible with the ioType, if so, refactor, then continue
@@ -177,19 +175,28 @@ public class ReplaceTool {
 	 * Pulled from: http://code.makery.ch/blog/javafx-dialogs-official/
 	 */
 	private static Pair<String, String> openReplaceDialog(Stage stage, ReplaceMode mode) {
-		// Create the custom dialog.
+		/*
+		 * Create the dialog
+		 */
+		
 		Dialog<Pair<String, String>> dialog = new Dialog<>();
 		dialog.setTitle("Replace");
 		dialog.setHeaderText(mode.getDesc());
 		
-		//Set icons
+		/*
+		 * Match the dialog icons to the main window
+		 */
 		((Stage) dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
 		
-		// Set the button types.
+		/*
+		 * Set the button types
+		 */
 		ButtonType confirmButtonType = new ButtonType("Start", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
-		// Create the username and password labels and fields.
+		/*
+		 * Create the find/replace fields
+		 */
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -203,22 +210,29 @@ public class ReplaceTool {
 		grid.add(new Label("Replace with:"), 0, 1);
 		grid.add(replace, 1, 1);
 
-		// Enable/Disable login button depending on whether a username was entered.
+		/*
+		 * Confirm button disabled by default until valid entries are inputted
+		 */
 		Node confirmButton = dialog.getDialogPane().lookupButton(confirmButtonType);
 		confirmButton.setDisable(true);
 
-		// Do some validation (using the Java 8 lambda syntax).
+		/*
+		 * Set the confirm button to only be enabled for valid find values
+		 */
 		find.textProperty().addListener((observable, oldValue, newValue) -> {
 			confirmButton.setDisable(newValue.trim().isEmpty());
 		});
 
 		dialog.getDialogPane().setContent(grid);
 
-		// Request focus on the username field by default.
+		/*
+		 * Request focus on the Find field 
+		 */
 		Platform.runLater(() -> find.requestFocus());
 
-		// Convert the result to a username-password-pair when the login button is
-		// clicked.
+		/*
+		 * Convert the values into a String Pair
+		 */
 		dialog.setResultConverter(dialogButton -> {
 			
 			if (dialogButton == confirmButtonType) {
@@ -228,7 +242,17 @@ public class ReplaceTool {
 			return null;
 		});
 
+		/*
+		 * Show the UI and return the values
+		 */
 		try {
+			//Center the dialog once we show it
+			//A workaround to the problem in this post: https://stackoverflow.com/questions/19025935/javafx-2-how-to-get-window-size-if-it-wasnt-set-manually
+			Platform.runLater(() -> {
+				dialog.setX(stage.getX() + stage.getWidth() / 2 - dialog.getWidth() / 2);
+				dialog.setY(stage.getY() + stage.getHeight() / 2 - dialog.getHeight() / 2);
+			});
+			
 			return dialog.showAndWait().get();
 		} catch (NoSuchElementException e) {
 			return null;

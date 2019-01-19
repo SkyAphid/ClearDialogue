@@ -13,7 +13,7 @@ public abstract class DialogueNode implements Serializable {
 	
 	private static final long serialVersionUID = 9061233295902786274L;
 
-	//Store the Project object for reference (I.E. seeing if a DialogueNode is a part of Project X when deserialized into a game)
+	//Store the Project object for reference (I.E. seeing if a DialogueNode is a part of Project X when loaded into a game)
 	private Project project;
 	
 	//Give every node a unique ID for potential saving/loading/usage purposes
