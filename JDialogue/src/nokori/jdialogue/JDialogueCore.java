@@ -294,7 +294,7 @@ public class JDialogueCore extends Application {
 		 * connector lines accordingly
 		 */
         
-    	nodeGestures = new NodeGestures(pannablePane) {
+    	nodeGestures = new NodeGestures(this, pannablePane) {
     		@Override
     		public void mouseDragged(MouseEvent event) {
     			if (event.getSource() instanceof Node) {
@@ -586,43 +586,39 @@ public class JDialogueCore extends Application {
 		//Updated project name field with this project's name
 		projectNameField.replaceText(project.getName());
 		
-		//
+		//Clear PannablePane and update its size
 		pannablePane.getChildren().clear();
 		pannablePane.setSize(project.getCanvasWidth(), project.getCanvasHeight());
-		pannablePane.requestLayout();
 		
-		//Set up the pane later after the layout is updated to avoid weird JavaFX bugs
-		Platform.runLater(() -> {
-			pannablePane.setTranslateX(project.getViewportX());
-			pannablePane.setTranslateY(project.getViewportY());
-			pannablePane.setScale(project.getViewportScale());
-			
-			//Build all of the DialogueNodePanes (graphical representation of node)
-			for (int i = 0; i < project.getNumNodes(); i++) {
-				DialogueNode node = project.getNode(i);
-				createDialogueNodePane(node);
-			}
+		pannablePane.setTranslateX(project.getViewportX());
+		pannablePane.setTranslateY(project.getViewportY());
+		pannablePane.setScale(project.getViewportScale());
 
-			//Build all BoundLine objects for each Connection
-			for (int i = 0; i < project.getNumConnections(); i++) {
-				Connection connection = project.getConnection(i);
-				
-				DialogueNodeConnector connector1 = connection.getConnector1();
-				DialogueNodeConnector connector2 = connection.getConnector2();
-				
-				DialogueNodeConnectorArc arc1 = getDialogueNodeConnectorArcOf(connector1);
-				DialogueNodeConnectorArc arc2 = getDialogueNodeConnectorArcOf(connector2);
-				
-				if (arc1 != null && arc2 != null) {
-					BoundLine line = new BoundLine(arc1, connector1, arc2, connector2);
+		// Build all of the DialogueNodePanes (graphical representation of node)
+		for (int i = 0; i < project.getNumNodes(); i++) {
+			DialogueNode node = project.getNode(i);
+			createDialogueNodePane(node);
+		}
 
-					addConnectorLine(line);
-					
-				}else {
-					throw new MissingArcError("\n" + connector1.getParent().getName() + " -> " + arc1 + "\n" + connector2.getParent().getName() + " -> " + arc2);
-				}
+		// Build all BoundLine objects for each Connection
+		for (int i = 0; i < project.getNumConnections(); i++) {
+			Connection connection = project.getConnection(i);
+
+			DialogueNodeConnector connector1 = connection.getConnector1();
+			DialogueNodeConnector connector2 = connection.getConnector2();
+
+			DialogueNodeConnectorArc arc1 = getDialogueNodeConnectorArcOf(connector1);
+			DialogueNodeConnectorArc arc2 = getDialogueNodeConnectorArcOf(connector2);
+
+			if (arc1 != null && arc2 != null) {
+				BoundLine line = new BoundLine(arc1, connector1, arc2, connector2);
+
+				addConnectorLine(line);
+
+			} else {
+				throw new MissingArcError("\n" + connector1.getParent().getName() + " -> " + arc1 + "\n" + connector2.getParent().getName() + " -> " + arc2);
 			}
-		});
+		}
 	}
 	
 	private DialogueNodeConnectorArc getDialogueNodeConnectorArcOf(DialogueNodeConnector connector) {
@@ -1052,6 +1048,10 @@ public class JDialogueCore extends Application {
 	 * GETTERS
 	 * 
 	 */
+	
+	public Project getActiveProject() {
+		return project;
+	}
 	
 	public String[] getSyntax() {
 		return syntax;

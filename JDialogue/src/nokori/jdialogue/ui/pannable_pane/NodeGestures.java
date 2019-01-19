@@ -4,6 +4,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import nokori.jdialogue.JDialogueCore;
+import nokori.jdialogue.project.Project;
 
 /**
  * Listeners for making the nodes draggable via left mouse button. Considers if
@@ -17,9 +19,11 @@ public class NodeGestures {
 
 	private DragContext nodeDragContext = new DragContext();
 
+	private JDialogueCore core;
 	private PannablePane pannablePane;
 
-	public NodeGestures(PannablePane pannablePane) {
+	public NodeGestures(JDialogueCore core, PannablePane pannablePane) {
+		this.core = core;
 		this.pannablePane = pannablePane;
 	}
 
@@ -88,15 +92,20 @@ public class NodeGestures {
 	 * @return
 	 */
 	public boolean clampToParentBounds(Node node) {
-
-        Bounds parentBounds = pannablePane.getLayoutBounds();
         Bounds childBounds = node.getBoundsInLocal();
         
         double translateX = node.getTranslateX();
         double translateY = node.getTranslateY();
         
-        node.setTranslateX(clamp(translateX, parentBounds.getMinX() - childBounds.getMinX(), parentBounds.getMaxX() - childBounds.getMaxX()));
-        node.setTranslateY(clamp(translateY, parentBounds.getMinY() - childBounds.getMinY(), parentBounds.getMaxY() - childBounds.getMaxY()));
+        //Bounds parentBounds = pannablePane.getLayoutBounds();
+        //node.setTranslateX(clamp(translateX, parentBounds.getMinX() - childBounds.getMinX(), parentBounds.getMaxX() - childBounds.getMaxX()));
+        //node.setTranslateY(clamp(translateY, parentBounds.getMinY() - childBounds.getMinY(), parentBounds.getMaxY() - childBounds.getMaxY()));
+        
+        //Bypasses unreliable JavaFX code for getting the PannablePane's dimensions
+        Project project = core.getActiveProject();
+        node.setTranslateX(clamp(translateX, 0, project.getCanvasWidth() - childBounds.getWidth()));
+        node.setTranslateY(clamp(translateY, 0, project.getCanvasHeight() - childBounds.getHeight()));
+        
         
         return false;
     }
