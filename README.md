@@ -6,6 +6,7 @@ JDialogue is a branching dialogue editor for video games. Designed to be extreme
 ## Features
 
 #### General 
+- Works with numerous languages
 - Supports both normal dialogue and dialogue responses
 - Use the node-based system to connect these and make complex branching dialogue paths
 - Has a game API that can be referenced directly from your Java game for even further simplicity of use
