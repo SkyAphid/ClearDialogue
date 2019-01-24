@@ -36,3 +36,8 @@ For development, JDialogue uses JDK8 and its version of JavaFX. All other used A
 
 ## Download
 [Get a runnable version of JDialogue on the releases page.](https://github.com/SkyAphid/JDialogue/releases)
+
+## Special Thanks
+UI design inspired by Yarn and Monologue:
+https://github.com/InfiniteAmmoInc/Yarn
+https://github.com/nospoone/monologue
