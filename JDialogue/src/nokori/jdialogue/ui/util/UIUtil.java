@@ -5,15 +5,19 @@ import java.time.Duration;
 import java.util.List;
 
 import javafx.geometry.Bounds;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
 import static org.fxmisc.wellbehaved.event.EventPattern.*;
 
+import javafx.application.Platform;
 import javafx.event.Event;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.model.PlainTextChange;
@@ -27,6 +31,25 @@ import org.reactfx.Subscription;
  * Various utilities to make the UI code cleaner
  */
 public class UIUtil {
+	
+	public static void showAlert(Stage stage, AlertType alertType, String title, String header, String message) {
+		Alert alert = new Alert(alertType);
+		
+		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
+		
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(message);
+		
+		
+		Platform.runLater(() -> {
+			alert.setX(stage.getX() + stage.getWidth() / 2 - alert.getWidth() / 2);
+			alert.setY(stage.getY() + stage.getHeight() / 2 - alert.getHeight() / 2);
+		});
+		
+		alert.showAndWait();
+	}
+	
 	/**
 	 * Return string width/height.
 	 * 
@@ -76,7 +99,7 @@ public class UIUtil {
 	 * Adds a syntax subscription to the text area that will highlight tags. Be sure to dispose it when your done with unsubscribe()!
 	 * @param textArea
 	 */
-	public static  Subscription addSyntaxSubscription(InlineCssTextArea textArea, String[] keywords, String colorFillCode) {
+	public static Subscription addSyntaxSubscription(InlineCssTextArea textArea, String[] keywords, String colorFillCode) {
 		
 		//Sets up the UndoManager to not undo text highlighting when CTRL-Z is pressed
 		UndoManager<List<PlainTextChange>> um = UndoUtils.plainTextUndoManager(textArea);

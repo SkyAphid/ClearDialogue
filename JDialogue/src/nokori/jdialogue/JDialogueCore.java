@@ -107,7 +107,7 @@ import nokori.jdialogue.ui.util.UIUtil;
 public class JDialogueCore extends Application {
 	
 	private static final String PROGRAM_NAME = "JDialogue";
-	private static final String PROGRAM_VERSION = "Rev. 2";
+	private static final String PROGRAM_VERSION = "Rev. 3";
 	
 	/*
 	 * window settings
@@ -343,8 +343,10 @@ public class JDialogueCore extends Application {
 	
 	/**
 	 * Loads user syntax for highlighting text in JDialogue. Will help the user with error checking their game-specific tags.
+	 * 
+	 * @return the name of the syntax file loaded
 	 */
-	private void loadSyntax() {
+	private String loadSyntax() {
 		/*
 		 * Get user-set syntax location (if it exists)
 		 */
@@ -399,6 +401,12 @@ public class JDialogueCore extends Application {
 				}
 			}
 		}
+		
+		/*
+		 * Return the name of the syntax file loaded
+		 */
+		
+		return syntaxFile.getName();
 	}
 	
 	/**
@@ -643,6 +651,7 @@ public class JDialogueCore extends Application {
 	private static final String REPLACE = "REPLACE...";
 	private static final String MULTIREPLACE = "MULTI-REPLACE...";
 	private static final String VIEW_SYNTAX = "VIEW SYNTAX";
+	private static final String REFRESH_SYNTAX = "REFRESH SYNTAX";
 	private static final String SET_SYNTAX = "SET SYNTAX...";
 	
 	/**
@@ -656,6 +665,7 @@ public class JDialogueCore extends Application {
 				REPLACE,
 				MULTIREPLACE,
 				VIEW_SYNTAX,
+				REFRESH_SYNTAX,
 				SET_SYNTAX
 		};
 		
@@ -685,6 +695,9 @@ public class JDialogueCore extends Application {
 					break;
 				case VIEW_SYNTAX:
 					uiPane.getChildren().add(new TextViewerMenu(JDialogueCore.this, serifRegular, syntax));
+					break;
+				case REFRESH_SYNTAX:
+					UIUtil.showAlert(stage, AlertType.INFORMATION, "Syntax Refreshed", "Reloaded syntax file: " + loadSyntax(), "");
 					break;
 				case SET_SYNTAX:
 					setSyntax(stage);
