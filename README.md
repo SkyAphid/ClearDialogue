@@ -14,10 +14,11 @@ JDialogue is a branching dialogue editor for video games. Designed to be extreme
 
 #### IO
 - Supports JSON exporting/importing
-- Has documented tools for how to add support for your own filetypes
+- Is heavily documented with instructions on how to add support for your own filetypes
 
 #### Tools
-- Has replace/find tools that support refactoring within the current project as well as multiple projects spanning multiple files
+- Supports quickly merging projects together into single files in the case of dialogue restructuring
+- Has basic replace/find tools that support refactoring within the current project as well as multiple projects spanning multiple files
 - Supports implementing custom syntax highlighting (I.E. highlighting text commands from your particular engine)
 
 #### Documentation
