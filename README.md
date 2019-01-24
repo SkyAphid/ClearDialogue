@@ -43,6 +43,9 @@ Do you work on projects that have thousands of lines of menu text in Google Shee
 
 https://github.com/SkyAphid/GoogleSheetsTableOfContents
 
+Also check out my software company's website to see more of our projects:
+https://www.nokoriware.com
+
 ## Special Thanks
 This project was inspired by these programs:
 - [Yarn](https://github.com/InfiniteAmmoInc/Yarn)
