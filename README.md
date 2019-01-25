@@ -39,7 +39,7 @@ For development, JDialogue uses JDK8 and its version of JavaFX. All other used A
 [Get a runnable version of JDialogue on the releases page.](https://github.com/SkyAphid/JDialogue/releases)
 
 ## Also check out:
-Do you work on projects that have thousands of lines of menu text in Google Sheets? Check out my open source Table of Contents generator to help you stay organized:
+Do you work on projects that have thousands of cells in Google Sheets? Check out my open source Table of Contents generator to help you stay organized with a table of contents:
 
 [Google Sheets Table of Contents Generator](https://github.com/SkyAphid/GoogleSheetsTableOfContents)
 
