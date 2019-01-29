@@ -128,6 +128,13 @@ public class Project implements Serializable {
 		return nodes.size();
 	}
 	
+	/**
+	 * Adds all nodes from the inputted project into this one.
+	 */
+	public void mergeProject(Project project) {
+		nodes.addAll(project.nodes);
+		connections.addAll(project.connections);
+	}
 
 	/**
 	 * Find DialogueNodes in the Project with the given tag.

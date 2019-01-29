@@ -1,11 +1,13 @@
 package nokori.jdialogue.ui.pannable_pane;
 
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import nokori.jdialogue.ui.node.DialogueNodePane;
 
 /**
- * Listeners for making the scene's canvas draggable and zoomable
+ * Listeners for making the scenes canvas draggable and zoomable
  * 
  * Found here:
  * https://stackoverflow.com/questions/32220042/pick-and-move-a-node-in-a-pannable-zoomable-pane
@@ -19,7 +21,8 @@ public class SceneGestures {
 	private DragContext sceneDragContext = new DragContext();
 
 	private PannablePane pannablePane;
-
+	private RectangleHighlightNode mouseHighlighter = null;
+	
 	public SceneGestures(PannablePane pannablePane) {
 		this.pannablePane = pannablePane;
 	}
@@ -30,6 +33,10 @@ public class SceneGestures {
 
 	public EventHandler<MouseEvent> getOnMousePressedEventHandler() {
 		return onMousePressedEventHandler;
+	}
+	
+	public EventHandler<MouseEvent> getOnMouseReleasedEventHandler() {
+		return onMouseReleasedEventHandler;
 	}
 
 	public EventHandler<MouseEvent> getOnMouseDraggedEventHandler() {
@@ -43,39 +50,72 @@ public class SceneGestures {
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
 		public void handle(MouseEvent event) {
-
-			// middle mouse button => panning
-			//if (!event.isMiddleButtonDown())
-			//	return;
-
-			sceneDragContext.mouseAnchorX = event.getSceneX();
-			sceneDragContext.mouseAnchorY = event.getSceneY();
-
-			sceneDragContext.translateAnchorX = pannablePane.getTranslateX();
-			sceneDragContext.translateAnchorY = pannablePane.getTranslateY();
-
+			//LMB -> Panning
+			if (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown()) {
+				sceneDragContext.mouseAnchorX = event.getSceneX();
+				sceneDragContext.mouseAnchorY = event.getSceneY();
+			
+				sceneDragContext.translateAnchorX = pannablePane.getTranslateX();
+				sceneDragContext.translateAnchorY = pannablePane.getTranslateY();
+			}
+			
+			//RMB -> Highlight
+			if (event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
+				setMouseHighlighter(new RectangleHighlightNode(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event)));
+			}
 		}
 
+	};
+	
+	private EventHandler<MouseEvent> onMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
+		public void handle(MouseEvent event) {
+			setMouseHighlighter(null);
+			
+			for (int i = 0; i < pannablePane.getChildren().size(); i++) {
+				Node node = pannablePane.getChildren().get(i);
+				
+				if (node instanceof DialogueNodePane) {
+					DialogueNodePane dNode = (DialogueNodePane) node;
+					dNode.setMultiSelected(false);
+				}
+			}
+		}
 	};
 
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
 
-			// middle mouse button => panning
-			//if (!event.isMiddleButtonDown())
-			//	return;
-
-			double newTranslateX = sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX;
-			double newTranslateY = sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY;
+			//LMB -> Panning
+			if (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown()) {
+				double newTranslateX = sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX;
+				double newTranslateY = sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY;
+				
+				pannablePane.setTranslateX(newTranslateX);
+				pannablePane.setTranslateY(newTranslateY);
+	
+				mouseDragged(event, newTranslateX, newTranslateY);
+			}
 			
-			pannablePane.setTranslateX(newTranslateX);
-			pannablePane.setTranslateY(newTranslateY);
-
-			mouseDragged(event, newTranslateX, newTranslateY);
+			//RMB -> Highlight
+			if (event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
+				mouseHighlighter.update(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event));
+			}
 			
 			event.consume();
 		}
 	};
+	
+	private void setMouseHighlighter(RectangleHighlightNode h) {
+		if (mouseHighlighter != null) {
+			pannablePane.getChildren().remove(mouseHighlighter);
+		}
+		
+		mouseHighlighter = h;
+		
+		if (h != null) {
+			pannablePane.getChildren().add(mouseHighlighter);
+		}
+	}
 	
 	public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
 		
@@ -115,7 +155,6 @@ public class SceneGestures {
 			mouseScrolled(event, scale);
 
 			event.consume();
-
 		}
 
 	};

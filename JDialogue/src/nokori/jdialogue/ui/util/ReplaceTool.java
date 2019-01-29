@@ -72,7 +72,7 @@ public class ReplaceTool {
 		
 		if (refactorInfo != null) {
 			replace(project, refactorInfo.getKey(), refactorInfo.getValue());
-			showInformation(stage, "Replace successful.");
+			UIUtil.showAlert(stage, AlertType.INFORMATION, "Replace Information", "Replace successful.", "");
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class ReplaceTool {
 				}
 			}
 			
-			showInformation(stage, "Multi-Replace successful.");
+			UIUtil.showAlert(stage, AlertType.INFORMATION, "Replace Information", "Multi-Replace successful.", "");
 		}
 	}
 	
@@ -257,17 +257,5 @@ public class ReplaceTool {
 		} catch (NoSuchElementException e) {
 			return null;
 		}
-	}
-	
-	/**
-	 * Shortcut function
-	 */
-	private static void showInformation(Stage stage, String message) {
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Replace Information");
-		alert.setHeaderText(message);
-		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
-		
-		alert.showAndWait();
 	}
 }

@@ -60,6 +60,7 @@ import nokori.jdialogue.ui.pannable_pane.NodeGestures;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
 import nokori.jdialogue.ui.pannable_pane.SceneGestures;
 import nokori.jdialogue.ui.util.CanvasSizeTool;
+import nokori.jdialogue.ui.util.MergeTool;
 import nokori.jdialogue.ui.util.ReplaceTool;
 import nokori.jdialogue.ui.util.ReplaceTool.ReplaceMode;
 import nokori.jdialogue.ui.util.UIUtil;
@@ -83,6 +84,18 @@ import nokori.jdialogue.ui.util.UIUtil;
  * When in doubt, read the comments
  * 
  * @author NOKORIWARE 2018
+ * 
+ * ------------------------------------------------------------------------------
+ * 
+ * This software uses JDK11 and JavaFX11. Use the following VM arguments to ensure that the program runs correctly:
+ * 
+ * --module-path "C:\Program Files\Java\javafx-sdk-11.0.2\lib" --add-modules=javafx.controls,javafx.fxml
+ * 
+ * --add-exports javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED
+ * --add-exports javafx.graphics/com.sun.javafx.text=ALL-UNNAMED
+ * --add-exports javafx.graphics/com.sun.javafx.scene.text=ALL-UNNAMED
+ * --add-opens javafx.graphics/javafx.scene.text=ALL-UNNAMED
+ * --add-opens javafx.graphics/com.sun.javafx.text=ALL-UNNAMED
  * 
  * ------------------------------------------------------------------------------
  * 
@@ -118,6 +131,9 @@ public class JDialogueCore extends Application {
 	/*
 	 * display data
 	 */
+	
+	public static final double TOOLTIP_SHOW_DELAY = 1;
+	
 	private Pane uiPane;
 	
 	private PannablePane pannablePane;
@@ -134,7 +150,7 @@ public class JDialogueCore extends Application {
 	private String[] syntax = null;
 	
 	/*
-	 * styling
+	 * Styling
 	 */
 	public static final int BUTTON_START_X = 20;
 	public static final int BUTTON_Y = 20;
@@ -280,6 +296,7 @@ public class JDialogueCore extends Application {
         //PannablePane event handlers (panning/zooming)
         scene.setOnMouseDragged(sceneGestures.getOnMouseDraggedEventHandler());
         scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
+        scene.setOnMouseReleased(sceneGestures.getOnMouseReleasedEventHandler());
         scene.addEventHandler(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
         
         //Reset the cursor when you panning panning
@@ -324,8 +341,8 @@ public class JDialogueCore extends Application {
 		initializeShadows();
 		
 		addBackground();
-		addProgramInfo();
-		addMenuButton(stage);
+		addProgramInformation();
+		addFileButton(stage);
 		addToolsButton(stage);
 		addNodeButton();
 		addProjectNameField();
@@ -430,38 +447,41 @@ public class JDialogueCore extends Application {
 	/**
 	 * Add info on the program to the bottom-left corner of the screen
 	 */
-	private void addProgramInfo() {
+	private void addProgramInformation() {
 		int offsetY = 20;
 		
-		Font sansLightSmall = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 18);
+		Font sansLightSmall = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 20);
 		
-		Text text = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " | Hold LMB = Drag/Pan | 2xLMB = Edit Node | 2xRMB = Delete Node | Scroll = Zoom In/Out on Mouse");
-		text.setFont(sansLightSmall);
-		text.setFill(Color.LIGHTGRAY.darker());
-		text.setX(20);
-		text.setY(WINDOW_HEIGHT - offsetY);
+		Text programInformation = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE");
+		programInformation.setFont(sansLightSmall);
+		programInformation.setFill(Color.LIGHTGRAY.darker());
+		programInformation.setX(20);
+		programInformation.setY(WINDOW_HEIGHT - offsetY);
+		programInformation.setMouseTransparent(true);
 		
 		//Clip to bottom-left
 		uiPane.layoutBoundsProperty().addListener((ov, oldValue, newValue) -> {
-			text.setY(newValue.getHeight() - offsetY);
+			programInformation.setY(newValue.getHeight() - offsetY);
 		});
 		
 		//Add to pane
-		uiPane.getChildren().add(text);
+		uiPane.getChildren().add(programInformation);
 	}
-	
+
 	private static final String NEW_PROJECT = "NEW PROJECT";
 	private static final String SELECT_PROJECT_DIRECTORY = "PROJECT DIR...";
+	private static final String MERGE_PROJECT = "MERGE PROJECT...";
 	private static final String EXPORT_JSON = "EXPORT JSON...";
 	private static final String IMPORT_JSON = "IMPORT JSON...";
 	
 	/**
 	 * Button for activating save/load settings and any other settings added in the future
 	 */
-	private void addMenuButton(Stage stage) {
+	private void addFileButton(Stage stage) {
 		String[] options = {
 				NEW_PROJECT,
 				SELECT_PROJECT_DIRECTORY,
+				MERGE_PROJECT,
 				EXPORT_JSON,
 				IMPORT_JSON
 		};
@@ -493,6 +513,9 @@ public class JDialogueCore extends Application {
 					break;
 				case SELECT_PROJECT_DIRECTORY:
 					setProjectDirectory(stage);
+					break;
+				case MERGE_PROJECT:
+					MergeTool.openMergeToolDialog(stage, JDialogueCore.this, getProjectDirectory(), project);
 					break;
 				case EXPORT_JSON:
 					exportProject(stage, new JDialogueJsonIO());

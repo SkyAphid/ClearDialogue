@@ -32,6 +32,44 @@ import org.reactfx.Subscription;
  */
 public class UIUtil {
 	
+	/**
+	 * Adapted from the java Rectangle API
+	 */
+	public static boolean rectanglesIntersect(double x1, double w1, double y1, double h1, double x2, double w2, double y2, double h2){
+		double tw = w1;
+		double th = h1;
+		
+		double rw = w2;
+		double rh = h2;
+
+		if (rw <= 0 || rh <= 0 || tw <= 0 || th <= 0) {
+			return false;
+		}
+
+		double tx = x1;
+		double ty = y1;
+		tw += tx;
+		th += ty;
+		
+		double rx = x2;
+		double ry = y2;
+		rw += rx;
+		rh += ry;
+
+		// overflow || intersect
+		return ((rw < rx || rw > tx) && (rh < ry || rh > ty)
+				&& (tw < tx || tw > rx) && (th < ty || th > ry));
+	}
+	
+	/**
+	 * Shortcut for showing basic alerts. Alerts are automatically centered on the window.
+	 * 
+	 * @param stage
+	 * @param alertType
+	 * @param title
+	 * @param header
+	 * @param message
+	 */
 	public static void showAlert(Stage stage, AlertType alertType, String title, String header, String message) {
 		Alert alert = new Alert(alertType);
 		

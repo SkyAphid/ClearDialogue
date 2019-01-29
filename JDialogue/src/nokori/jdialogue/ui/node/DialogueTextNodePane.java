@@ -39,7 +39,8 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		body.setMouseTransparent(true);
 
 		body.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
-		
+
+		//Finalize
 		UIUtil.computeHighlighting(body, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 		
 		StackPane.setAlignment(body, Pos.BOTTOM_CENTER);

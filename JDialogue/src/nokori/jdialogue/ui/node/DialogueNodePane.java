@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -47,9 +48,11 @@ public abstract class DialogueNodePane extends StackPane {
 	
 	//Instances
 	protected DialogueNode node;
-	private Rectangle outline, background;
+	private Tooltip tooltip = null;
 	private InlineCssTextArea title;
-
+	private Rectangle outline, background;
+	private boolean multiSelected = false;
+	
 	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont) {
 		this.core = core;
 		this.node = node;
@@ -90,22 +93,25 @@ public abstract class DialogueNodePane extends StackPane {
 		getChildren().addAll(background, connectorArc, title, outline);
 		
 		setOnMouseEntered(event -> {
-			FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
-			fadeTransition.setFromValue(outline.getOpacity());
-			fadeTransition.setToValue(1.0);
-			fadeTransition.play();
+			if (!multiSelected) {
+				fadeOutlineIn();
+			}
 		});
 		
 		setOnMouseExited(event -> {
-			FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
-			fadeTransition.setFromValue(outline.getOpacity());
-			fadeTransition.setToValue(0.0);
-			fadeTransition.play();
+			if (!multiSelected) {
+				fadeOutlineOut();
+			}
 		});
 
 		setOnMouseClicked(event -> {
 			checkDispose(event, core);
 		});
+		
+		//Tooltip
+		tooltip = new Tooltip("Drag with LMB\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
+		tooltip.setShowDelay(Duration.seconds(JDialogueCore.TOOLTIP_SHOW_DELAY));
+		Tooltip.install(this, tooltip);
 		
 		//Initial animation
 		RotateTransition rotateTransition = new RotateTransition(Duration.millis(FADE_TIME), this);
@@ -140,6 +146,14 @@ public abstract class DialogueNodePane extends StackPane {
 	}
 	
 	/**
+	 * Set the text of this DialogueNodePane's tooltip
+	 * @param text
+	 */
+	public void setTooltipText(String text) {
+		tooltip.setText(text);
+	}
+	
+	/**
 	 * Checks if the right mouse button is clicking on this node, indicating a deletion request
 	 */
 	protected boolean checkDispose(MouseEvent event, JDialogueCore core) {
@@ -169,6 +183,10 @@ public abstract class DialogueNodePane extends StackPane {
 		fadeTransition.play();
 		
 		fadeTransition.setOnFinished(event -> {
+			if (tooltip != null) {
+				tooltip.hide();
+			}
+			
 			core.removeDialogueNode(this);
 		});
 	}
@@ -179,6 +197,40 @@ public abstract class DialogueNodePane extends StackPane {
 	public void setBackgroundHeight(int height) {
 		outline.setHeight(height);
 		background.setHeight(height);
+	}
+	
+	/**
+	 * Highlights this DialogueNodePane for multi-select controls (editing multiple DialogueNodes at once)
+	 */
+	
+	public void setMultiSelected(boolean multiSelected) {
+		this.multiSelected = multiSelected;
+		
+		if (multiSelected) {
+			fadeOutlineIn();
+		} else {
+			fadeOutlineOut();
+		}
+	}
+	
+	/**
+	 * Sets and starts a fader the highlight outline that goes up to 1.0 from its current opacity.
+	 */
+	private void fadeOutlineIn() {
+		FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
+		fadeTransition.setFromValue(outline.getOpacity());
+		fadeTransition.setToValue(1.0);
+		fadeTransition.play();
+	}
+	
+	/**
+	 * Sets and starts a fader the highlight outline that goes down to 0.0 from its current opacity.
+	 */
+	private void fadeOutlineOut() {
+		FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
+		fadeTransition.setFromValue(outline.getOpacity());
+		fadeTransition.setToValue(0.0);
+		fadeTransition.play();
 	}
 	
 	/**

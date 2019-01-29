@@ -117,6 +117,7 @@ public class BoundLine extends CubicCurve {
 			boolean looping = (ndx > 0 && node1.getConnectorType() == ConnectorType.IN && node2.getConnectorType() == ConnectorType.OUT 
 					|| ndx < 0 && node1.getConnectorType() == ConnectorType.OUT && node2.getConnectorType() == ConnectorType.IN);
 			
+			//Curve the connector so that it doesn't end up behind nodes in cases where nodes loop back to the start
 			if (looping) {
 				n1ControlX = (ndx > 0 ? n1X - 100 : n1X + 100);
 				n2ControlX = (ndx < 0 ? n2X - 100 : n2X + 100);
