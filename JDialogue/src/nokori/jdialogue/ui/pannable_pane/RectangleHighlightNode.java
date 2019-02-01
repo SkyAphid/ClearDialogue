@@ -16,8 +16,11 @@ public class RectangleHighlightNode extends Rectangle {
 		
 		setFill(Color.LIGHTCORAL);
 		setStroke(Color.CORAL);
-		setOpacity(0.5);
+		setOpacity(0.25);
 		setMouseTransparent(true);
+		
+		setWidth(0);
+		setHeight(0);
 	}
 	
 	public void update(double mouseX, double mouseY) {

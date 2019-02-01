@@ -2,11 +2,9 @@ package nokori.jdialogue.ui.pannable_pane;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.util.Duration;
-import nokori.jdialogue.JDialogueCore;
+import nokori.jdialogue.ui.util.UIUtil;
 
 /**
  * The canvas which holds all of the nodes of the application.
@@ -33,9 +31,8 @@ public class PannablePane extends Pane {
 		setStyle("-fx-border-color: gray; -fx-border-width: 5; -fx-border-style: segments(50) line-cap butt;");
 
 		//Tooltip
-		Tooltip tooltip = new Tooltip("Hold and drag LMB to pan viewport.\nHold and drag RMB to highlight nodes.\nUse the scroll wheel to zoom in and out on the mouse location.");
-		tooltip.setShowDelay(Duration.seconds(JDialogueCore.TOOLTIP_SHOW_DELAY));
-		Tooltip.install(this, tooltip);
+		UIUtil.quickTooltip(this, "Hold and drag LMB to pan viewport.\nHold and drag RMB to highlight multiple nodes.\nAfter highlighting, click RMB to unhighlight all.\nUse the scroll wheel to zoom in and out on the mouse location.");
+
 		
 		// logging
 		/*addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {

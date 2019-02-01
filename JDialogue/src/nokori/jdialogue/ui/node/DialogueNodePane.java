@@ -45,7 +45,7 @@ public abstract class DialogueNodePane extends StackPane {
 	public static final int TITLE_HEIGHT = 30;
 	
 	private JDialogueCore core;
-	
+
 	//Instances
 	protected DialogueNode node;
 	private Tooltip tooltip = null;
@@ -109,9 +109,7 @@ public abstract class DialogueNodePane extends StackPane {
 		});
 		
 		//Tooltip
-		tooltip = new Tooltip("Drag with LMB\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
-		tooltip.setShowDelay(Duration.seconds(JDialogueCore.TOOLTIP_SHOW_DELAY));
-		Tooltip.install(this, tooltip);
+		tooltip = UIUtil.quickTooltip(this, "Drag with LMB\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
 		
 		//Initial animation
 		RotateTransition rotateTransition = new RotateTransition(Duration.millis(FADE_TIME), this);
@@ -214,7 +212,7 @@ public abstract class DialogueNodePane extends StackPane {
 	}
 	
 	/**
-	 * Sets and starts a fader the highlight outline that goes up to 1.0 from its current opacity.
+	 * Sets and starts a fader the mouse-hover outline that goes up to 1.0 from its current opacity.
 	 */
 	private void fadeOutlineIn() {
 		FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
@@ -224,7 +222,7 @@ public abstract class DialogueNodePane extends StackPane {
 	}
 	
 	/**
-	 * Sets and starts a fader the highlight outline that goes down to 0.0 from its current opacity.
+	 * Sets and starts a fader the  mouse-hover outline that goes down to 0.0 from its current opacity.
 	 */
 	private void fadeOutlineOut() {
 		FadeTransition fadeTransition = new FadeTransition(Duration.millis(Button.FADE_TIME), outline);
@@ -232,7 +230,7 @@ public abstract class DialogueNodePane extends StackPane {
 		fadeTransition.setToValue(0.0);
 		fadeTransition.play();
 	}
-	
+
 	/**
 	 * Tries to fetch the DialogueNodeConnectorArc for the inputted connector
 	 */
@@ -266,6 +264,10 @@ public abstract class DialogueNodePane extends StackPane {
 		return null;
 	}
 	
+	public boolean isMultiSelected() {
+		return multiSelected;
+	}
+
 	public DialogueNode getDialogueNode() {
 		return node;
 	}

@@ -4,6 +4,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.ui.node.DialogueNodePane;
 
 /**
@@ -20,10 +21,12 @@ public class SceneGestures {
 
 	private DragContext sceneDragContext = new DragContext();
 
+	private JDialogueCore core;
 	private PannablePane pannablePane;
 	private RectangleHighlightNode mouseHighlighter = null;
 	
-	public SceneGestures(PannablePane pannablePane) {
+	public SceneGestures(JDialogueCore core, PannablePane pannablePane) {
+		this.core = core;
 		this.pannablePane = pannablePane;
 	}
 
@@ -61,7 +64,21 @@ public class SceneGestures {
 			
 			//RMB -> Highlight
 			if (event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
-				setMouseHighlighter(new RectangleHighlightNode(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event)));
+
+				//Clear all selected from the last highlight
+				core.clearContextHint();
+
+				for (int i = 0; i < pannablePane.getChildren().size(); i++) {
+					Node node = pannablePane.getChildren().get(i);
+
+					if (node instanceof DialogueNodePane) {
+						DialogueNodePane dNode = (DialogueNodePane) node;
+						dNode.setMultiSelected(false);
+					}
+				}
+
+				//Create new highlighter
+				setMouseHighlighter(new RectangleHighlightNode(pannablePane.getScaledMouseX(event),pannablePane.getScaledMouseY(event)));
 			}
 		}
 
@@ -70,15 +87,6 @@ public class SceneGestures {
 	private EventHandler<MouseEvent> onMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
 			setMouseHighlighter(null);
-			
-			for (int i = 0; i < pannablePane.getChildren().size(); i++) {
-				Node node = pannablePane.getChildren().get(i);
-				
-				if (node instanceof DialogueNodePane) {
-					DialogueNodePane dNode = (DialogueNodePane) node;
-					dNode.setMultiSelected(false);
-				}
-			}
 		}
 	};
 
@@ -97,8 +105,27 @@ public class SceneGestures {
 			}
 			
 			//RMB -> Highlight
-			if (event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
+			if (mouseHighlighter != null && event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
 				mouseHighlighter.update(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event));
+				
+				//Run through all the DialogueNodePanes and update the ones within the highlighter to be multi-selected
+				for (int i = 0; i < pannablePane.getChildren().size(); i++) {
+					Node node = pannablePane.getChildren().get(i);
+					
+					if (node instanceof DialogueNodePane) {
+						DialogueNodePane dNode = (DialogueNodePane) node;
+						
+						boolean bSelected = dNode.isMultiSelected();
+						boolean selected = mouseHighlighter.getBoundsInParent().intersects(dNode.getBoundsInParent());
+						dNode.setMultiSelected(selected);
+						
+						
+						//Context hint updated every time a new node is highlighted
+						if (!bSelected && selected) {
+							core.setContextHint("Nodes Selected: " + core.getNumMultiSelected() + " | LMB = Drag All Selected | T-Key = Add Tag to All Selected");
+						}
+					}
+				}
 			}
 			
 			event.consume();

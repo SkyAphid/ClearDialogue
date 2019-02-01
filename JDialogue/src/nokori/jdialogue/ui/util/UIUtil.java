@@ -1,24 +1,15 @@
 package nokori.jdialogue.ui.util;
 
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCombination.SHIFT_ANY;
+import static javafx.scene.input.KeyCombination.SHORTCUT_ANY;
+import static org.fxmisc.wellbehaved.event.EventPattern.anyOf;
+import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
+
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
 
-import javafx.geometry.Bounds;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-
-import static javafx.scene.input.KeyCode.*;
-import static javafx.scene.input.KeyCombination.*;
-import static org.fxmisc.wellbehaved.event.EventPattern.*;
-
-import javafx.application.Platform;
-import javafx.event.Event;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.model.PlainTextChange;
 import org.fxmisc.richtext.util.UndoUtils;
@@ -27,10 +18,42 @@ import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
 import org.reactfx.Subscription;
 
+import javafx.application.Platform;
+import javafx.event.Event;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Tooltip;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+
 /**
  * Various utilities to make the UI code cleaner
  */
 public class UIUtil {
+	
+	//In seconds
+	private static final double TOOLTIP_SHOW_DELAY = 1;
+	private static final double TOOLTIP_HIDE_DELAY = 10;
+	
+	/**
+	 * Shortcut for adding Tooltips that follow JDialogue's default configurations.
+	 * @param node
+	 * @param tooltip
+	 */
+	public static Tooltip quickTooltip(Node node, String string) {
+		Tooltip tooltip = new Tooltip(string);
+		
+		tooltip.setShowDelay(javafx.util.Duration.seconds(TOOLTIP_SHOW_DELAY));
+		tooltip.setHideDelay(javafx.util.Duration.seconds(TOOLTIP_HIDE_DELAY));
+		Tooltip.install(node, tooltip);
+		
+		return tooltip;
+	}
 	
 	/**
 	 * Adapted from the java Rectangle API

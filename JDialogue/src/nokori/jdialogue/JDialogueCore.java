@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Stack;
 
 import javax.swing.UIManager;
 
@@ -87,9 +88,9 @@ import nokori.jdialogue.ui.util.UIUtil;
  * 
  * ------------------------------------------------------------------------------
  * 
- * This software uses JDK11 and JavaFX11. Use the following VM arguments to ensure that the program runs correctly:
+ * This software uses JDK11 and JavaFX11. Use the following VM arguments to ensure that the program runs correctly (make sure to read them first):
  * 
- * --module-path "C:\Program Files\Java\javafx-sdk-11.0.2\lib" --add-modules=javafx.controls,javafx.fxml
+ * --module-path "(javafx filepath)" --add-modules=javafx.controls,javafx.fxml
  * 
  * --add-exports javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED
  * --add-exports javafx.graphics/com.sun.javafx.text=ALL-UNNAMED
@@ -132,8 +133,6 @@ public class JDialogueCore extends Application {
 	 * display data
 	 */
 	
-	public static final double TOOLTIP_SHOW_DELAY = 1;
-	
 	private Pane uiPane;
 	
 	private PannablePane pannablePane;
@@ -175,6 +174,7 @@ public class JDialogueCore extends Application {
 	/*
 	 * UI components
 	 */
+	private Text contextHints;
 	private InlineCssTextArea projectNameField;
 	
 	/*
@@ -276,7 +276,7 @@ public class JDialogueCore extends Application {
 		scene.getStylesheets().add(getClass().getClassLoader().getResource("nokori/jdialogue/css/scrollbar_style.css").toExternalForm());
 		
 		//Configure pannable pane mouse gestures
-		sceneGestures = new SceneGestures(pannablePane) {
+		sceneGestures = new SceneGestures(this, pannablePane) {
 			@Override
 			public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
 				// Drag the grabbing hand when you pane the screen
@@ -320,6 +320,8 @@ public class JDialogueCore extends Application {
 	    			Node n = (Node) event.getSource();
 					
 					if (n instanceof DialogueNodePane) {
+						scene.setCursor(Cursor.CLOSED_HAND);
+						
 						//Update connectors if a node was moved
 						updateConnectors(event);
 						
@@ -452,20 +454,33 @@ public class JDialogueCore extends Application {
 		
 		Font sansLightSmall = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 20);
 		
-		Text programInformation = new Text(PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE");
+		//Information on the program itself (so that if screenshots are taken, people will know what the program is)
+		String programInformationString = PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE";
+		
+		Text programInformation = new Text(programInformationString);
 		programInformation.setFont(sansLightSmall);
 		programInformation.setFill(Color.LIGHTGRAY.darker());
 		programInformation.setX(20);
 		programInformation.setY(WINDOW_HEIGHT - offsetY);
 		programInformation.setMouseTransparent(true);
 		
+		//Context hints. These are activated under certain circumstances to tell the user instructions on how to use tools when they're activated.
+		contextHints = new Text();
+		contextHints.setFont(sansLightSmall);
+		contextHints.setFill(programInformation.getFill());
+		contextHints.setX(UIUtil.getStringBounds(sansLightSmall, programInformationString).getWidth() + 75);
+		contextHints.setY(programInformation.getY());
+		contextHints.setMouseTransparent(true);
+		
 		//Clip to bottom-left
 		uiPane.layoutBoundsProperty().addListener((ov, oldValue, newValue) -> {
-			programInformation.setY(newValue.getHeight() - offsetY);
+			double newY = newValue.getHeight() - offsetY;
+			programInformation.setY(newY);
+			contextHints.setY(newY);
 		});
 		
 		//Add to pane
-		uiPane.getChildren().add(programInformation);
+		uiPane.getChildren().addAll(programInformation, contextHints);
 	}
 
 	private static final String NEW_PROJECT = "NEW PROJECT";
@@ -1081,9 +1096,57 @@ public class JDialogueCore extends Application {
 
 	/*
 	 * 
-	 * GETTERS
+	 * GETTERS/SETTERS
 	 * 
 	 */
+	
+	/**
+	 * Compiles a Stack of all the multi-selected nodes and returns them. Stacks are not recycled, use wisely!
+	 * @return
+	 */
+	public Stack<DialogueNodePane> getAllMultiSelected(){
+		Stack<DialogueNodePane> selected = new Stack<DialogueNodePane>();
+		
+		for (int i = 0; i < pannablePane.getChildren().size(); i++) {
+			Node node = pannablePane.getChildren().get(i);
+			
+			if (node instanceof DialogueNodePane) {
+				DialogueNodePane dNode = (DialogueNodePane) node;
+				
+				if (dNode.isMultiSelected()) {
+					selected.push(dNode);
+				}
+			}
+		}
+		
+		return selected;
+	}
+	
+	public int getNumMultiSelected() {
+		int numSel = 0;
+		
+		for (int i = 0; i < pannablePane.getChildren().size(); i++) {
+			Node node = pannablePane.getChildren().get(i);
+			
+			if (node instanceof DialogueNodePane) {
+				DialogueNodePane dNode = (DialogueNodePane) node;
+				
+				if (dNode.isMultiSelected()) {
+					numSel++;
+				}
+			}
+		}
+		
+		return numSel;
+	}
+	
+	public void setContextHint(String hint) {
+		contextHints.setText(hint);
+	}
+	
+	public void clearContextHint() {
+		contextHints.setText("");
+	}
 	
 	public Project getActiveProject() {
 		return project;
