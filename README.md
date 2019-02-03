@@ -1,7 +1,7 @@
 # JDialogue
 JDialogue is a branching dialogue editor for video games. Designed to be extremely flexible and work with any type of game engine.
 
-![jdialogue](https://user-images.githubusercontent.com/6147299/51421782-4c789e00-1b69-11e9-8cd6-98c1a887f946.png)
+![jdialogue](https://user-images.githubusercontent.com/6147299/52175570-5aced880-276b-11e9-8879-924d437652af.png)
 
 ## Features
 
