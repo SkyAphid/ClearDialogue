@@ -13,6 +13,8 @@ import java.util.Stack;
 import javax.swing.UIManager;
 
 import org.fxmisc.richtext.InlineCssTextArea;
+
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
@@ -37,6 +39,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import nokori.jdialogue.io.JDialogueIO;
 import nokori.jdialogue.io.JDialogueJsonIO;
 import nokori.jdialogue.project.Connection;
@@ -129,6 +132,8 @@ public class JDialogueCore extends Application {
 	private static final int WINDOW_WIDTH = 1280;
 	private static final int WINDOW_HEIGHT = 720;
 
+	private Stage stage;
+	
 	/*
 	 * display data
 	 */
@@ -198,6 +203,8 @@ public class JDialogueCore extends Application {
 	 */
 	@Override
 	public void start(Stage stage) {
+		this.stage = stage;
+		
 		stage.getIcons().addAll(
 				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_512x512.png")),
 				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_256x256.png")),
@@ -343,7 +350,7 @@ public class JDialogueCore extends Application {
 		initializeShadows();
 		
 		addBackground();
-		addProgramInformation();
+		addProgramInformationAndContextHints();
 		addFileButton(stage);
 		addToolsButton(stage);
 		addNodeButton();
@@ -449,10 +456,10 @@ public class JDialogueCore extends Application {
 	/**
 	 * Add info on the program to the bottom-left corner of the screen
 	 */
-	private void addProgramInformation() {
+	private void addProgramInformationAndContextHints() {
 		int offsetY = 20;
 		
-		Font sansLightSmall = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 20);
+		Font sansLightSmall = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 18);
 		
 		//Information on the program itself (so that if screenshots are taken, people will know what the program is)
 		String programInformationString = PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE";
@@ -471,6 +478,7 @@ public class JDialogueCore extends Application {
 		contextHints.setX(UIUtil.getStringBounds(sansLightSmall, programInformationString).getWidth() + 75);
 		contextHints.setY(programInformation.getY());
 		contextHints.setMouseTransparent(true);
+		setDefaultContextHint();
 		
 		//Clip to bottom-left
 		uiPane.layoutBoundsProperty().addListener((ov, oldValue, newValue) -> {
@@ -1141,11 +1149,18 @@ public class JDialogueCore extends Application {
 	}
 	
 	public void setContextHint(String hint) {
-		contextHints.setText(hint);
+		if (!contextHints.getText().equals(hint)) {
+			FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.5), contextHints);
+			fadeTransition.setFromValue(0.0);
+			fadeTransition.setToValue(1.0);
+			fadeTransition.play();
+			
+			contextHints.setText(hint);
+		}
 	}
 	
-	public void clearContextHint() {
-		contextHints.setText("");
+	public void setDefaultContextHint() {
+		setContextHint("Drag LMB = Pan | Drag RMB = Multi-Select | Scroll Wheel = Zoom in/out on mouse position");
 	}
 	
 	public Project getActiveProject() {
@@ -1154,6 +1169,10 @@ public class JDialogueCore extends Application {
 	
 	public String[] getSyntax() {
 		return syntax;
+	}
+	
+	public Stage getStage() {
+		return stage;
 	}
 	
 	public Scene getScene() {

@@ -1,11 +1,16 @@
 package nokori.jdialogue.ui.pannable_pane;
 
+import java.util.HashMap;
+import java.util.Stack;
+
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import javafx.util.Pair;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.Project;
+import nokori.jdialogue.ui.node.DialogueNodePane;
 
 /**
  * Listeners for making the nodes draggable via left mouse button. Considers if
@@ -17,7 +22,7 @@ import nokori.jdialogue.project.Project;
  */
 public class NodeGestures {
 
-	private DragContext nodeDragContext = new DragContext();
+	private NodeDragContext nodeDragContext = new NodeDragContext();
 
 	private JDialogueCore core;
 	private PannablePane pannablePane;
@@ -39,18 +44,26 @@ public class NodeGestures {
 
 		public void handle(MouseEvent event) {
 			
-			// left mouse button => dragging
-			if (!event.isPrimaryButtonDown())
+			//LMB -> Dragging Nodes
+			if (!event.isPrimaryButtonDown()) {
 				return;
+			}
 
+			//Set mouse anchors for scene 
 			nodeDragContext.mouseAnchorX = event.getSceneX();
 			nodeDragContext.mouseAnchorY = event.getSceneY();
 
+			//Set mouse anchors for node
 			Node node = (Node) event.getSource();
-
-			nodeDragContext.translateAnchorX = node.getTranslateX();
-			nodeDragContext.translateAnchorY = node.getTranslateY();
-
+			nodeDragContext.translateAnchors.put(node, new Pair<>(node.getTranslateX(), node.getTranslateY()));
+			
+			//Set mouse anchors for multi-selected nodes
+			Stack<DialogueNodePane> multiSelected = core.getAllMultiSelected();
+			
+			while(!multiSelected.isEmpty()) {
+				DialogueNodePane n = multiSelected.pop();
+				nodeDragContext.translateAnchors.put(n, new Pair<>(n.getTranslateX(), n.getTranslateY()));
+			}
 		}
 
 	};
@@ -58,16 +71,23 @@ public class NodeGestures {
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
 			
-			// left mouse button => dragging
-			if (!event.isPrimaryButtonDown())
+			//LMB -> Dragging Nodes
+			if (!event.isPrimaryButtonDown()) {
 				return;
+			}
 
-			double scale = pannablePane.getScale();
-
+			//Pan the selected node
 			Node node = (Node) event.getSource();
+			node.setTranslateX(getNodeDragTranslateX(node, event));
+			node.setTranslateY(getNodeDragTranslateY(node, event));
 			
-			node.setTranslateX(nodeDragContext.translateAnchorX + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / scale));
-			node.setTranslateY(nodeDragContext.translateAnchorY + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / scale));
+			Stack<DialogueNodePane> multiSelected = core.getAllMultiSelected();
+			
+			while(!multiSelected.isEmpty()) {
+				DialogueNodePane n = multiSelected.pop();
+				n.setTranslateX(getNodeDragTranslateX(n, event));
+				n.setTranslateY(getNodeDragTranslateY(n, event));
+			}
 			
 			clampToParentBounds(node);
 			
@@ -76,6 +96,14 @@ public class NodeGestures {
 			event.consume();
 		}
 	};
+	
+	private double getNodeDragTranslateX(Node node, MouseEvent event) {
+		return nodeDragContext.translateAnchors.get(node).getKey() + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / pannablePane.getScale());
+	}
+	
+	private double getNodeDragTranslateY(Node node, MouseEvent event) {
+		return nodeDragContext.translateAnchors.get(node).getValue() + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / pannablePane.getScale());
+	}
 	
 	/**
 	 * Custom callback because the normal one has to consume the event for the dragging to work correctly
@@ -113,4 +141,12 @@ public class NodeGestures {
 	private static double clamp(double val, double min, double max) {
 	    return Math.max(min, Math.min(max, val));
 	}
+}
+
+class NodeDragContext {
+
+	double mouseAnchorX;
+	double mouseAnchorY;
+	
+	HashMap<Node, Pair<Double, Double>> translateAnchors = new HashMap<Node, Pair<Double, Double>>();
 }

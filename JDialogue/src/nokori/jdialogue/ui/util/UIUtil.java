@@ -9,6 +9,7 @@ import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.model.PlainTextChange;
@@ -24,6 +25,8 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -38,20 +41,19 @@ public class UIUtil {
 	
 	//In seconds
 	private static final double TOOLTIP_SHOW_DELAY = 1;
-	private static final double TOOLTIP_HIDE_DELAY = 10;
-	
+
 	/**
 	 * Shortcut for adding Tooltips that follow JDialogue's default configurations.
 	 * @param node
 	 * @param tooltip
 	 */
-	public static Tooltip quickTooltip(Node node, String string) {
+	public static Tooltip quickTooltip(Node node, int showDurationInSeconds, String string) {
 		Tooltip tooltip = new Tooltip(string);
 		
 		tooltip.setShowDelay(javafx.util.Duration.seconds(TOOLTIP_SHOW_DELAY));
-		tooltip.setHideDelay(javafx.util.Duration.seconds(TOOLTIP_HIDE_DELAY));
+		tooltip.setShowDuration(javafx.util.Duration.seconds(showDurationInSeconds));
 		Tooltip.install(node, tooltip);
-		
+
 		return tooltip;
 	}
 	
@@ -109,6 +111,38 @@ public class UIUtil {
 		});
 		
 		alert.showAndWait();
+	}
+	
+	/**
+	 * Shortcut for showing a confirmation alert. Returns true if the user selects "yes."
+	 * 
+	 * @param stage
+	 * @param alertType
+	 * @param title
+	 * @param header
+	 * @param message
+	 */
+	public static boolean showConfirmAlert(Stage stage, AlertType alertType, String title, String header, String message) {
+		Alert alert = new Alert(alertType);
+		
+		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
+		
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(message);
+		
+		ButtonType yesButtonType = new ButtonType("Yes", ButtonData.OK_DONE);
+		alert.getDialogPane().getButtonTypes().clear();
+		alert.getDialogPane().getButtonTypes().addAll(yesButtonType, ButtonType.CANCEL);
+		
+		Platform.runLater(() -> {
+			alert.setX(stage.getX() + stage.getWidth() / 2 - alert.getWidth() / 2);
+			alert.setY(stage.getY() + stage.getHeight() / 2 - alert.getHeight() / 2);
+		});
+		
+		Optional<ButtonType> result = alert.showAndWait();
+		
+		return (result.get() == yesButtonType);
 	}
 	
 	/**

@@ -4,7 +4,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import nokori.jdialogue.ui.util.UIUtil;
 
 /**
  * The canvas which holds all of the nodes of the application.
@@ -30,10 +29,6 @@ public class PannablePane extends Pane {
 		//Set CSS
 		setStyle("-fx-border-color: gray; -fx-border-width: 5; -fx-border-style: segments(50) line-cap butt;");
 
-		//Tooltip
-		UIUtil.quickTooltip(this, "Hold and drag LMB to pan viewport.\nHold and drag RMB to highlight multiple nodes.\nAfter highlighting, click RMB to unhighlight all.\nUse the scroll wheel to zoom in and out on the mouse location.");
-
-		
 		// logging
 		/*addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
 		 * Thank GOD for the line below. I couldn't figure out how to get the correct mouse coordinates for the life of me. 

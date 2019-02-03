@@ -51,7 +51,7 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		
 		//Open Editor
 		setOnMouseClicked(event -> {
-			if (checkDispose(event, core)) {
+			if (checkDispose(event)) {
 				return;
 			}
 			

@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
@@ -105,11 +106,11 @@ public abstract class DialogueNodePane extends StackPane {
 		});
 
 		setOnMouseClicked(event -> {
-			checkDispose(event, core);
+			checkDispose(event);
 		});
 		
 		//Tooltip
-		tooltip = UIUtil.quickTooltip(this, "Drag with LMB\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
+		tooltip = UIUtil.quickTooltip(this, 30, "Hold LMB and drag to move node.\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
 		
 		//Initial animation
 		RotateTransition rotateTransition = new RotateTransition(Duration.millis(FADE_TIME), this);
@@ -154,9 +155,11 @@ public abstract class DialogueNodePane extends StackPane {
 	/**
 	 * Checks if the right mouse button is clicking on this node, indicating a deletion request
 	 */
-	protected boolean checkDispose(MouseEvent event, JDialogueCore core) {
+	protected boolean checkDispose(MouseEvent event) {
 		if (event.getClickCount() > 1 && event.getButton() == MouseButton.SECONDARY) {
-			dispose(core);
+			if (UIUtil.showConfirmAlert(core.getStage(), AlertType.CONFIRMATION, "Delete Node", "Delete node \"" + node.getName() + "?\"", "*This cannot be undone")) {
+				dispose(core);
+			}
 			
 			return true;
 		}

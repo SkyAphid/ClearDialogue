@@ -19,7 +19,7 @@ public class SceneGestures {
 	private static final double MAX_SCALE = 1.0;
 	private static final double MIN_SCALE = 0.1;
 
-	private DragContext sceneDragContext = new DragContext();
+	private SceneDragContext sceneDragContext = new SceneDragContext();
 
 	private JDialogueCore core;
 	private PannablePane pannablePane;
@@ -30,7 +30,7 @@ public class SceneGestures {
 		this.pannablePane = pannablePane;
 	}
 
-	public DragContext getSceneDragContext() {
+	public SceneDragContext getSceneDragContext() {
 		return sceneDragContext;
 	}
 
@@ -66,7 +66,7 @@ public class SceneGestures {
 			if (event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
 
 				//Clear all selected from the last highlight
-				core.clearContextHint();
+				core.setDefaultContextHint();
 
 				for (int i = 0; i < pannablePane.getChildren().size(); i++) {
 					Node node = pannablePane.getChildren().get(i);
@@ -122,7 +122,7 @@ public class SceneGestures {
 						
 						//Context hint updated every time a new node is highlighted
 						if (!bSelected && selected) {
-							core.setContextHint("Nodes Selected: " + core.getNumMultiSelected() + " | LMB = Drag All Selected | T-Key = Add Tag to All Selected");
+							core.setContextHint("Nodes selected: " + core.getNumMultiSelected() + " | LMB = Drag all selected | RMB = De-select all nodes | T-Key = Add tag to all selected");
 						}
 					}
 				}
@@ -200,4 +200,13 @@ public class SceneGestures {
 
 		return value;
 	}
+}
+
+class SceneDragContext {
+
+	double mouseAnchorX;
+	double mouseAnchorY;
+
+	double translateAnchorX;
+	double translateAnchorY;
 }
