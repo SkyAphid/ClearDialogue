@@ -69,7 +69,7 @@ public class SceneGestures {
 	 * @return
 	 */
 	public static String getSceneContextHint() {
-		return "Drag LMB = Multi-Select | Drag RMB = Pan Viewport | Scroll Wheel = Zoom in/out on mouse position";
+		return "Drag LMB = Multi-Select | Drag RMB = Pan viewport | Scroll Wheel = Zoom in/out on mouse position";
 	}
 	
 	/**
