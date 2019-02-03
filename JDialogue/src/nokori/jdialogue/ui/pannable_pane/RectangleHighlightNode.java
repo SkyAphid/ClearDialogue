@@ -24,7 +24,20 @@ public class RectangleHighlightNode extends Rectangle {
 	}
 	
 	public void update(double mouseX, double mouseY) {
-		setWidth(mouseX - startX);
-		setHeight(mouseY - startY);
+		if (mouseX < startX) {
+			setTranslateX(mouseX);
+			setWidth(startX - mouseX);
+		} else {
+			setTranslateX(startX);
+			setWidth(mouseX - startX);
+		}
+		
+		if (mouseY < startY) {
+			setTranslateY(mouseY);
+			setHeight(startY - mouseY);
+		} else {
+			setTranslateY(startY);
+			setHeight(mouseY - startY);
+		}
 	}
 }

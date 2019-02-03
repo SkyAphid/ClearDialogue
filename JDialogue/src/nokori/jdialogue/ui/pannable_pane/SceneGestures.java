@@ -49,12 +49,45 @@ public class SceneGestures {
 	public EventHandler<ScrollEvent> getOnScrollEventHandler() {
 		return onScrollEventHandler;
 	}
-
+	
+	/**
+	 * Inputs for panning the viewport
+	 */
+	private boolean isPanning(MouseEvent event) {
+		return (!event.isPrimaryButtonDown() && event.isSecondaryButtonDown());
+	}
+	
+	/**
+	 * Inputs for highlighting nodes
+	 */
+	private boolean isHighlighting(MouseEvent event) {
+		return (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown());
+	}
+	
+	/**
+	 * Used as the default JDialogueCore context hint. I've put the function here because this class is where you change the controls if needed.
+	 * @return
+	 */
+	public static String getSceneContextHint() {
+		return "Drag LMB = Multi-Select | Drag RMB = Pan Viewport | Scroll Wheel = Zoom in/out on mouse position";
+	}
+	
+	/**
+	 * Get the context hint for when multiple nodes are selected with the highlighter.
+	 * @param nodesSelected
+	 * @return
+	 */
+	public static String getMultiSelectContextHint(int nodesSelected) {
+		return "Nodes selected: " + nodesSelected + " | LMB = De-select all nodes | T-Key = Add tag to all | R-Key = Remove tags from all";
+	}
+	
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
 		public void handle(MouseEvent event) {
-			//LMB -> Panning
-			if (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown()) {
+			/*
+			 * Panning
+			 */
+			if (isPanning(event)) {
 				sceneDragContext.mouseAnchorX = event.getSceneX();
 				sceneDragContext.mouseAnchorY = event.getSceneY();
 			
@@ -62,8 +95,10 @@ public class SceneGestures {
 				sceneDragContext.translateAnchorY = pannablePane.getTranslateY();
 			}
 			
-			//RMB -> Highlight
-			if (event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
+			/*
+			 * Highlighting
+			 */
+			if (isHighlighting(event)) {
 
 				//Clear all selected from the last highlight
 				core.setDefaultContextHint();
@@ -80,6 +115,7 @@ public class SceneGestures {
 				//Create new highlighter
 				setMouseHighlighter(new RectangleHighlightNode(pannablePane.getScaledMouseX(event),pannablePane.getScaledMouseY(event)));
 			}
+			
 		}
 
 	};
@@ -93,8 +129,10 @@ public class SceneGestures {
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
 
-			//LMB -> Panning
-			if (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown()) {
+			/*
+			 * Panning
+			 */
+			if (isPanning(event)) {
 				double newTranslateX = sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX;
 				double newTranslateY = sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY;
 				
@@ -104,8 +142,10 @@ public class SceneGestures {
 				mouseDragged(event, newTranslateX, newTranslateY);
 			}
 			
-			//RMB -> Highlight
-			if (mouseHighlighter != null && event.isSecondaryButtonDown() && !event.isPrimaryButtonDown()) {
+			/*
+			 * Highlighting
+			 */
+			if (isHighlighting(event)) {
 				mouseHighlighter.update(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event));
 				
 				//Run through all the DialogueNodePanes and update the ones within the highlighter to be multi-selected
@@ -122,7 +162,7 @@ public class SceneGestures {
 						
 						//Context hint updated every time a new node is highlighted
 						if (!bSelected && selected) {
-							core.setContextHint("Nodes selected: " + core.getNumMultiSelected() + " | LMB = Drag all selected | RMB = De-select all nodes | T-Key = Add tag to all selected");
+							core.setContextHint(getMultiSelectContextHint(core.getNumMultiSelected()));
 						}
 					}
 				}

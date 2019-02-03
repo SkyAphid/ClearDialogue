@@ -27,6 +27,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -113,6 +114,10 @@ public class UIUtil {
 		alert.showAndWait();
 	}
 	
+	public static void showAlert(Stage stage, AlertType alertType, String title, String header) {
+		showAlert(stage, alertType, title, header, "");
+	}
+	
 	/**
 	 * Shortcut for showing a confirmation alert. Returns true if the user selects "yes."
 	 * 
@@ -131,18 +136,56 @@ public class UIUtil {
 		alert.setHeaderText(header);
 		alert.setContentText(message);
 		
+		//Create buttons
 		ButtonType yesButtonType = new ButtonType("Yes", ButtonData.OK_DONE);
 		alert.getDialogPane().getButtonTypes().clear();
 		alert.getDialogPane().getButtonTypes().addAll(yesButtonType, ButtonType.CANCEL);
 		
+		//Center alert
 		Platform.runLater(() -> {
 			alert.setX(stage.getX() + stage.getWidth() / 2 - alert.getWidth() / 2);
 			alert.setY(stage.getY() + stage.getHeight() / 2 - alert.getHeight() / 2);
 		});
 		
+		//Show and wait
 		Optional<ButtonType> result = alert.showAndWait();
 		
 		return (result.get() == yesButtonType);
+	}
+	
+	/**
+	 * Show a centered dialog with a string input field and wait for the users input. If the text field is empty or the X button is pressed, null is returned.
+	 * 
+	 * @param stage
+	 * @param alertType
+	 * @param title
+	 * @param header
+	 * @param message
+	 * @return
+	 */
+	public static String showInputDialog(Stage stage, String title, String header, String defaultText, String fieldLabel) {
+		TextInputDialog dialog = new TextInputDialog(defaultText);
+		dialog.setTitle(title);
+		dialog.setHeaderText(header);
+		dialog.setContentText(fieldLabel);
+		
+		//Set dialog icon to match the main window
+		((Stage) dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(stage.getIcons());
+		
+		//Center dialog
+		Platform.runLater(() -> {
+			dialog.setX(stage.getX() + stage.getWidth() / 2 - dialog.getWidth() / 2);
+			dialog.setY(stage.getY() + stage.getHeight() / 2 - dialog.getHeight() / 2);
+		});
+
+		//Show and wait
+		Optional<String> result = dialog.showAndWait();
+		
+		if (result.isPresent()){
+		  	return result.get();
+		} else {
+			return null;
+		}
 	}
 	
 	/**

@@ -27,6 +27,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Background;
@@ -65,6 +66,7 @@ import nokori.jdialogue.ui.pannable_pane.PannablePane;
 import nokori.jdialogue.ui.pannable_pane.SceneGestures;
 import nokori.jdialogue.ui.util.CanvasSizeTool;
 import nokori.jdialogue.ui.util.MergeTool;
+import nokori.jdialogue.ui.util.MultiTagTool;
 import nokori.jdialogue.ui.util.ReplaceTool;
 import nokori.jdialogue.ui.util.ReplaceTool.ReplaceMode;
 import nokori.jdialogue.ui.util.UIUtil;
@@ -124,7 +126,7 @@ import nokori.jdialogue.ui.util.UIUtil;
 public class JDialogueCore extends Application {
 	
 	private static final String PROGRAM_NAME = "JDialogue";
-	private static final String PROGRAM_VERSION = "Rev. 3";
+	private static final String PROGRAM_VERSION = "Rev. 5";
 	
 	/*
 	 * window settings
@@ -305,6 +307,8 @@ public class JDialogueCore extends Application {
         scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
         scene.setOnMouseReleased(sceneGestures.getOnMouseReleasedEventHandler());
         scene.addEventHandler(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, MultiTagTool.getKeyPressEventHandler(this));
+        
         
         //Reset the cursor when you panning panning
         scene.setOnMouseClicked(event -> {
@@ -538,7 +542,7 @@ public class JDialogueCore extends Application {
 					setProjectDirectory(stage);
 					break;
 				case MERGE_PROJECT:
-					MergeTool.openMergeToolDialog(stage, JDialogueCore.this, getProjectDirectory(), project);
+					MergeTool.openMergeToolDialog(JDialogueCore.this, getProjectDirectory(), project);
 					break;
 				case EXPORT_JSON:
 					exportProject(stage, new JDialogueJsonIO());
@@ -721,7 +725,7 @@ public class JDialogueCore extends Application {
 			public void optionClicked(MouseEvent event, String optionName, int optionIndex) {
 				switch(optionName) {
 				case CANVAS_SIZE:
-					new CanvasSizeTool().openCanvasSizeDialog(stage, JDialogueCore.this, project, pannablePane);
+					new CanvasSizeTool().openCanvasSizeDialog(JDialogueCore.this, project, pannablePane);
 					break;
 				case REPLACE:
 					ReplaceTool.run(stage, getProjectDirectory(), project, ReplaceMode.LOCAL);
@@ -1160,7 +1164,7 @@ public class JDialogueCore extends Application {
 	}
 	
 	public void setDefaultContextHint() {
-		setContextHint("Drag LMB = Pan | Drag RMB = Multi-Select | Scroll Wheel = Zoom in/out on mouse position");
+		setContextHint(SceneGestures.getSceneContextHint());
 	}
 	
 	public Project getActiveProject() {

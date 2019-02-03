@@ -20,7 +20,9 @@ import nokori.jdialogue.ui.pannable_pane.PannablePane;
 public class CanvasSizeTool {
 	private boolean canvasWidthValid = true, canvasHeightValid = true;
 	
-	public void openCanvasSizeDialog(Stage stage, JDialogueCore core, Project project, PannablePane pannablePane) {
+	public void openCanvasSizeDialog(JDialogueCore core, Project project, PannablePane pannablePane) {
+		Stage stage = core.getStage();
+		
 		/*
 		 * Create the custom dialog.
 		 */
