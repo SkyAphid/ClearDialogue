@@ -43,7 +43,7 @@ public abstract class DialogueNode implements Serializable {
 		this.y = y;
 		
 		uid = new UID().toString();
-		tag = "No Tag";
+		tag = "";
 		
 		inConnector = new DialogueNodeConnector(project, this);
 	}
