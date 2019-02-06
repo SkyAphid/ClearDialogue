@@ -205,12 +205,14 @@ public abstract class DialogueNodePane extends StackPane {
 	 */
 	
 	public void setMultiSelected(boolean multiSelected) {
-		this.multiSelected = multiSelected;
-		
-		if (multiSelected) {
-			fadeOutlineIn();
-		} else {
-			fadeOutlineOut();
+		if (this.multiSelected != multiSelected) {
+			this.multiSelected = multiSelected;
+			
+			if (multiSelected) {
+				fadeOutlineIn();
+			} else {
+				fadeOutlineOut();
+			}
 		}
 	}
 	

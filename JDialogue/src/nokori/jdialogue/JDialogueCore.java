@@ -1166,9 +1166,9 @@ public class JDialogueCore extends Application {
 			
 			contextHints.setText(hint);
 			
-			//FYI I totally pulled the 1.7 out of nowhere just so multi-line context hints would line up with the program information
+			//FYI I totally pulled the 2.1 out of nowhere just so multi-line context hints would line up with the program information
 			//Feel free to change it if necessary
-			double newLineOffset = (hint.contains("\n") ? (JDialogueUtils.getStringBounds(contextHints.getFont(), hint)).getHeight()/1.75 : 0);
+			double newLineOffset = (hint.contains("\n") ? (contextHints.getBoundsInParent().getHeight()/2.1) : 0);
 			contextHints.setY(programInformation.getY() - newLineOffset);
 		}
 	}
