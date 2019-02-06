@@ -1,5 +1,6 @@
 package nokori.jdialogue.ui.util;
 
+import java.util.Collections;
 import java.util.Stack;
 
 import javafx.event.EventHandler;
@@ -16,7 +17,7 @@ import nokori.jdialogue.ui.node.DialogueNodePane;
  * @author Brayden
  *
  */
-public class MultiTagTool {
+public class MultiEditTool {
 	
 	public static EventHandler<KeyEvent> getKeyPressEventHandler(JDialogueCore core) {
 		return new EventHandler<KeyEvent>() {
@@ -70,6 +71,41 @@ public class MultiTagTool {
 							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Removal Success", "\"" + searchTag + "\" was removed successfully from " + removals + " nodes.");
 						} else {
 							JDialogueUtils.showAlert(stage, AlertType.ERROR, "Tag Removal Failure", "\"" + searchTag + "\" wasn't found in any nodes.");
+						}
+					}
+				}
+				
+				/*
+				 * Set name for all nodes
+				 */
+				if (event.getCode() == KeyCode.N) {
+					Stack<DialogueNodePane> selected = core.getAllMultiSelected();
+					
+					if (!selected.isEmpty()) {
+						Collections.reverse(selected);
+						String autoNumTag = "[[#NUM]]";
+						
+						String name = JDialogueUtils.showInputDialog(stage, "Multi-Name", 
+								"Input a name for the selected DialogueNodes."
+								+ "\n\n*Note: you can add " +autoNumTag + " to the name to automatically add the node's number to the name."
+								+ "\n*e.g. Node " + autoNumTag + " would be Node 1, Node 2, etc", 
+								
+								"", "Please input the new node names:");
+						
+						if (name != null) {
+							int numNames = 0;
+								
+							while (!selected.isEmpty()) {
+								DialogueNode node = selected.pop().getDialogueNode();
+								node.setName(name.replace(autoNumTag, Integer.toString(numNames + 1)));
+								numNames++;
+							}
+							
+							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Rename Success", "\"" + name + "\" was set on " + numNames + " nodes.");
+							
+							core.refreshUI(true);
+						} else {
+							JDialogueUtils.showAlert(stage, AlertType.ERROR, "Rename Canceled", "No name was inputted.");
 						}
 					}
 				}

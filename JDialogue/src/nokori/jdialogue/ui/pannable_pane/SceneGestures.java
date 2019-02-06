@@ -82,7 +82,7 @@ public class SceneGestures {
 	 * @return
 	 */
 	public static String getMultiSelectContextHint(int nodesSelected) {
-		return "Nodes selected: " + nodesSelected + " | Drag LMB = Drag all nodes | RMB = De-select all\nT-Key = Add tag to all | R-Key = Remove tags from all";
+		return "Nodes selected: " + nodesSelected + " | Drag LMB = Drag all nodes | RMB = De-select all\nT-Key = Add tag to all | R-Key = Remove tags from all | N-Key = Set name for all";
 	}
 	
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {

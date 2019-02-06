@@ -66,7 +66,7 @@ import nokori.jdialogue.ui.pannable_pane.PannablePane;
 import nokori.jdialogue.ui.pannable_pane.SceneGestures;
 import nokori.jdialogue.ui.util.CanvasSizeTool;
 import nokori.jdialogue.ui.util.MergeTool;
-import nokori.jdialogue.ui.util.MultiTagTool;
+import nokori.jdialogue.ui.util.MultiEditTool;
 import nokori.jdialogue.ui.util.ReplaceTool;
 import nokori.jdialogue.ui.util.ReplaceTool.ReplaceMode;
 import nokori.jdialogue.ui.util.JDialogueUtils;
@@ -328,7 +328,7 @@ public class JDialogueCore extends Application {
         scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
         scene.setOnMouseReleased(sceneGestures.getOnMouseReleasedEventHandler());
         scene.addEventHandler(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, MultiTagTool.getKeyPressEventHandler(this));
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, MultiEditTool.getKeyPressEventHandler(this));
         
         
         //Reset the cursor when you panning panning
