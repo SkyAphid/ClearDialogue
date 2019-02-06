@@ -563,7 +563,7 @@ public class JDialogueCore extends Application {
 		project = new Project();
 		
 		if (!projectNull) {
-			refreshUI();
+			refreshUI(false);
 		}
 	}
 	
@@ -610,7 +610,7 @@ public class JDialogueCore extends Application {
 				Project project = behavior.importProject(f);
 				
 				this.project = project;
-				refreshUI();
+				refreshUI(false);
 				
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -627,20 +627,25 @@ public class JDialogueCore extends Application {
 	/**
 	 * This refreshes PannablePane and any other UI element to match a newly imported Project's settings. This can also be used if anything concerning the
 	 * viewport is updated as well, such as the canvas size or scaling.
+	 * 
+	 * @param retainViewportSettings if set to true, the viewports X/Y/Scale/Size won't be modified upon refresh (e.g. when merging projects instead of just importing)
 	 */
-	public void refreshUI() {
+	public void refreshUI(boolean retainViewportSettings) {
 		
 		//Updated project name field with this project's name
 		projectNameField.replaceText(project.getName());
 		
 		//Clear PannablePane and update its size
 		pannablePane.getChildren().clear();
-		pannablePane.setSize(project.getCanvasWidth(), project.getCanvasHeight());
 		
-		pannablePane.setTranslateX(project.getViewportX());
-		pannablePane.setTranslateY(project.getViewportY());
-		pannablePane.setScale(project.getViewportScale());
-
+		if (!retainViewportSettings) {
+			pannablePane.setSize(project.getCanvasWidth(), project.getCanvasHeight());
+		
+			pannablePane.setTranslateX(project.getViewportX());
+			pannablePane.setTranslateY(project.getViewportY());
+			pannablePane.setScale(project.getViewportScale());
+		}
+		
 		// Build all of the DialogueNodePanes (graphical representation of node)
 		for (int i = 0; i < project.getNumNodes(); i++) {
 			DialogueNode node = project.getNode(i);

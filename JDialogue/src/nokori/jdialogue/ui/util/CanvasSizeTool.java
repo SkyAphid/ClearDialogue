@@ -119,7 +119,7 @@ public class CanvasSizeTool {
 			project.setViewportY(-canvasHeight/2);
 			project.setViewportScale(1.0);
 			
-			core.refreshUI();
+			core.refreshUI(false);
 		} catch (NoSuchElementException e) {
 			//This means the value wasn't changed, so we do nothing.
 		}

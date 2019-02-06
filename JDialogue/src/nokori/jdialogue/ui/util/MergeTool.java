@@ -21,7 +21,7 @@ public class MergeTool {
 		if (file != null) {
 			try {
 				project.mergeProject(new JDialogueJsonIO().importProject(file));
-				core.refreshUI();
+				core.refreshUI(true);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
