@@ -126,7 +126,7 @@ import nokori.jdialogue.ui.util.JDialogueUtils;
 public class JDialogueCore extends Application {
 	
 	private static final String PROGRAM_NAME = "JDialogue";
-	private static final String PROGRAM_VERSION = "Rev. 5";
+	private static final String PROGRAM_VERSION = "Rev. 7";
 	
 	/*
 	 * window settings
@@ -296,22 +296,7 @@ public class JDialogueCore extends Application {
     		public void mouseDragged(MouseEvent event) {
     			if (event.getSource() instanceof Node) {
             		setSelectedConnector(null);
-            		
-	    			Node n = (Node) event.getSource();
-					
-					if (n instanceof DialogueNodePane) {
-						scene.setCursor(Cursor.CLOSED_HAND);
-						
-						//Update connectors if a node was moved
-						updateConnectors(event);
-						
-						//Update node positiong
-						DialogueNodePane pane = (DialogueNodePane) n;
-						DialogueNode node = pane.getDialogueNode();
-						
-						node.setX(pane.getTranslateX());
-						node.setY(pane.getTranslateY());
-					}
+            		scene.setCursor(Cursor.CLOSED_HAND);
     			}
     		}
     	};

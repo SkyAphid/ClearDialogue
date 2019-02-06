@@ -52,6 +52,10 @@ public class NodeGestures {
 	public boolean isNodeSelected() {
 		return nodeSelected;
 	}
+	
+	private boolean isUsingDragControls(MouseEvent event) {
+		return event.isPrimaryButtonDown();
+	}
 
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
@@ -59,8 +63,7 @@ public class NodeGestures {
 			
 			nodeSelected = false;
 			
-			//LMB -> Dragging Nodes
-			if (!event.isPrimaryButtonDown()) {
+			if (!isUsingDragControls(event)) {
 				return;
 			}
 
@@ -95,8 +98,7 @@ public class NodeGestures {
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
 			
-			//LMB -> Dragging Nodes
-			if (!event.isPrimaryButtonDown()) {
+			if (!isUsingDragControls(event)) {
 				return;
 			}
 
@@ -104,6 +106,7 @@ public class NodeGestures {
 			Node node = (Node) event.getSource();
 			node.setTranslateX(getNodeDragTranslateX(node, event));
 			node.setTranslateY(getNodeDragTranslateY(node, event));
+			((DialogueNodePane) node).syncPositionOnDrag(event);
 			
 			Stack<DialogueNodePane> multiSelected = core.getAllMultiSelected();
 			
@@ -111,6 +114,7 @@ public class NodeGestures {
 				DialogueNodePane n = multiSelected.pop();
 				n.setTranslateX(getNodeDragTranslateX(n, event));
 				n.setTranslateY(getNodeDragTranslateY(n, event));
+				n.syncPositionOnDrag(event);
 			}
 			
 			clampToParentBounds(node);

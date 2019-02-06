@@ -58,14 +58,14 @@ public class SceneGestures {
 	 * Inputs for panning the viewport
 	 */
 	private boolean isUsingPanningControls(MouseEvent event) {
-		return (!event.isPrimaryButtonDown() && event.isSecondaryButtonDown());
+		return (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown());
 	}
 	
 	/**
 	 * Inputs for highlighting nodes
 	 */
 	private boolean isUsingHighlightingControls(MouseEvent event) {
-		return (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown());
+		return (!event.isPrimaryButtonDown() && event.isSecondaryButtonDown());
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class SceneGestures {
 	 * @return
 	 */
 	public static String getSceneContextHint() {
-		return "Drag LMB = Multi-Select | Drag RMB = Pan viewport | Scroll Wheel = Zoom in/out on mouse position";
+		return "Drag LMB = Pan viewport | Drag RMB = Multi-Select | Scroll Wheel = Zoom in/out on mouse position";
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class SceneGestures {
 	 * @return
 	 */
 	public static String getMultiSelectContextHint(int nodesSelected) {
-		return "Nodes selected: " + nodesSelected + " | Drag LMB (inside node) = Drag all nodes | LMB (outside node) = De-select all\nT-Key = Add tag to all | R-Key = Remove tags from all";
+		return "Nodes selected: " + nodesSelected + " | Drag LMB = Drag all nodes | RMB = De-select all\nT-Key = Add tag to all | R-Key = Remove tags from all";
 	}
 	
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {

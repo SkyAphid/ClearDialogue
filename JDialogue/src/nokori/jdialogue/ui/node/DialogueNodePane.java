@@ -135,6 +135,15 @@ public abstract class DialogueNodePane extends StackPane {
 	}
 	
 	/**
+	 * Have to make a function to manually sync the nodes information since I can't override setTranslateX/Y
+	 */
+	public void syncPositionOnDrag(MouseEvent event) {
+		node.setX(getTranslateX());
+		node.setY(getTranslateY());
+		core.updateConnectors(event);
+	}
+	
+	/**
 	 * Refresh nodes to have the latest Node data
 	 * 
 	 * Called by DialogueNodeEditor when it closes
