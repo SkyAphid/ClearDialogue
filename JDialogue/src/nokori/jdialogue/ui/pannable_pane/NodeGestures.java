@@ -27,6 +27,8 @@ public class NodeGestures {
 	private JDialogueCore core;
 	private PannablePane pannablePane;
 
+	private boolean nodeSelected = false;
+	
 	public NodeGestures(JDialogueCore core, PannablePane pannablePane) {
 		this.core = core;
 		this.pannablePane = pannablePane;
@@ -36,13 +38,26 @@ public class NodeGestures {
 		return onMousePressedEventHandler;
 	}
 
+	public EventHandler<MouseEvent> getOnMouseReleasedEventHandler() {
+		return onMouseReleasedEventHandler;
+	}
+
 	public EventHandler<MouseEvent> getOnMouseDraggedEventHandler() {
 		return onMouseDraggedEventHandler;
+	}
+	
+	/**
+	 * @return true if a node is currently being dragged around.
+	 */
+	public boolean isNodeSelected() {
+		return nodeSelected;
 	}
 
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
 		public void handle(MouseEvent event) {
+			
+			nodeSelected = false;
 			
 			//LMB -> Dragging Nodes
 			if (!event.isPrimaryButtonDown()) {
@@ -64,8 +79,17 @@ public class NodeGestures {
 				DialogueNodePane n = multiSelected.pop();
 				nodeDragContext.translateAnchors.put(n, new Pair<>(n.getTranslateX(), n.getTranslateY()));
 			}
+			
+			//Turn on "Node is being selected" flag.
+			nodeSelected = true;
 		}
 
+	};
+	
+	private EventHandler<MouseEvent> onMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
+		public void handle(MouseEvent event) {
+			nodeSelected = false;
+		}
 	};
 
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {

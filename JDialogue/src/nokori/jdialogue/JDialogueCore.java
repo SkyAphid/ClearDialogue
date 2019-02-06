@@ -181,7 +181,7 @@ public class JDialogueCore extends Application {
 	/*
 	 * UI components
 	 */
-	private Text contextHints;
+	private Text programInformation, contextHints;
 	private InlineCssTextArea projectNameField;
 	
 	/*
@@ -284,37 +284,6 @@ public class JDialogueCore extends Application {
 		scene = new Scene(uiPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 		scene.getStylesheets().add(getClass().getClassLoader().getResource("nokori/jdialogue/css/scrollbar_style.css").toExternalForm());
 		
-		//Configure pannable pane mouse gestures
-		sceneGestures = new SceneGestures(this, pannablePane) {
-			@Override
-			public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
-				// Drag the grabbing hand when you pane the screen
-				scene.setCursor(Cursor.CLOSED_HAND);
-
-				// Set viewport memory
-				project.setViewportX(newTranslateX);
-				project.setViewportY(newTranslateY);
-			}
-
-			@Override
-			public void mouseScrolled(ScrollEvent event, double newScale) {
-				project.setViewportScale(newScale);
-			}
-		};
-        
-        //PannablePane event handlers (panning/zooming)
-        scene.setOnMouseDragged(sceneGestures.getOnMouseDraggedEventHandler());
-        scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
-        scene.setOnMouseReleased(sceneGestures.getOnMouseReleasedEventHandler());
-        scene.addEventHandler(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, MultiTagTool.getKeyPressEventHandler(this));
-        
-        
-        //Reset the cursor when you panning panning
-        scene.setOnMouseClicked(event -> {
-        	scene.setCursor(Cursor.DEFAULT);
-        });
-		
 		/*
 		 * NodeGestures controls the node dragging in pannable pane
 		 * 
@@ -346,6 +315,41 @@ public class JDialogueCore extends Application {
     			}
     		}
     	};
+		
+		/*
+		 * SceneGestures controls the PannablePane panning/highlighting
+		 * 
+		 * It's overriden to connect it to the Project object so that the viewport settings can be saved for the next session.
+		 */
+		sceneGestures = new SceneGestures(this, pannablePane, nodeGestures) {
+			@Override
+			public void mouseDragged(MouseEvent event, double newTranslateX, double newTranslateY) {
+				// Drag the grabbing hand when you pane the screen
+				scene.setCursor(Cursor.CLOSED_HAND);
+
+				// Set viewport memory
+				project.setViewportX(newTranslateX);
+				project.setViewportY(newTranslateY);
+			}
+
+			@Override
+			public void mouseScrolled(ScrollEvent event, double newScale) {
+				project.setViewportScale(newScale);
+			}
+		};
+        
+        //PannablePane event handlers (panning/zooming)
+        scene.setOnMouseDragged(sceneGestures.getOnMouseDraggedEventHandler());
+        scene.setOnMousePressed(sceneGestures.getOnMousePressedEventHandler());
+        scene.setOnMouseReleased(sceneGestures.getOnMouseReleasedEventHandler());
+        scene.addEventHandler(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, MultiTagTool.getKeyPressEventHandler(this));
+        
+        
+        //Reset the cursor when you panning panning
+        scene.setOnMouseClicked(event -> {
+        	scene.setCursor(Cursor.DEFAULT);
+        });
 		
 		/*
 		 * Initialize UI
@@ -468,7 +472,7 @@ public class JDialogueCore extends Application {
 		//Information on the program itself (so that if screenshots are taken, people will know what the program is)
 		String programInformationString = PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE";
 		
-		Text programInformation = new Text(programInformationString);
+		programInformation = new Text(programInformationString);
 		programInformation.setFont(sansLightSmall);
 		programInformation.setFill(Color.LIGHTGRAY.darker());
 		programInformation.setX(20);
@@ -977,6 +981,7 @@ public class JDialogueCore extends Application {
 	        dialogueNodePane.setTranslateX(dialogueNode.getX());
 	        dialogueNodePane.setTranslateY(dialogueNode.getY());
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_PRESSED, nodeGestures.getOnMousePressedEventHandler());
+	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_RELEASED, nodeGestures.getOnMouseReleasedEventHandler());
 	        dialogueNodePane.addEventFilter(MouseEvent.MOUSE_DRAGGED, nodeGestures.getOnMouseDraggedEventHandler());
 	        
 			//Add to parent
@@ -1160,6 +1165,11 @@ public class JDialogueCore extends Application {
 			fadeTransition.play();
 			
 			contextHints.setText(hint);
+			
+			//FYI I totally pulled the 1.7 out of nowhere just so multi-line context hints would line up with the program information
+			//Feel free to change it if necessary
+			double newLineOffset = (hint.contains("\n") ? (UIUtil.getStringBounds(contextHints.getFont(), hint)).getHeight()/1.75 : 0);
+			contextHints.setY(programInformation.getY() - newLineOffset);
 		}
 	}
 	

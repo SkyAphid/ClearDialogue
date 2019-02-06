@@ -23,11 +23,14 @@ public class SceneGestures {
 
 	private JDialogueCore core;
 	private PannablePane pannablePane;
+	private NodeGestures nodeGestures;
+	
 	private RectangleHighlightNode mouseHighlighter = null;
 	
-	public SceneGestures(JDialogueCore core, PannablePane pannablePane) {
+	public SceneGestures(JDialogueCore core, PannablePane pannablePane, NodeGestures nodeGestures) {
 		this.core = core;
 		this.pannablePane = pannablePane;
+		this.nodeGestures = nodeGestures;
 	}
 
 	public SceneDragContext getSceneDragContext() {
@@ -53,14 +56,14 @@ public class SceneGestures {
 	/**
 	 * Inputs for panning the viewport
 	 */
-	private boolean isPanning(MouseEvent event) {
+	private boolean isUsingPanningControls(MouseEvent event) {
 		return (!event.isPrimaryButtonDown() && event.isSecondaryButtonDown());
 	}
 	
 	/**
 	 * Inputs for highlighting nodes
 	 */
-	private boolean isHighlighting(MouseEvent event) {
+	private boolean isUsingHighlightingControls(MouseEvent event) {
 		return (event.isPrimaryButtonDown() && !event.isSecondaryButtonDown());
 	}
 	
@@ -78,7 +81,7 @@ public class SceneGestures {
 	 * @return
 	 */
 	public static String getMultiSelectContextHint(int nodesSelected) {
-		return "Nodes selected: " + nodesSelected + " | LMB = De-select all nodes | T-Key = Add tag to all | R-Key = Remove tags from all";
+		return "Nodes selected: " + nodesSelected + " | Drag LMB (inside node) = Drag all nodes | LMB (outside node) = De-select all\nT-Key = Add tag to all | R-Key = Remove tags from all";
 	}
 	
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
@@ -87,7 +90,7 @@ public class SceneGestures {
 			/*
 			 * Panning
 			 */
-			if (isPanning(event)) {
+			if (isUsingPanningControls(event)) {
 				sceneDragContext.mouseAnchorX = event.getSceneX();
 				sceneDragContext.mouseAnchorY = event.getSceneY();
 			
@@ -98,7 +101,7 @@ public class SceneGestures {
 			/*
 			 * Highlighting
 			 */
-			if (isHighlighting(event)) {
+			if (isUsingHighlightingControls(event) && !nodeGestures.isNodeSelected()) {
 
 				//Clear all selected from the last highlight
 				core.setDefaultContextHint();
@@ -113,7 +116,7 @@ public class SceneGestures {
 				}
 
 				//Create new highlighter
-				setMouseHighlighter(new RectangleHighlightNode(pannablePane.getScaledMouseX(event),pannablePane.getScaledMouseY(event)));
+				setMouseHighlighter(new RectangleHighlightNode(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event)));
 			}
 			
 		}
@@ -132,7 +135,7 @@ public class SceneGestures {
 			/*
 			 * Panning
 			 */
-			if (isPanning(event)) {
+			if (isUsingPanningControls(event)) {
 				double newTranslateX = sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX;
 				double newTranslateY = sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY;
 				
@@ -145,7 +148,7 @@ public class SceneGestures {
 			/*
 			 * Highlighting
 			 */
-			if (isHighlighting(event)) {
+			if (isUsingHighlightingControls(event) && mouseHighlighter != null) {
 				mouseHighlighter.update(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event));
 				
 				//Run through all the DialogueNodePanes and update the ones within the highlighter to be multi-selected
@@ -158,7 +161,6 @@ public class SceneGestures {
 						boolean bSelected = dNode.isMultiSelected();
 						boolean selected = mouseHighlighter.getBoundsInParent().intersects(dNode.getBoundsInParent());
 						dNode.setMultiSelected(selected);
-						
 						
 						//Context hint updated every time a new node is highlighted
 						if (!bSelected && selected) {
