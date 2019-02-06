@@ -26,7 +26,7 @@ import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
-import nokori.jdialogue.ui.util.UIUtil;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -110,7 +110,7 @@ public abstract class DialogueNodePane extends StackPane {
 		});
 		
 		//Tooltip
-		tooltip = UIUtil.quickTooltip(this, 30, "Hold LMB and drag to move node.\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
+		tooltip = JDialogueUtils.quickTooltip(this, 30, "Hold LMB and drag to move node.\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
 		
 		//Initial animation
 		RotateTransition rotateTransition = new RotateTransition(Duration.millis(FADE_TIME), this);
@@ -141,7 +141,7 @@ public abstract class DialogueNodePane extends StackPane {
 	 */
 	public void refresh(JDialogueCore core) {
 		title.replaceText(node.getName());
-		UIUtil.computeHighlighting(title, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		JDialogueUtils.computeHighlighting(title, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 	}
 	
 	/**
@@ -157,7 +157,7 @@ public abstract class DialogueNodePane extends StackPane {
 	 */
 	protected boolean checkDispose(MouseEvent event) {
 		if (event.getClickCount() > 1 && event.getButton() == MouseButton.SECONDARY) {
-			if (UIUtil.showConfirmAlert(core.getStage(), AlertType.CONFIRMATION, "Delete Node", "Delete node \"" + node.getName() + "?\"", "*This cannot be undone")) {
+			if (JDialogueUtils.showConfirmAlert(core.getStage(), AlertType.CONFIRMATION, "Delete Node", "Delete node \"" + node.getName() + "?\"", "*This cannot be undone")) {
 				dispose(core);
 			}
 			

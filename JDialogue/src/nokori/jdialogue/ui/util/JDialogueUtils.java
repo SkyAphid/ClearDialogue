@@ -38,11 +38,30 @@ import javafx.stage.Stage;
 /**
  * Various utilities to make the UI code cleaner
  */
-public class UIUtil {
+public class JDialogueUtils {
 	
 	//In seconds
 	private static final double TOOLTIP_SHOW_DELAY = 1;
 
+
+	/**
+	 * Utility function for clamping values to a min and max.
+	 * @param value
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	public static double clamp(double value, double min, double max) {
+
+		if (Double.compare(value, min) < 0)
+			return min;
+
+		if (Double.compare(value, max) > 0)
+			return max;
+
+		return value;
+	}
+	
 	/**
 	 * Shortcut for adding Tooltips that follow JDialogue's default configurations.
 	 * @param node
@@ -221,7 +240,7 @@ public class UIUtil {
 	 * @return
 	 */
 	public static InputStream loadFromPackage(String packagePath) {
-		return UIUtil.class.getClassLoader().getResourceAsStream(packagePath);
+		return JDialogueUtils.class.getClassLoader().getResourceAsStream(packagePath);
 	}
 	
 	/**

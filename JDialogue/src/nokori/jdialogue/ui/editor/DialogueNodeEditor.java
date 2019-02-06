@@ -18,7 +18,7 @@ import javafx.util.Duration;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.ui.node.DialogueNodePane;
-import nokori.jdialogue.ui.util.UIUtil;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 /**
  * This is a basic editor that is compatible with any type of DialogueNode.
@@ -107,13 +107,13 @@ public abstract class DialogueNodeEditor extends StackPane {
 			}
 		});
 		
-		UIUtil.disableMultiLineShortcuts(nameField);
+		JDialogueUtils.disableMultiLineShortcuts(nameField);
 		
 		//Style/Syntax
 		nameField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
 			 	 		 + "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
 		
-		nameFieldSub = UIUtil.addSyntaxSubscription(nameField, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		nameFieldSub = JDialogueUtils.addSyntaxSubscription(nameField, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 		
 		//Set text
 		nameField.replaceText(node.getName());
@@ -145,13 +145,13 @@ public abstract class DialogueNodeEditor extends StackPane {
 			}
 		});
 		
-		UIUtil.disableMultiLineShortcuts(tagField);
+		JDialogueUtils.disableMultiLineShortcuts(tagField);
 		
 		//Style/Syntax
 		tagField.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
 						+ "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
 		
-		tagFieldSub = UIUtil.addSyntaxSubscription(tagField, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		tagFieldSub = JDialogueUtils.addSyntaxSubscription(tagField, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 		
 		//Set text
 		tagField.replaceText(node.getTag());

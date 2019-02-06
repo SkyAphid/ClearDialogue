@@ -72,7 +72,7 @@ public class ReplaceTool {
 		
 		if (refactorInfo != null) {
 			replace(project, refactorInfo.getKey(), refactorInfo.getValue());
-			UIUtil.showAlert(stage, AlertType.INFORMATION, "Replace Information", "Replace successful.", "");
+			JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Replace Information", "Replace successful.", "");
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class ReplaceTool {
 				}
 			}
 			
-			UIUtil.showAlert(stage, AlertType.INFORMATION, "Replace Information", "Multi-Replace successful.", "");
+			JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Replace Information", "Multi-Replace successful.", "");
 		}
 	}
 	

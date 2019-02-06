@@ -69,7 +69,7 @@ import nokori.jdialogue.ui.util.MergeTool;
 import nokori.jdialogue.ui.util.MultiTagTool;
 import nokori.jdialogue.ui.util.ReplaceTool;
 import nokori.jdialogue.ui.util.ReplaceTool.ReplaceMode;
-import nokori.jdialogue.ui.util.UIUtil;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 /**
  * The Core of this program, containing the GUI.
@@ -169,9 +169,9 @@ public class JDialogueCore extends Application {
 	
 	private DropShadow shadow;
 	
-	private Font sansRegular = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Regular.ttf"), 20);
-	private Font sansLight = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 20);
-	private Font serifRegular = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSerif-Regular.ttf"), 16);
+	private Font sansRegular = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Regular.ttf"), 20);
+	private Font sansLight = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 20);
+	private Font serifRegular = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSerif-Regular.ttf"), 16);
 	
 	/*
 	 * Project data
@@ -208,14 +208,14 @@ public class JDialogueCore extends Application {
 		this.stage = stage;
 		
 		stage.getIcons().addAll(
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_512x512.png")),
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_256x256.png")),
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_128x128.png")),
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_64x64.png")),
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_48x48.png")),
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_32x32.png")),
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_24x24.png")),
-				new Image(UIUtil.loadFromPackage("nokori/jdialogue/icons/icon_16x16.png")));
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_512x512.png")),
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_256x256.png")),
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_128x128.png")),
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_64x64.png")),
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_48x48.png")),
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_32x32.png")),
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_24x24.png")),
+				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_16x16.png")));
 		
 		stage.setMinWidth(WINDOW_WIDTH);
 		stage.setMinHeight(WINDOW_HEIGHT);
@@ -467,7 +467,7 @@ public class JDialogueCore extends Application {
 	private void addProgramInformationAndContextHints() {
 		int offsetY = 20;
 		
-		Font sansLightSmall = Font.loadFont(UIUtil.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 18);
+		Font sansLightSmall = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 18);
 		
 		//Information on the program itself (so that if screenshots are taken, people will know what the program is)
 		String programInformationString = PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE";
@@ -483,7 +483,7 @@ public class JDialogueCore extends Application {
 		contextHints = new Text();
 		contextHints.setFont(sansLightSmall);
 		contextHints.setFill(programInformation.getFill());
-		contextHints.setX(UIUtil.getStringBounds(sansLightSmall, programInformationString).getWidth() + 75);
+		contextHints.setX(JDialogueUtils.getStringBounds(sansLightSmall, programInformationString).getWidth() + 75);
 		contextHints.setY(programInformation.getY());
 		contextHints.setMouseTransparent(true);
 		setDefaultContextHint();
@@ -751,7 +751,7 @@ public class JDialogueCore extends Application {
 					uiPane.getChildren().add(new TextViewerMenu(JDialogueCore.this, serifRegular, syntax));
 					break;
 				case REFRESH_SYNTAX:
-					UIUtil.showAlert(stage, AlertType.INFORMATION, "Syntax Refreshed", "Reloaded syntax file: " + loadSyntax(), "");
+					JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Syntax Refreshed", "Reloaded syntax file: " + loadSyntax(), "");
 					break;
 				case SET_SYNTAX:
 					setSyntax(stage);
@@ -1099,7 +1099,7 @@ public class JDialogueCore extends Application {
 		});
 		
 		//Hack fix for not being able to disable multi-line
-		UIUtil.disableMultiLineShortcuts(projectNameField);
+		JDialogueUtils.disableMultiLineShortcuts(projectNameField);
 
 		//Add to button skeleton
 		projectNameFieldButton.getChildren().add(projectNameField);
@@ -1168,7 +1168,7 @@ public class JDialogueCore extends Application {
 			
 			//FYI I totally pulled the 1.7 out of nowhere just so multi-line context hints would line up with the program information
 			//Feel free to change it if necessary
-			double newLineOffset = (hint.contains("\n") ? (UIUtil.getStringBounds(contextHints.getFont(), hint)).getHeight()/1.75 : 0);
+			double newLineOffset = (hint.contains("\n") ? (JDialogueUtils.getStringBounds(contextHints.getFont(), hint)).getHeight()/1.75 : 0);
 			contextHints.setY(programInformation.getY() - newLineOffset);
 		}
 	}

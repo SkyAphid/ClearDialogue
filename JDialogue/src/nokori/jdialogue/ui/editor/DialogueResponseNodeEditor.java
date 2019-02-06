@@ -17,7 +17,7 @@ import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueResponseNode;
 import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.ui.node.DialogueNodePane;
-import nokori.jdialogue.ui.util.UIUtil;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 
@@ -42,7 +42,7 @@ public class DialogueResponseNodeEditor extends DialogueNodeEditor {
 		textArea.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
 		
 		//Syntax
-		sub = UIUtil.addSyntaxSubscription(textArea, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		sub = JDialogueUtils.addSyntaxSubscription(textArea, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 		
 		//Set text
 		textArea.replaceText(defaultText);

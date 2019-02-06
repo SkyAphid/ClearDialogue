@@ -6,6 +6,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.ui.node.DialogueNodePane;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 /**
  * Listeners for making the scenes canvas draggable and zoomable
@@ -115,8 +116,8 @@ public class SceneGestures {
 					}
 				}
 
-				//Create new highlighter
-				setMouseHighlighter(new RectangleHighlightNode(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event)));
+				//Create new highlighter at the mouse coordinates
+				setMouseHighlighter(new RectangleHighlightNode(getClampedScaledMouseX(event), getClampedScaledMouseY(event)));
 			}
 			
 		}
@@ -149,7 +150,7 @@ public class SceneGestures {
 			 * Highlighting
 			 */
 			if (isUsingHighlightingControls(event) && mouseHighlighter != null) {
-				mouseHighlighter.update(pannablePane.getScaledMouseX(event), pannablePane.getScaledMouseY(event));
+				mouseHighlighter.update(getClampedScaledMouseX(event), getClampedScaledMouseY(event));
 				
 				//Run through all the DialogueNodePanes and update the ones within the highlighter to be multi-selected
 				for (int i = 0; i < pannablePane.getChildren().size(); i++) {
@@ -173,6 +174,14 @@ public class SceneGestures {
 			event.consume();
 		}
 	};
+	
+	private double getClampedScaledMouseX(MouseEvent event) {
+		return JDialogueUtils.clamp(pannablePane.getScaledMouseX(event), 0, pannablePane.getWidth());
+	}
+	
+	private double getClampedScaledMouseY(MouseEvent event) {
+		return JDialogueUtils.clamp(pannablePane.getScaledMouseY(event), 0, pannablePane.getHeight());
+	}
 	
 	private void setMouseHighlighter(RectangleHighlightNode h) {
 		if (mouseHighlighter != null) {
@@ -209,7 +218,7 @@ public class SceneGestures {
 				scale *= delta;
 			}
 
-			scale = clamp(scale, MIN_SCALE, MAX_SCALE);
+			scale = JDialogueUtils.clamp(scale, MIN_SCALE, MAX_SCALE);
 
 			double f = (scale / oldScale) - 1;
 
@@ -230,17 +239,6 @@ public class SceneGestures {
 	
 	public void mouseScrolled(ScrollEvent event, double newScale) {
 		
-	}
-
-	private static double clamp(double value, double min, double max) {
-
-		if (Double.compare(value, min) < 0)
-			return min;
-
-		if (Double.compare(value, max) > 0)
-			return max;
-
-		return value;
 	}
 }
 

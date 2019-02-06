@@ -11,7 +11,7 @@ import nokori.jdialogue.JDialogueCore;
 import nokori.jdialogue.project.DialogueTextNode;
 import nokori.jdialogue.ui.editor.DialogueTextNodeEditor;
 import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
-import nokori.jdialogue.ui.util.UIUtil;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -41,7 +41,7 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		body.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
 
 		//Finalize
-		UIUtil.computeHighlighting(body, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		JDialogueUtils.computeHighlighting(body, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 		
 		StackPane.setAlignment(body, Pos.BOTTOM_CENTER);
 		StackPane.setMargin(body, new Insets(0, 10, 10, 10));
@@ -65,6 +65,6 @@ public class DialogueTextNodePane extends DialogueNodePane{
 	public void refresh(JDialogueCore core) {
 		super.refresh(core);
 		body.replaceText(((DialogueTextNode) node).getText());
-		UIUtil.computeHighlighting(body, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		JDialogueUtils.computeHighlighting(body, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 	}
 }

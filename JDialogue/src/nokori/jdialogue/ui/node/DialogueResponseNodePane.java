@@ -14,7 +14,7 @@ import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.ui.editor.DialogueResponseNodeEditor;
 import nokori.jdialogue.ui.node.DialogueNodeConnectorArc.ConnectorType;
 import nokori.jdialogue.ui.pannable_pane.PannablePane;
-import nokori.jdialogue.ui.util.UIUtil;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 /**
  * This is the GUI representation of a DialogueNode.
@@ -100,7 +100,7 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 			responseText.setLayoutY(y);
 			
 			responseText.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
-			UIUtil.computeHighlighting(responseText, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+			JDialogueUtils.computeHighlighting(responseText, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 			
 			responseGroup.getChildren().add(responseText);
 		}

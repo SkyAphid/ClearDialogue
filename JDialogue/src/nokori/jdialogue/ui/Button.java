@@ -12,7 +12,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import nokori.jdialogue.JDialogueCore;
-import nokori.jdialogue.ui.util.UIUtil;
+import nokori.jdialogue.ui.util.JDialogueUtils;
 
 public class Button extends ButtonSkeleton{
 	
@@ -46,7 +46,7 @@ public class Button extends ButtonSkeleton{
 		text.setFill(TEXT_COLOR);
 		text.setMouseTransparent(true);
 		
-		Bounds bounds = UIUtil.getStringBounds(font, buttonTitle);
+		Bounds bounds = JDialogueUtils.getStringBounds(font, buttonTitle);
 		text.setLayoutX(BUTTON_MARGIN_X);
 		text.setLayoutY(h/2 + bounds.getHeight()/2);
 		

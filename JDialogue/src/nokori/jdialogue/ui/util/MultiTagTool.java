@@ -30,7 +30,7 @@ public class MultiTagTool {
 					Stack<DialogueNodePane> selected = core.getAllMultiSelected();
 					
 					if (!selected.isEmpty()) {
-						String newTag = UIUtil.showInputDialog(stage, "Multi-Tag Insertion", "Input a tag to insert into all of the selected DialogueNodes."
+						String newTag = JDialogueUtils.showInputDialog(stage, "Multi-Tag Insertion", "Input a tag to insert into all of the selected DialogueNodes."
 								+ "\n\n*Note: spaces must be added manually", "New Tag", "Please input the new tag:");
 						
 						int insertions = 0;
@@ -41,7 +41,7 @@ public class MultiTagTool {
 							insertions++;
 						}
 						
-						UIUtil.showAlert(stage, AlertType.INFORMATION, "Tag Insertion Success", "\"" + newTag + "\" was inserted successfully into " + insertions + " nodes.");
+						JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Insertion Success", "\"" + newTag + "\" was inserted successfully into " + insertions + " nodes.");
 					}
 				}
 				
@@ -52,7 +52,7 @@ public class MultiTagTool {
 					Stack<DialogueNodePane> selected = core.getAllMultiSelected();
 					
 					if (!selected.isEmpty()) {
-						String searchTag = UIUtil.showInputDialog(stage, "Multi-Tag Removal", 
+						String searchTag = JDialogueUtils.showInputDialog(stage, "Multi-Tag Removal", 
 								"Input a tag to remove from all of the selected DialogueNodes.", "", "Please input the tag to remove:");
 						
 						int removals = 0;
@@ -67,9 +67,9 @@ public class MultiTagTool {
 						}
 						
 						if (removals > 0) {
-							UIUtil.showAlert(stage, AlertType.INFORMATION, "Tag Removal Success", "\"" + searchTag + "\" was removed successfully from " + removals + " nodes.");
+							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Removal Success", "\"" + searchTag + "\" was removed successfully from " + removals + " nodes.");
 						} else {
-							UIUtil.showAlert(stage, AlertType.ERROR, "Tag Removal Failure", "\"" + searchTag + "\" wasn't found in any nodes.");
+							JDialogueUtils.showAlert(stage, AlertType.ERROR, "Tag Removal Failure", "\"" + searchTag + "\" wasn't found in any nodes.");
 						}
 					}
 				}
