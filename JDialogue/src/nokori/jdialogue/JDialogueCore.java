@@ -1,9 +1,11 @@
 package nokori.jdialogue;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -53,6 +55,7 @@ import nokori.jdialogue.throwable.MissingArcError;
 import nokori.jdialogue.throwable.MissingDialogueNodePaneError;
 import nokori.jdialogue.ui.Button;
 import nokori.jdialogue.ui.ButtonSkeleton;
+import nokori.jdialogue.ui.ClickableText;
 import nokori.jdialogue.ui.MenuButton;
 import nokori.jdialogue.ui.TextViewerMenu;
 import nokori.jdialogue.ui.node.BoundLine;
@@ -181,7 +184,8 @@ public class JDialogueCore extends Application {
 	/*
 	 * UI components
 	 */
-	private Text programInformation, contextHints;
+	private ClickableText programInformation;
+	private Text contextHints;
 	private InlineCssTextArea projectNameField;
 	
 	/*
@@ -453,21 +457,33 @@ public class JDialogueCore extends Application {
 		int offsetY = 20;
 		
 		Font sansLightSmall = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 18);
+		Color textFill = Color.LIGHTGRAY.darker();
 		
 		//Information on the program itself (so that if screenshots are taken, people will know what the program is)
 		String programInformationString = PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE";
 		
-		programInformation = new Text(programInformationString);
+		programInformation = new ClickableText(programInformationString, textFill, Color.CORAL) {
+			@Override
+			public void mouseClicked(MouseEvent event, boolean clickingEnabled) {
+				if (clickingEnabled) {
+					try {
+						Desktop.getDesktop().browse(new URL("https://github.com/SkyAphid/JDialogue").toURI());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
 		programInformation.setFont(sansLightSmall);
-		programInformation.setFill(Color.LIGHTGRAY.darker());
 		programInformation.setX(20);
 		programInformation.setY(WINDOW_HEIGHT - offsetY);
-		programInformation.setMouseTransparent(true);
+		programInformation.setClickingEnabled(Desktop.isDesktopSupported());
+		programInformation.setMouseTransparent(!programInformation.isClickingEnabled());
 		
 		//Context hints. These are activated under certain circumstances to tell the user instructions on how to use tools when they're activated.
 		contextHints = new Text();
 		contextHints.setFont(sansLightSmall);
-		contextHints.setFill(programInformation.getFill());
+		contextHints.setFill(textFill);
 		contextHints.setX(JDialogueUtils.getStringBounds(sansLightSmall, programInformationString).getWidth() + 75);
 		contextHints.setY(programInformation.getY());
 		contextHints.setMouseTransparent(true);
