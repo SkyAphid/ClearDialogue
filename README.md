@@ -3,7 +3,7 @@ JDialogue is a branching dialogue editor for video games designed to be extremel
 
 ![jdialogue](https://user-images.githubusercontent.com/6147299/52175570-5aced880-276b-11e9-8879-924d437652af.png)
 
-[This program was written by NOKORI•WARE. Please visit our website and consider buying some of our products to help support the development of free software like this!](https://www.nokoriware.com/)
+[This program was written by NOKORI•WARE. If you're satisfied with JDialogue, please visit our website and consider buying some of our products to help support the development of free software like this!](https://www.nokoriware.com/)
 
 ## Features
 
