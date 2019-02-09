@@ -34,15 +34,19 @@ public class MultiEditTool {
 						String newTag = JDialogueUtils.showInputDialog(stage, "Multi-Tag Insertion", "Input a tag to insert into all of the selected DialogueNodes."
 								+ "\n\n*Note: spaces must be added manually", "New Tag", "Please input the new tag:");
 						
-						int insertions = 0;
+						if (newTag != null) {
+							int insertions = 0;
+								
+							while (newTag != null && !selected.isEmpty()) {
+								DialogueNode node = selected.pop().getDialogueNode();
+								node.setTag(node.getTag() + newTag);
+								insertions++;
+							}
 							
-						while (newTag != null && !selected.isEmpty()) {
-							DialogueNode node = selected.pop().getDialogueNode();
-							node.setTag(node.getTag() + newTag);
-							insertions++;
+							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Insertion Success", "\"" + newTag + "\" was inserted successfully into " + insertions + " nodes.");
+						} else {
+							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Insertion Cancelled", "No tag was inputted.");
 						}
-						
-						JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Insertion Success", "\"" + newTag + "\" was inserted successfully into " + insertions + " nodes.");
 					}
 				}
 				
@@ -56,21 +60,25 @@ public class MultiEditTool {
 						String searchTag = JDialogueUtils.showInputDialog(stage, "Multi-Tag Removal", 
 								"Input a tag to remove from all of the selected DialogueNodes.", "", "Please input the tag to remove:");
 						
-						int removals = 0;
-							
-						while (searchTag != null && !selected.isEmpty()) {
-							DialogueNode node = selected.pop().getDialogueNode();
-							
-							if (node.getTag().contains(searchTag)) {
-								node.setTag(node.getTag().replace(searchTag, ""));
-								removals++;
+						if (searchTag != null) {
+							int removals = 0;
+								
+							while (searchTag != null && !selected.isEmpty()) {
+								DialogueNode node = selected.pop().getDialogueNode();
+								
+								if (node.getTag().contains(searchTag)) {
+									node.setTag(node.getTag().replace(searchTag, ""));
+									removals++;
+								}
 							}
-						}
-						
-						if (removals > 0) {
-							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Removal Success", "\"" + searchTag + "\" was removed successfully from " + removals + " nodes.");
+							
+							if (removals > 0) {
+								JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Removal Success", "\"" + searchTag + "\" was removed successfully from " + removals + " nodes.");
+							} else {
+								JDialogueUtils.showAlert(stage, AlertType.ERROR, "Tag Removal Failure", "\"" + searchTag + "\" wasn't found in any nodes.");
+							}
 						} else {
-							JDialogueUtils.showAlert(stage, AlertType.ERROR, "Tag Removal Failure", "\"" + searchTag + "\" wasn't found in any nodes.");
+							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Removal Cancelled", "No name was inputted.");
 						}
 					}
 				}
@@ -105,7 +113,7 @@ public class MultiEditTool {
 							
 							core.refreshUI(true);
 						} else {
-							JDialogueUtils.showAlert(stage, AlertType.ERROR, "Rename Canceled", "No name was inputted.");
+							JDialogueUtils.showAlert(stage, AlertType.ERROR, "Rename Cancelled", "No name was inputted.");
 						}
 					}
 				}

@@ -333,7 +333,7 @@ public class JDialogueCore extends Application {
         scene.setOnMouseReleased(sceneGestures.getOnMouseReleasedEventHandler());
         scene.addEventHandler(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
         scene.addEventHandler(KeyEvent.KEY_PRESSED, MultiEditTool.getKeyPressEventHandler(this));
-        
+        scene.addEventHandler(KeyEvent.ANY, nodeGestures.getAnyKeyEventHandler());
         
         //Reset the cursor when you panning panning
         scene.setOnMouseClicked(event -> {

@@ -6,6 +6,7 @@ import java.util.Stack;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Pair;
 import nokori.jdialogue.JDialogueCore;
@@ -28,6 +29,7 @@ public class NodeGestures {
 	private PannablePane pannablePane;
 
 	private boolean nodeSelected = false;
+	private boolean nodeSnappingEnabled = false;
 	
 	public NodeGestures(JDialogueCore core, PannablePane pannablePane) {
 		this.core = core;
@@ -46,6 +48,10 @@ public class NodeGestures {
 		return onMouseDraggedEventHandler;
 	}
 	
+	public EventHandler<KeyEvent> getAnyKeyEventHandler() {
+		return anyKeyEventHandler;
+	}
+
 	/**
 	 * @return true if a node is currently being dragged around.
 	 */
@@ -55,6 +61,15 @@ public class NodeGestures {
 	
 	private boolean isUsingDragControls(MouseEvent event) {
 		return event.isPrimaryButtonDown();
+	}
+	
+	/**
+	 * Set the context hint for dragging nodes if one is selected
+	 */
+	private void updateNodeSelectedContextHint() {
+		if (nodeSelected) {
+			core.setContextHint("Hold Shift-key = Node Snapping (" + (nodeSnappingEnabled ? "ON" : "OFF") + ")");
+		}
 	}
 
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
@@ -85,6 +100,7 @@ public class NodeGestures {
 			
 			//Turn on "Node is being selected" flag.
 			nodeSelected = true;
+			updateNodeSelectedContextHint();
 		}
 
 	};
@@ -92,6 +108,7 @@ public class NodeGestures {
 	private EventHandler<MouseEvent> onMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
 		public void handle(MouseEvent event) {
 			nodeSelected = false;
+			core.setDefaultContextHint();
 		}
 	};
 
@@ -124,13 +141,38 @@ public class NodeGestures {
 			event.consume();
 		}
 	};
+
+	private EventHandler<KeyEvent> anyKeyEventHandler = new EventHandler<KeyEvent>() {
+		public void handle(KeyEvent event) {
+			nodeSnappingEnabled = event.isShiftDown();
+			updateNodeSelectedContextHint();
+		}
+	};
+	
+	private static final double NODE_SNAPPING_MULT = 1.2f;
 	
 	private double getNodeDragTranslateX(Node node, MouseEvent event) {
-		return nodeDragContext.translateAnchors.get(node).getKey() + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / pannablePane.getScale());
+		double newX = event.getSceneX();
+		
+		if (nodeSnappingEnabled) {
+			double snapXGrid = DialogueNodePane.WIDTH * NODE_SNAPPING_MULT;
+			double snappedX = event.getSceneX() - (event.getSceneX() % snapXGrid);
+			newX = snappedX + snapXGrid - DialogueNodePane.WIDTH/2;
+		}
+		
+		return nodeDragContext.translateAnchors.get(node).getKey() + ((newX - nodeDragContext.mouseAnchorX) / pannablePane.getScale());
 	}
 	
 	private double getNodeDragTranslateY(Node node, MouseEvent event) {
-		return nodeDragContext.translateAnchors.get(node).getValue() + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / pannablePane.getScale());
+		double newY = event.getSceneY();
+		
+		if (nodeSnappingEnabled) {
+			double snapYGrid = DialogueNodePane.HEIGHT * NODE_SNAPPING_MULT;
+			double snappedY = event.getSceneY() - (event.getSceneY() % snapYGrid);
+			newY = snappedY + snapYGrid - DialogueNodePane.HEIGHT/2;
+		}
+		
+		return nodeDragContext.translateAnchors.get(node).getValue() + ((newY - nodeDragContext.mouseAnchorY) / pannablePane.getScale());
 	}
 	
 	/**
