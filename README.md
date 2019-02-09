@@ -1,12 +1,14 @@
 # JDialogue
-JDialogue is a branching dialogue editor for video games designed to be extremely flexible and work with any type of game engine.
+JDialogue is a branching dialogue editor for video games designed to be extremely flexible and work with any type of game engine. 
 
 ![jdialogue](https://user-images.githubusercontent.com/6147299/52175570-5aced880-276b-11e9-8879-924d437652af.png)
+
+[This program was written by NOKORI•WARE. Please visit our website and consider buying some of our products to help support the development of free software like this!](https://www.nokoriware.com/)
 
 ## Features
 
 #### General 
-- Works with numerous languages
+- Should be compatible with any language (however the UI itself is only in English, if you'd like a translated version, please let us know and we'll see about adding support for it)
 - Supports both normal dialogue and dialogue responses
 - Use the node-based system to connect these and make complex branching dialogue paths
 - Has a game API that can be referenced directly from your Java game for even further simplicity of use
