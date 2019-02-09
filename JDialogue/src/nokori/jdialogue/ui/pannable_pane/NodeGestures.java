@@ -149,30 +149,26 @@ public class NodeGestures {
 		}
 	};
 	
-	private static final double NODE_SNAPPING_MULT = 1.2f;
-	
 	private double getNodeDragTranslateX(Node node, MouseEvent event) {
-		double newX = event.getSceneX();
+		double x = nodeDragContext.translateAnchors.get(node).getKey() + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / pannablePane.getScale());
 		
 		if (nodeSnappingEnabled) {
-			double snapXGrid = DialogueNodePane.WIDTH * NODE_SNAPPING_MULT;
-			double snappedX = event.getSceneX() - (event.getSceneX() % snapXGrid);
-			newX = snappedX + snapXGrid - DialogueNodePane.WIDTH/2;
+			double snapXGrid = node.getBoundsInLocal().getWidth();
+			return x - (x % snapXGrid);
+		} else {
+			return x;
 		}
-		
-		return nodeDragContext.translateAnchors.get(node).getKey() + ((newX - nodeDragContext.mouseAnchorX) / pannablePane.getScale());
 	}
 	
 	private double getNodeDragTranslateY(Node node, MouseEvent event) {
-		double newY = event.getSceneY();
+		double y = nodeDragContext.translateAnchors.get(node).getValue() + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / pannablePane.getScale());
 		
 		if (nodeSnappingEnabled) {
-			double snapYGrid = DialogueNodePane.HEIGHT * NODE_SNAPPING_MULT;
-			double snappedY = event.getSceneY() - (event.getSceneY() % snapYGrid);
-			newY = snappedY + snapYGrid - DialogueNodePane.HEIGHT/2;
+			double snapYGrid = node.getBoundsInLocal().getHeight();
+			return (y - (y % snapYGrid));
+		} else {
+			return y;
 		}
-		
-		return nodeDragContext.translateAnchors.get(node).getValue() + ((newY - nodeDragContext.mouseAnchorY) / pannablePane.getScale());
 	}
 	
 	/**
