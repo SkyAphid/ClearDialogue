@@ -96,10 +96,11 @@ import nokori.jdialogue.ui.util.JDialogueUtils;
  * 
  * ------------------------------------------------------------------------------
  * 
- * This software uses JDK11 and JavaFX11. Use the following VM arguments to ensure that the program runs correctly (make sure to read them first):
+ * This software uses JDK11 and JavaFX11. Use the following VM arguments to ensure that the program runs correctly (make sure to read them first). 
+ * Most of these are compatibility settings for RichTextFX until the next update, but the first two are for configuring JavaFX11.
  * 
- * --module-path "(javafx filepath)" --add-modules=javafx.controls,javafx.fxml
- * 
+ * --module-path "(javafx filepath)" 
+ * --add-modules=javafx.controls,javafx.fxml
  * --add-exports javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED
  * --add-exports javafx.graphics/com.sun.javafx.text=ALL-UNNAMED
  * --add-exports javafx.graphics/com.sun.javafx.scene.text=ALL-UNNAMED
@@ -129,7 +130,7 @@ import nokori.jdialogue.ui.util.JDialogueUtils;
 public class JDialogueCore extends Application {
 	
 	private static final String PROGRAM_NAME = "JDialogue";
-	private static final String PROGRAM_VERSION = "Rev. 7";
+	private static final String PROGRAM_VERSION = "Rev. 8";
 	
 	/*
 	 * window settings
