@@ -149,7 +149,7 @@ public class NodeGestures {
 		}
 	};
 	
-	private static final double GRID_SIZE_MULTIPLIER = 1.2;
+	private static final double GRID_SIZE_MULTIPLIER = 1.5;
 	private static final double GRID_X_START_OFFSET = 80;
 	private static final double GRID_Y_START_OFFSET = 70;
 	
@@ -157,7 +157,7 @@ public class NodeGestures {
 		double x = nodeDragContext.translateAnchors.get(node).getKey() + ((event.getSceneX() - nodeDragContext.mouseAnchorX) / pannablePane.getScale());
 		
 		if (nodeSnappingEnabled) {
-			double nodeWidth = node.getBoundsInLocal().getWidth();
+			double nodeWidth = DialogueNodePane.WIDTH;
 			double snapXGrid = nodeWidth * GRID_SIZE_MULTIPLIER;
 			return GRID_X_START_OFFSET + (x - (x % snapXGrid));
 		} else {
@@ -169,7 +169,7 @@ public class NodeGestures {
 		double y = nodeDragContext.translateAnchors.get(node).getValue() + ((event.getSceneY() - nodeDragContext.mouseAnchorY) / pannablePane.getScale());
 		
 		if (nodeSnappingEnabled) {
-			double nodeHeight = node.getBoundsInLocal().getHeight();
+			double nodeHeight = DialogueNodePane.HEIGHT;
 			double snapYGrid = nodeHeight * GRID_SIZE_MULTIPLIER;
 			return GRID_Y_START_OFFSET + (y - (y % snapYGrid));
 		} else {
