@@ -11,7 +11,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/JDialogueAPI"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/LWJGUI"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JDialogueAPI"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
