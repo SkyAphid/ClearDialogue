@@ -1,5 +1,7 @@
 package nokori.jdialogue.ui.window_design;
 
+import java.io.File;
+
 import org.lwjgl.glfw.GLFW;
 
 import lwjgui.event.listener.KeyListener;
@@ -15,6 +17,8 @@ public class MainWindowDesign {
 		
 		// Create a simple pane
 		StackPane pane = new StackPane();
+		
+		window.setIcon(new File("res/icon_pngs/").listFiles());
 		
 		// Set the pane as the scenes root
 		scene.setRoot(pane);
