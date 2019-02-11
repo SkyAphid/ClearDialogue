@@ -19,14 +19,13 @@ import javax.json.JsonWriter;
 import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
 
-import javafx.stage.FileChooser.ExtensionFilter;
 import nokori.jdialogue.project.Connection;
 import nokori.jdialogue.project.DialogueNode;
 import nokori.jdialogue.project.DialogueNodeConnector;
 import nokori.jdialogue.project.DialogueResponseNode;
-import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.project.DialogueTextNode;
 import nokori.jdialogue.project.Project;
+import nokori.jdialogue.project.DialogueResponseNode.Response;
 import nokori.jdialogue.throwable.FailedToFindConnectorsException;
 import nokori.jdialogue.throwable.FailedToInstantiateNodeException;
 
@@ -343,11 +342,6 @@ public class JDialogueJsonIO implements JDialogueIO{
 
 		return project;
 			
-	}
-
-	@Override
-	public ExtensionFilter getExtensionFilter() {
-		return new ExtensionFilter("JDialogue JSON Files (*.json)", "*.json");
 	}
 
 	@Override
