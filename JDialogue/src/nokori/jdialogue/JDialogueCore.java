@@ -463,7 +463,7 @@ public class JDialogueCore extends Application {
 		//Information on the program itself (so that if screenshots are taken, people will know what the program is)
 		String programInformationString = PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE";
 		
-		programInformation = new ClickableText(programInformationString, textFill, Color.CORAL) {
+		programInformation = new ClickableText(scene, programInformationString, textFill, Color.CORAL) {
 			@Override
 			public void mouseClicked(MouseEvent event, boolean clickingEnabled) {
 				if (clickingEnabled) {

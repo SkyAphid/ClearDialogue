@@ -1,6 +1,8 @@
 package nokori.jdialogue.ui;
 
 import javafx.animation.FillTransition;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -14,7 +16,7 @@ public class ClickableText extends Text {
 	
 	private boolean clickingEnabled = true;
 	
-	public ClickableText(String text, Color defaultFill, Color highlightFill) {
+	public ClickableText(Scene scene, String text, Color defaultFill, Color highlightFill) {
 		super(text);
 		
 		setFill(defaultFill);
@@ -28,6 +30,8 @@ public class ClickableText extends Text {
 				fadeTransition.play();
 			}
 			
+			scene.setCursor(Cursor.HAND);
+			
 			mouseEntered(event, clickingEnabled);
 		});
 		
@@ -38,6 +42,8 @@ public class ClickableText extends Text {
 				fadeTransition.setToValue(defaultFill);
 				fadeTransition.play();
 			}
+			
+			scene.setCursor(Cursor.DEFAULT);
 			
 			mouseExited(event, clickingEnabled);
 		});
