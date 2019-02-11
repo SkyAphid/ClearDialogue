@@ -43,18 +43,20 @@ public abstract class DialogueNodePane extends StackPane {
 	//Basic background dimension data that all nodes should share in-common
 	public static final int WIDTH = 200;
 	public static final int HEIGHT = 200;
-	public static final int TITLE_HEIGHT = 30;
+	public static final int TOP_INSET = 10;
+	public static final int TITLE_HEIGHT = 40;
+	public static final int TAG_HEIGHT = 40;
 	
 	private JDialogueCore core;
 
 	//Instances
 	protected DialogueNode node;
 	private Tooltip tooltip = null;
-	private InlineCssTextArea title;
+	private InlineCssTextArea title, tag;
 	private Rectangle outline, background;
 	private boolean multiSelected = false;
 	
-	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont) {
+	public DialogueNodePane(JDialogueCore core, DialogueNode node, DropShadow shadow, Font titleFont, Font tagFont) {
 		this.core = core;
 		this.node = node;
 		
@@ -77,7 +79,6 @@ public abstract class DialogueNodePane extends StackPane {
 		
 		//Title text
 		title = new InlineCssTextArea();
-		title.replaceText(node.getName());
 		title.setMaxWidth(WIDTH - 20f);
 		title.setMaxHeight(TITLE_HEIGHT); 
 		title.setWrapText(false);
@@ -85,13 +86,27 @@ public abstract class DialogueNodePane extends StackPane {
 		title.setMouseTransparent(true);
 		
 		title.setStyle("-fx-font-family: '" + titleFont.getFamily() + "'; -fx-font-size: " + titleFont.getSize() + ";"
-				  	 + "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0;");
+				  	 + "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-border-insets: 0 0 5 0;");
 		
 		StackPane.setAlignment(title, Pos.TOP_CENTER);
-		StackPane.setMargin(title, new Insets(10, 0, 0, 0));
+		StackPane.setMargin(title, new Insets(TOP_INSET, 0, 0, 0));
+		
+		//Tag text
+		tag = new InlineCssTextArea();
+		tag.setMaxWidth(WIDTH - 20f);
+		tag.setMaxHeight(TITLE_HEIGHT); 
+		tag.setWrapText(false);
+		tag.setEditable(false);
+		tag.setMouseTransparent(true);
+		
+		tag.setStyle("-fx-font-family: '" + tagFont.getFamily() + "'; -fx-font-size: " + tagFont.getSize() + ";"
+				  	 + "-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-border-insets: 0 0 15 0;");
+		
+		StackPane.setAlignment(tag, Pos.TOP_CENTER);
+		StackPane.setMargin(tag, new Insets(TOP_INSET + TITLE_HEIGHT, 0, 0, 0));
 		
 		//Configure pane
-		getChildren().addAll(background, connectorArc, title, outline);
+		getChildren().addAll(background, connectorArc, title, tag, outline);
 		
 		setOnMouseEntered(event -> {
 			if (!multiSelected) {
@@ -106,11 +121,13 @@ public abstract class DialogueNodePane extends StackPane {
 		});
 
 		setOnMouseClicked(event -> {
-			checkDispose(event);
+			checkDuplicateOrDispose(event);
 		});
 		
 		//Tooltip
-		tooltip = JDialogueUtils.quickTooltip(this, 30, "Hold LMB and drag to move node.\nDouble-click LMB to edit node.\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
+		tooltip = JDialogueUtils.quickTooltip(this, 30, 
+				"Hold LMB and drag to move node.\nDouble-click LMB to edit node.\nDouble-click MMB to duplicate node."
+				+ "\nDouble-click RMB to delete node.\nConnect green to red connectors to link nodes.");
 		
 		//Initial animation
 		RotateTransition rotateTransition = new RotateTransition(Duration.millis(FADE_TIME), this);
@@ -151,6 +168,9 @@ public abstract class DialogueNodePane extends StackPane {
 	public void refresh(JDialogueCore core) {
 		title.replaceText(node.getName());
 		JDialogueUtils.computeHighlighting(title, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
+		
+		tag.replaceText(node.getTag());
+		JDialogueUtils.computeHighlighting(tag, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 	}
 	
 	/**
@@ -162,15 +182,23 @@ public abstract class DialogueNodePane extends StackPane {
 	}
 	
 	/**
-	 * Checks if the right mouse button is clicking on this node, indicating a deletion request
+	 * Checks if the user is trying to delete or duplicate this node.
 	 */
-	protected boolean checkDispose(MouseEvent event) {
-		if (event.getClickCount() > 1 && event.getButton() == MouseButton.SECONDARY) {
-			if (JDialogueUtils.showConfirmAlert(core.getStage(), AlertType.CONFIRMATION, "Delete Node", "Delete node \"" + node.getName() + "?\"", "*This cannot be undone")) {
-				dispose(core);
+	protected boolean checkDuplicateOrDispose(MouseEvent event) {
+		if (event.getClickCount() > 1) {
+			
+			if (event.getButton() == MouseButton.MIDDLE) {
+				core.newDialogueNode(node.duplicate());
+				return true;
 			}
 			
-			return true;
+			if (event.getButton() == MouseButton.SECONDARY) {
+				if (JDialogueUtils.showConfirmAlert(core.getStage(), AlertType.CONFIRMATION, "Delete Node", "Delete node \"" + node.getName() + "?\"", "*This cannot be undone")) {
+					dispose(core);
+				}
+				
+				return true;
+			}
 		}
 		
 		return false;

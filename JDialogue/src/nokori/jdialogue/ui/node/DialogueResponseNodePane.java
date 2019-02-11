@@ -30,15 +30,15 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 	private Font textFont;
 	private int incrementH;
 	
-	public DialogueResponseNodePane(JDialogueCore core, DialogueResponseNode node, DropShadow shadow, Font titleFont, Font textFont, int incrementH) {
-		super(core, node, shadow, titleFont);
+	public DialogueResponseNodePane(JDialogueCore core, DialogueResponseNode node, DropShadow shadow, Font titleFont, Font tagFont, Font textFont, int incrementH) {
+		super(core, node, shadow, titleFont, tagFont);
 		
 		this.textFont = textFont;
 		this.incrementH = incrementH;
 		
 		//Open Editor
 		setOnMouseClicked(event -> {
-			if (checkDispose(event)) {
+			if (checkDuplicateOrDispose(event)) {
 				return;
 			}
 			
@@ -47,6 +47,7 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 			}
 		});
 		
+		//Finalize
 		refresh(core);
 	}
 	
@@ -69,7 +70,7 @@ public class DialogueResponseNodePane extends DialogueNodePane{
 		ArrayList<Response> responses = ((DialogueResponseNode) node).getResponses();
 		
 		//The ten is to give the bottom extra bounding space
-		int extendedH = Math.max(TITLE_HEIGHT + 10 + (responses.size() * incrementH), HEIGHT);
+		int extendedH = Math.max(TITLE_HEIGHT + 60 + (responses.size() * incrementH), HEIGHT);
 		int connectorRadius = (int) (incrementH * (1.0/3.0));
 		
 		for (int i = 0; i < responses.size(); i++) {

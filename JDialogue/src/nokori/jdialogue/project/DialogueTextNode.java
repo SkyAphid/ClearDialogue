@@ -21,8 +21,8 @@ public class DialogueTextNode extends DialogueNode {
 		this.text = text;
 	}
 	
-	public DialogueTextNode(Project project, String name, double x, double y) {
-		super(project, name, x, y);
+	public DialogueTextNode(Project project, String name, String tag, double x, double y) {
+		super(project, name, tag, x, y);
 		text = "Default Text";
 		outConnector = new DialogueNodeConnector(project, this);
 	}
@@ -56,5 +56,12 @@ public class DialogueTextNode extends DialogueNode {
 	public void disconnectAllConnectors() {
 		getInConnector().disconnectAll();
 		outConnector.disconnectAll();
+	}
+
+	@Override
+	public DialogueNode duplicate() {
+		DialogueTextNode node = new DialogueTextNode(getProject(), getName(), getTag(), getX(), getY());
+		node.text = text;
+		return node;
 	}
 }

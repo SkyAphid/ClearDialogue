@@ -23,8 +23,8 @@ public class DialogueResponseNode extends DialogueNode {
 		super(project, uid, name, tag, x, y);
 	}
 	
-	public DialogueResponseNode(Project project, String name, double x, double y) {
-		super(project, name, x, y);
+	public DialogueResponseNode(Project project, String name, String tag, double x, double y) {
+		super(project, name, tag, x, y);
 
 		addResponse("Default Response");
 	}
@@ -92,5 +92,12 @@ public class DialogueResponseNode extends DialogueNode {
 		public void setOutConnector(DialogueNodeConnector outConnector) {
 			this.outConnector = outConnector;
 		}
+	}
+
+	@Override
+	public DialogueNode duplicate() {
+		DialogueResponseNode node = new DialogueResponseNode(getProject(), getName(), getTag(), getX(), getY());
+		node.responses.addAll(responses);
+		return node;
 	}
 }

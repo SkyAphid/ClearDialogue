@@ -35,15 +35,15 @@ public abstract class DialogueNode implements Serializable {
 		this.x = x;
 		this.y = y;
 	}
-	
-	public DialogueNode(Project project, String name, double x, double y) {
+
+	public DialogueNode(Project project, String name, String tag, double x, double y) {
 		this.project = project;
 		this.name = name;
+		this.tag = tag;
 		this.x = x;
 		this.y = y;
 		
 		uid = new UID().toString();
-		tag = "";
 		
 		inConnector = new DialogueNodeConnector(project, this);
 	}
@@ -107,4 +107,11 @@ public abstract class DialogueNode implements Serializable {
 	 * If you extend this, remember to call getInConnector().disconnectAll()!!
 	 */
 	public abstract void disconnectAllConnectors();
+	
+	/**
+	 * Duplicate this DialogueNode. Keep in mind that connections generally aren't copied, just the contents of the node itself.
+	 * 
+	 * @return the duplicated node.
+	 */
+	public abstract DialogueNode duplicate();
 }

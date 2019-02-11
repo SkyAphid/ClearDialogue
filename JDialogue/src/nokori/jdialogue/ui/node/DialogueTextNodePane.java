@@ -23,25 +23,21 @@ public class DialogueTextNodePane extends DialogueNodePane{
 	
 	private InlineCssTextArea body;
 	
-	public DialogueTextNodePane(JDialogueCore core, DialogueTextNode node, DropShadow shadow, Font titleFont, Font textFont) {
-		super(core, node, shadow, titleFont);
+	public DialogueTextNodePane(JDialogueCore core, DialogueTextNode node, DropShadow shadow, Font titleFont, Font tagFont, Font textFont) {
+		super(core, node, shadow, titleFont, tagFont);
 		
 		//Out-Connector
 		DialogueNodeConnectorArc outConnector = new DialogueNodeConnectorArc(core, this, ConnectorType.OUT, node.getOutConnector());
 
 		//Body Text Viewer
 		body = new InlineCssTextArea();
-		body.replaceText(node.getText());
 		body.setMaxWidth(WIDTH - 20f);
-		body.setMaxHeight(HEIGHT - TITLE_HEIGHT - 20f); 
+		body.setMaxHeight(HEIGHT - TOP_INSET - TITLE_HEIGHT - TAG_HEIGHT); 
 		body.setWrapText(true);
 		body.setEditable(false);
 		body.setMouseTransparent(true);
 
 		body.setStyle("-fx-font-family: '" + textFont.getFamily() + "'; -fx-font-size: " + textFont.getSize() + ";");
-
-		//Finalize
-		JDialogueUtils.computeHighlighting(body, core.getSyntax(), JDialogueCore.SYNTAX_HIGHLIGHT_COLOR);
 		
 		StackPane.setAlignment(body, Pos.BOTTOM_CENTER);
 		StackPane.setMargin(body, new Insets(0, 10, 10, 10));
@@ -51,7 +47,7 @@ public class DialogueTextNodePane extends DialogueNodePane{
 		
 		//Open Editor
 		setOnMouseClicked(event -> {
-			if (checkDispose(event)) {
+			if (checkDuplicateOrDispose(event)) {
 				return;
 			}
 			
@@ -59,6 +55,9 @@ public class DialogueTextNodePane extends DialogueNodePane{
 				core.getUIPane().getChildren().add(new DialogueTextNodeEditor(core, node, this, titleFont, textFont));
 			}
 		});
+		
+		//Finalize
+		refresh(core);
 	}
 	
 	@Override

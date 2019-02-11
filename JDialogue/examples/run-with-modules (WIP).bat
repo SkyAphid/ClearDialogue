@@ -1,0 +1,3 @@
+@ECHO OFF
+%~dp0\jre\bin\java --module-path "JDialogue.jar;lib;lib\javafx\lib" --add-modules=javafx.controls,javafx.fxml --add-exports javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.text=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene.text=ALL-UNNAMED --add-opens javafx.graphics/javafx.scene.text=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.text=ALL-UNNAMED --module nokori.jdialogue/nokori.jdialogue.JDialogueCore
+pause

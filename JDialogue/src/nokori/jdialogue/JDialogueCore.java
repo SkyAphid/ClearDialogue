@@ -2,6 +2,7 @@ package nokori.jdialogue;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Stack;
-
-import javax.swing.UIManager;
 
 import org.fxmisc.richtext.InlineCssTextArea;
 
@@ -130,7 +129,7 @@ import nokori.jdialogue.ui.util.JDialogueUtils;
 public class JDialogueCore extends Application {
 	
 	private static final String PROGRAM_NAME = "JDialogue";
-	private static final String PROGRAM_VERSION = "Rev. 8";
+	private static final String PROGRAM_VERSION = "Rev. 10";
 	
 	/*
 	 * window settings
@@ -173,9 +172,7 @@ public class JDialogueCore extends Application {
 	
 	private DropShadow shadow;
 	
-	private Font sansRegular = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Regular.ttf"), 20);
-	private Font sansLight = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 20);
-	private Font serifRegular = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSerif-Regular.ttf"), 16);
+	private Font sansRegular, sansRegularSmall, sansLight, sansLightSmall, serifRegular;
 	
 	/*
 	 * Project data
@@ -195,16 +192,6 @@ public class JDialogueCore extends Application {
 	protected ArrayList<BoundLine> connectorLines = new ArrayList<BoundLine>();
 	private ConnectorSelection selectedConnector = null;
 	
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		launch(args);
-	}
-
 	/**
 	 * Start program
 	 */
@@ -212,15 +199,25 @@ public class JDialogueCore extends Application {
 	public void start(Stage stage) {
 		this.stage = stage;
 		
-		stage.getIcons().addAll(
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_512x512.png")),
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_256x256.png")),
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_128x128.png")),
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_64x64.png")),
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_48x48.png")),
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_32x32.png")),
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_24x24.png")),
-				new Image(JDialogueUtils.loadFromPackage("nokori/jdialogue/icons/icon_16x16.png")));
+		try {
+			sansRegular = Font.loadFont(new FileInputStream("res/fonts/NotoSans-Regular.ttf"), 20);
+			sansRegularSmall = Font.loadFont(new FileInputStream("res/fonts/NotoSans-Regular.ttf"), 14);
+			sansLight = Font.loadFont(new FileInputStream("res/fonts/NotoSans-Light.ttf"), 20);
+			sansLightSmall = Font.loadFont(new FileInputStream("res/fonts/NotoSans-Light.ttf"), 18);
+			serifRegular = Font.loadFont(new FileInputStream("res/fonts/NotoSerif-Regular.ttf"), 16);
+			
+			stage.getIcons().addAll(
+					new Image(new FileInputStream("res/icons/icon_512x512.png")),
+					new Image(new FileInputStream("res/icons/icon_256x256.png")),
+					new Image(new FileInputStream("res/icons/icon_128x128.png")),
+					new Image(new FileInputStream("res/icons/icon_64x64.png")),
+					new Image(new FileInputStream("res/icons/icon_48x48.png")),
+					new Image(new FileInputStream("res/icons/icon_32x32.png")),
+					new Image(new FileInputStream("res/icons/icon_24x24.png")),
+					new Image(new FileInputStream("res/icons/icon_16x16.png")));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		stage.setMinWidth(WINDOW_WIDTH);
 		stage.setMinHeight(WINDOW_HEIGHT);
@@ -287,7 +284,7 @@ public class JDialogueCore extends Application {
 		
 		//Scene
 		scene = new Scene(uiPane, WINDOW_WIDTH, WINDOW_HEIGHT);
-		scene.getStylesheets().add(getClass().getClassLoader().getResource("nokori/jdialogue/css/scrollbar_style.css").toExternalForm());
+		//scene.getStylesheets().add("res/css/scrollbar_style.css");
 		
 		/*
 		 * NodeGestures controls the node dragging in pannable pane
@@ -456,13 +453,13 @@ public class JDialogueCore extends Application {
 	 */
 	private void addProgramInformationAndContextHints() {
 		int offsetY = 20;
-		
-		Font sansLightSmall = Font.loadFont(JDialogueUtils.loadFromPackage("nokori/jdialogue/fonts/NotoSans-Light.ttf"), 18);
+
 		Color textFill = Color.LIGHTGRAY.darker();
-		
-		//Information on the program itself (so that if screenshots are taken, people will know what the program is)
+
+		// Information on the program itself (so that if screenshots are taken, people
+		// will know what the program is)
 		String programInformationString = PROGRAM_NAME + " " + PROGRAM_VERSION + " by NOKORI•WARE";
-		
+
 		programInformation = new ClickableText(scene, programInformationString, textFill, Color.CORAL) {
 			@Override
 			public void mouseClicked(MouseEvent event, boolean clickingEnabled) {
@@ -480,8 +477,9 @@ public class JDialogueCore extends Application {
 		programInformation.setY(WINDOW_HEIGHT - offsetY);
 		programInformation.setClickingEnabled(Desktop.isDesktopSupported());
 		programInformation.setMouseTransparent(!programInformation.isClickingEnabled());
-		
-		//Context hints. These are activated under certain circumstances to tell the user instructions on how to use tools when they're activated.
+
+		// Context hints. These are activated under certain circumstances to tell the
+		// user instructions on how to use tools when they're activated.
 		contextHints = new Text();
 		contextHints.setFont(sansLightSmall);
 		contextHints.setFill(textFill);
@@ -489,15 +487,15 @@ public class JDialogueCore extends Application {
 		contextHints.setY(programInformation.getY());
 		contextHints.setMouseTransparent(true);
 		setDefaultContextHint();
-		
-		//Clip to bottom-left
+
+		// Clip to bottom-left
 		uiPane.layoutBoundsProperty().addListener((ov, oldValue, newValue) -> {
 			double newY = newValue.getHeight() - offsetY;
 			programInformation.setY(newY);
 			contextHints.setY(newY);
 		});
-		
-		//Add to pane
+
+		// Add to pane
 		uiPane.getChildren().addAll(programInformation, contextHints);
 	}
 
@@ -648,7 +646,6 @@ public class JDialogueCore extends Application {
 	 * @param retainViewportSettings if set to true, the viewports X/Y/Scale/Size won't be modified upon refresh (e.g. when merging projects instead of just importing)
 	 */
 	public void refreshUI(boolean retainViewportSettings) {
-		
 		//Updated project name field with this project's name
 		projectNameField.replaceText(project.getName());
 		
@@ -946,16 +943,15 @@ public class JDialogueCore extends Application {
 				
 				switch(optionName) {
 				case DIALOGUE:
-					node = new DialogueTextNode(project, "Dialogue", nodeX, nodeY);
+					node = new DialogueTextNode(project, "Dialogue", "", nodeX, nodeY);
 					break;
 				case RESPONSE:
-					node = new DialogueResponseNode(project, "Response", nodeX, nodeY);
+					node = new DialogueResponseNode(project, "Response", "", nodeX, nodeY);
 					break;
 				}
 				
 				//Add node to project data
-				project.addNode(node);
-				createDialogueNodePane(node);
+				newDialogueNode(node);
 			}
 		};
 		
@@ -967,6 +963,16 @@ public class JDialogueCore extends Application {
 	}
 	
 	/**
+	 * Adds a the given DialogueNode to the Project and creates a corresponding DialogueNodePane in the viewport.
+	 * 
+	 * @param node
+	 */
+	public void newDialogueNode(DialogueNode node) {
+		project.addNode(node);
+		createDialogueNodePane(node);
+	}
+	
+	/**
 	 * Automatically generates and adds a new DialogueNodeFX to the instance based on the passed in DialogueNode type.
 	 * @param dialogueNode
 	 * @throws MissingDialogueNodePaneError 
@@ -975,11 +981,11 @@ public class JDialogueCore extends Application {
 		DialogueNodePane dialogueNodePane = null;
 		
 		if (dialogueNode instanceof DialogueTextNode) {
-			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, sansRegular, serifRegular);
+			dialogueNodePane = new DialogueTextNodePane(this, (DialogueTextNode) dialogueNode, shadow, sansRegular, sansRegularSmall, serifRegular);
 		}
 		
 		if (dialogueNode instanceof DialogueResponseNode) {
-			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, sansRegular, serifRegular, 45);
+			dialogueNodePane = new DialogueResponseNodePane(this, (DialogueResponseNode) dialogueNode, shadow, sansRegular, sansRegularSmall, serifRegular, 45);
 		}
 		
 		if (dialogueNodePane != null) {
@@ -1176,7 +1182,7 @@ public class JDialogueCore extends Application {
 			//FYI I totally pulled the 2.1 out of nowhere just so multi-line context hints would line up with the program information
 			//Feel free to change it if necessary
 			double newLineOffset = (hint.contains("\n") ? (contextHints.getBoundsInParent().getHeight()/2.1) : 0);
-			contextHints.setY(programInformation.getY() - newLineOffset);
+			contextHints.setLayoutY(programInformation.getLayoutY() - newLineOffset);
 		}
 	}
 	

@@ -1,6 +1,7 @@
 package nokori.jdialogue.ui.util;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Stack;
 
 import javafx.event.EventHandler;
@@ -44,6 +45,8 @@ public class MultiEditTool {
 							}
 							
 							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Insertion Success", "\"" + newTag + "\" was inserted successfully into " + insertions + " nodes.");
+							
+							core.refreshUI(true);
 						} else {
 							JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Insertion Cancelled", "No tag was inputted.");
 						}
@@ -74,6 +77,8 @@ public class MultiEditTool {
 							
 							if (removals > 0) {
 								JDialogueUtils.showAlert(stage, AlertType.INFORMATION, "Tag Removal Success", "\"" + searchTag + "\" was removed successfully from " + removals + " nodes.");
+								
+								core.refreshUI(true);
 							} else {
 								JDialogueUtils.showAlert(stage, AlertType.ERROR, "Tag Removal Failure", "\"" + searchTag + "\" wasn't found in any nodes.");
 							}
@@ -90,7 +95,30 @@ public class MultiEditTool {
 					Stack<DialogueNodePane> selected = core.getAllMultiSelected();
 					
 					if (!selected.isEmpty()) {
+						/*
+						 * Sort the list based on X/Y coordinates so that if the #NUM tag is used, the numbers appear in descending order
+						 */
+						Collections.sort(selected, new Comparator<DialogueNodePane>() {
+							public int compare(DialogueNodePane x1, DialogueNodePane x2) {
+								DialogueNode n1 = x1.getDialogueNode();
+								DialogueNode n2 = x2.getDialogueNode();
+
+								int result = Double.compare(n1.getY(), n2.getY());
+								
+								if (result == 0) {
+									result = Double.compare(n1.getX(), n2.getX());
+								}
+								
+								return result;
+							}
+						});
+						
 						Collections.reverse(selected);
+
+						/*
+						 * Begin renaming process
+						 */
+						
 						String autoNumTag = "[[#NUM]]";
 						
 						String name = JDialogueUtils.showInputDialog(stage, "Multi-Name", 

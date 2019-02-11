@@ -6,7 +6,6 @@ import static javafx.scene.input.KeyCombination.SHORTCUT_ANY;
 import static org.fxmisc.wellbehaved.event.EventPattern.anyOf;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -233,16 +232,7 @@ public class JDialogueUtils {
 	    
 	    return intersectionBounds;
 	}
-	
-	/**
-	 * Quick access to a file within the JAR
-	 * @param packagePath
-	 * @return
-	 */
-	public static InputStream loadFromPackage(String packagePath) {
-		return JDialogueUtils.class.getClassLoader().getResourceAsStream(packagePath);
-	}
-	
+
 	/**
 	 * RichTextFX doesn't have TextFields (yet)
 	 */
