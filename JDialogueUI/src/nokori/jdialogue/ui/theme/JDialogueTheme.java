@@ -11,7 +11,6 @@ public class JDialogueTheme extends Theme {
 	public JDialogueTheme() {
 		sans = new Font("res/fonts/NotoSans/", "NotoSans-Regular.ttf", "NotoSans-Bold.ttf", "NotoSans-Italic.ttf", "NotoSans-Light.ttf");
 		serif = new Font("res/fonts/NotoSerif/", "NotoSerif-Regular.ttf", "NotoSerif-Bold.ttf", "NotoSerif-Italic.ttf", "NotoSerif-Light.ttf");
-		
 	}
 	
 	public Font getSansFont() {
@@ -57,6 +56,11 @@ public class JDialogueTheme extends Theme {
 		return Color.DARK_GRAY;
 	}
 
+	@Override
+	public Color getTextAlt() {
+		return Color.WHITE_SMOKE;
+	}
+	
 	@Override
 	public Color getControl() {
 		return new Color(240, 240, 240);

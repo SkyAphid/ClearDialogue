@@ -2,73 +2,94 @@ package nokori.jdialogue.ui.components;
 
 
 import lwjgui.Color;
+import lwjgui.event.Event;
 import lwjgui.geometry.Pos;
-import lwjgui.scene.layout.FloatingPane;
+import lwjgui.scene.layout.floating.FloatingPane;
 import lwjgui.scene.shape.DropShadow;
 import lwjgui.scene.shape.Rectangle;
-import lwjgui.transition.Transition;
+import lwjgui.theme.Theme;
+import lwjgui.transition.ShapeFillTransition;
 
 /**
  * This class serves as the skeleton for all of the Toolbar buttons on the HUD.
- * 
- * @author Brayden
  *
  */
 public class JDButtonSkeleton extends FloatingPane {
 	
-	private static final int CORNER_RADIUS = 3;
-	private static final int DROP_SHADOW_SIZE_OFFSET = 3;
-	private static final int HIGHLIGHT_SPEED_IN_MILLIS = 1000;
+	public static final int DEFAULT_HEIGHT = 50;
 	
-	private Color defaultFill;
+	protected static final int HIGHLIGHT_SPEED_IN_MILLIS = 200;
 	
-	private DropShadow dropShadow;
-	private Rectangle background;
+	protected static final int CORNER_RADIUS = 3;
+	protected static final int DROP_SHADOW_SIZE_OFFSET = 3;
+	protected static final double HIGHLIGHT_OPACITY = 0.25;
 	
-	public JDButtonSkeleton(int width, int height, Color backgroundFill) {
-		defaultFill = backgroundFill;
-		
+	protected DropShadow dropShadow;
+	protected Rectangle background, highlight;
+	
+	private ShapeFillTransition fillTransition = null;
+	
+	private boolean highlighted = false;
+	
+	public JDButtonSkeleton(int absoluteX, int absoluteY, int width, int height, boolean backgroundEnabled) {
+		setAbsolutePosition(absoluteX, absoluteY);
 		setAlignment(Pos.TOP_LEFT);
 		
-		dropShadow = new DropShadow(width + DROP_SHADOW_SIZE_OFFSET, height + DROP_SHADOW_SIZE_OFFSET, 5);
-		dropShadow.setMouseTransparent(true);
+		if (backgroundEnabled) {
+			dropShadow = new DropShadow(width + DROP_SHADOW_SIZE_OFFSET, height + DROP_SHADOW_SIZE_OFFSET, 5);
+			dropShadow.setMouseTransparent(true);
+			
+			background = new Rectangle(width, height, Theme.currentTheme().getSelection());
+			background.setCornerRadius(CORNER_RADIUS);
+			background.setMouseTransparent(true);
+			getChildren().addAll(dropShadow, background);
+		}
 		
-		background = new Rectangle(width, height, backgroundFill);
-		background.setCornerRadius(CORNER_RADIUS);
-		background.setMouseTransparent(true);
+		highlight = new Rectangle(width, height, Color.TRANSPARENT);
+		highlight.setCornerRadius(CORNER_RADIUS);
+		highlight.setMouseTransparent(true);
+		getChildren().add(highlight);
 		
 		setMouseEnteredEvent(e -> {
-			setHighlighted(true);
-			System.err.println("Mouse Entered");
+			playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.WHITE.opaque(HIGHLIGHT_OPACITY)));
+			highlighted = true;
+			mouseEntered(e);
 		});
 		
 		setMouseExitedEvent(e -> {
-			setHighlighted(false);
-			System.err.println("Mouse Exited");
+			playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.TRANSPARENT));
+			highlighted = false;
+			mouseExited(e);
 		});
 		
-		getChildren().addAll(dropShadow, background);
+		setOnMouseClicked(e -> {
+			mouseClicked(e);
+		});
 	}
 	
-	/**
-	 * Toggles the animations for highlighting this JDButton.
-	 */
-	private void setHighlighted(boolean highlighted) {
-		Color fromFill = new Color(background.getFill());
-		
-		if (highlighted) {
-			//Highlight the background on select
-			RectangleFillTransition transition = new RectangleFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, background, fromFill, Color.CORAL.brighter());
-			transition.play();
-		} else {
-			//Fade back to the normal color
-			RectangleFillTransition transition = new RectangleFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, background, fromFill, defaultFill);
-			transition.play();
+	private void playShapeFillTransition(ShapeFillTransition transition) {
+		if (fillTransition != null) {
+			fillTransition.stop();
+			fillTransition = null;
 		}
+		
+		fillTransition = transition;
+		fillTransition.play();
+	}
+
+	public boolean isHighlighted() {
+		return highlighted;
+	}
+
+	protected void mouseEntered(Event e) {
+		
 	}
 	
-	public void setHeight(double height) {
-		dropShadow.setPrefHeight(height + DROP_SHADOW_SIZE_OFFSET);
-		background.setPrefHeight(height);
+	protected void mouseExited(Event e) {
+		
+	}
+	
+	protected void mouseClicked(Event e) {
+		
 	}
 }

@@ -3,8 +3,7 @@ package nokori.jdialogue.ui;
 import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
 import lwjgui.scene.Window;
-import lwjgui.util.UpdateTimer;
-import nokori.jdialogue.ui.window_design.MainWindowDesign;
+import nokori.jdialogue.ui.window_design.MainWindowDesigner;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -24,8 +23,14 @@ public class JDialogueUICore {
 	private long windowID;
 	private Window window;
 	
+	private JDUIController controller;
+	
 	public static void main(String args[]) {
-		if (!glfwInit())throw new IllegalStateException("Unable to initialize GLFW");
+		if (LWJGUIUtil.restartJVMOnFirstThread(true, args)) {
+			return;
+		}
+		
+		if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW");
 
 		//Begin running the program.
 		new JDialogueUICore().run();
@@ -40,7 +45,7 @@ public class JDialogueUICore {
 	
 		//Initialize LWJGUI for this window ID.
 		window = LWJGUI.initialize(windowID);
-		new MainWindowDesign(window);
+		new MainWindowDesigner(window, controller);
 	}
 
 	public void run() {
