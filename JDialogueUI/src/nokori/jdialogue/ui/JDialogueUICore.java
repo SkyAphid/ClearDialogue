@@ -11,25 +11,25 @@ import org.lwjgl.glfw.GLFW;
 
 public class JDialogueUICore {
 	
-	private static final String programName = "JDialogue";
-	private static final String programVersion = "Rev. 10";
-	private static final String programDeveloper = "NOKORI•WARE";
+	public static final String PROGRAM_NAME = "JDialogue";
+	public static final String PROGRAM_VERSION = "Rev. 10";
+	public static final String PROGRAM_DEVELOPER = "NOKORI•WARE";
 	
 	private static final int DEFAULT_WIDTH = 1280;
 	private static final int DEFAULT_HEIGHT = 720;
 	
-	public static final int UPDATES_PER_SECOND = 30;
-	
 	private long windowID;
 	private Window window;
 	
-	private JDUIController controller;
+	private JDUIController controller = new JDUIController();
 	
 	public static void main(String args[]) {
+		//Restarts the JVM if necessary on the first thread to ensure Mac compatibility
 		if (LWJGUIUtil.restartJVMOnFirstThread(true, args)) {
 			return;
 		}
 		
+		//Fail to start the program if GLFW can't be initialized
 		if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW");
 
 		//Begin running the program.
@@ -41,7 +41,7 @@ public class JDialogueUICore {
 	
 	public JDialogueUICore() {
 		//Create a standard opengl 3.2 window.
-		windowID = LWJGUIUtil.createOpenGLCoreWindow(programName, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, false);
+		windowID = LWJGUIUtil.createOpenGLCoreWindow(PROGRAM_NAME, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, false);
 	
 		//Initialize LWJGUI for this window ID.
 		window = LWJGUI.initialize(windowID);

@@ -130,7 +130,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 	@Override
 	protected void mouseEntered(Event e) {
 		if (!expanded) {
-			playHeightTransition(new HeightTransition(EXPAND_SPEED_IN_MILLIS, this, options.length * DEFAULT_HEIGHT));
+			playHeightTransition(new HeightTransition(EXPAND_SPEED_IN_MILLIS, this, DEFAULT_HEIGHT + (options.length * DEFAULT_HEIGHT)));
 			expanded = true;
 		}
 	}

@@ -50,13 +50,13 @@ public class JDButtonSkeleton extends FloatingPane {
 		highlight.setMouseTransparent(true);
 		getChildren().add(highlight);
 		
-		setMouseEnteredEvent(e -> {
+		setOnMouseEntered(e -> {
 			playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.WHITE.opaque(HIGHLIGHT_OPACITY)));
 			highlighted = true;
 			mouseEntered(e);
 		});
 		
-		setMouseExitedEvent(e -> {
+		setOnMouseExited(e -> {
 			playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.TRANSPARENT));
 			highlighted = false;
 			mouseExited(e);

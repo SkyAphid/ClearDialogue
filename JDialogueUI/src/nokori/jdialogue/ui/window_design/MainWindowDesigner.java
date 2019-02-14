@@ -1,18 +1,29 @@
 package nokori.jdialogue.ui.window_design;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.net.URL;
+
+import lwjgui.event.Event;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
+import lwjgui.scene.Context;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
+import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.floating.FloatingPane;
 import lwjgui.scene.layout.Font;
+import lwjgui.scene.layout.FontStyle;
+import lwjgui.scene.layout.GridPane;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
 import nokori.jdialogue.ui.JDUIController;
 import nokori.jdialogue.ui.components.JDDropdownMenu;
+import nokori.jdialogue.ui.components.JDSelectableLabel;
 import nokori.jdialogue.ui.components.JDTextField;
 import nokori.jdialogue.ui.theme.JDialogueTheme;
+
+import static nokori.jdialogue.ui.JDialogueUICore.*;
 
 /**
  * This class assembles the design of the main window; such as the UI and canvas.
@@ -21,7 +32,7 @@ import nokori.jdialogue.ui.theme.JDialogueTheme;
  */
 public class MainWindowDesigner {
 	
-	private static final int TOOLBAR_PADDING = 10;
+	private static final int PADDING = 10;
 	
 	public MainWindowDesigner(Window window, JDUIController controller) {
 		/*
@@ -50,6 +61,10 @@ public class MainWindowDesigner {
 		
 		//Set root pane
 		StackPane rootPane = new StackPane();
+		rootPane.setFillToParentWidth(true);
+		rootPane.setFillToParentHeight(true);
+		rootPane.setAlignment(Pos.BOTTOM_LEFT);
+		rootPane.setPadding(new Insets(0, 0, PADDING, PADDING));
 		scene.setRoot(rootPane);
 		
 		//Set canvas pane
@@ -61,12 +76,8 @@ public class MainWindowDesigner {
 		rootPane.getChildren().add(canvasPane);
 		
 		//Create "toolbar" pane
-		int padding = 10;
-		
 		FloatingPane uiPaneTop = new FloatingPane();
-		uiPaneTop.setPadding(new Insets(padding, 0, 0, padding));
-		uiPaneTop.setAlignment(Pos.TOP_LEFT);
-		canvasPane.getChildren().add(uiPaneTop);
+		rootPane.getChildren().add(uiPaneTop);
 		
 		uiPaneTop.getChildren().add(newFileMenu(sansFont));
 		uiPaneTop.getChildren().add(newToolMenu(sansFont));
@@ -74,7 +85,38 @@ public class MainWindowDesigner {
 		uiPaneTop.getChildren().add(newProjectNameField(sansFont));
 		
 		//Create program information and context hints pane
+		GridPane uiPaneBottom = new GridPane();
+		uiPaneBottom.setHgap(50);
+		rootPane.getChildren().add(uiPaneBottom);
 		
+		JDSelectableLabel programInformation = new JDSelectableLabel(PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER) {
+			@Override
+			protected void mouseClicked(Event e) {
+				try {
+					Desktop.getDesktop().browse(new URL("https://github.com/SkyAphid/JDialogue").toURI());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		};
+		programInformation.setFont(sansFont);
+		programInformation.setFontSize(22);
+		programInformation.setFontStyle(FontStyle.LIGHT);
+		programInformation.setClickingEnabled(Desktop.isDesktopSupported());
+
+		Label contextHint = new Label() {
+			@Override
+			public void render(Context context) {
+				setText(controller.getContextHint());
+				super.render(context);
+			}
+		};
+		contextHint.setFont(sansFont);
+		contextHint.setFontSize(22);
+		contextHint.setFontStyle(FontStyle.LIGHT);
+		
+		uiPaneBottom.add(programInformation, 0, 0);
+		uiPaneBottom.add(contextHint, 1, 0);
 	}
 	
 	/*
@@ -92,7 +134,7 @@ public class MainWindowDesigner {
 			NEW_PROJECT, SELECT_PROJECT_DIRECTORY, MERGE_PROJECT, EXPORT_JSON, IMPORT_JSON	
 		};
 		
-		JDDropdownMenu file = new JDDropdownMenu(getToolbarAbsoluteX(0), TOOLBAR_PADDING, sansFont, "FILE", options);
+		JDDropdownMenu file = new JDDropdownMenu(getToolbarAbsoluteX(0), PADDING, sansFont, "FILE", options);
 		
 		return file;
 	}
@@ -113,7 +155,7 @@ public class MainWindowDesigner {
 			CANVAS_SIZE, REPLACE, MULTIREPLACE, VIEW_SYNTAX, REFRESH_SYNTAX, SET_SYNTAX	
 		};
 		
-		JDDropdownMenu tool = new JDDropdownMenu(getToolbarAbsoluteX(1), TOOLBAR_PADDING, sansFont, "TOOL", options);
+		JDDropdownMenu tool = new JDDropdownMenu(getToolbarAbsoluteX(1), PADDING, sansFont, "TOOL", options);
 		
 		return tool;
 	}
@@ -130,7 +172,7 @@ public class MainWindowDesigner {
 			DIALOGUE, RESPONSE	
 		};
 		
-		JDDropdownMenu node = new JDDropdownMenu(getToolbarAbsoluteX(2), TOOLBAR_PADDING, sansFont, "+NODE", options);
+		JDDropdownMenu node = new JDDropdownMenu(getToolbarAbsoluteX(2), PADDING, sansFont, "+NODE", options);
 		
 		return node;
 	}
@@ -140,7 +182,7 @@ public class MainWindowDesigner {
 	 */
 	
 	private JDTextField newProjectNameField(Font sansFont) {
-		JDTextField field = new JDTextField(getToolbarAbsoluteX(3), TOOLBAR_PADDING, "Default Project");
+		JDTextField field = new JDTextField(getToolbarAbsoluteX(3), PADDING, "Default Project");
 		
 		return field;
 	}
@@ -152,6 +194,6 @@ public class MainWindowDesigner {
 	 * @return
 	 */
 	private static int getToolbarAbsoluteX(int index) {
-		return TOOLBAR_PADDING + (JDDropdownMenu.DEFAULT_WIDTH + TOOLBAR_PADDING) * index;
+		return PADDING + (JDDropdownMenu.DEFAULT_WIDTH + PADDING) * index;
 	}
 }
