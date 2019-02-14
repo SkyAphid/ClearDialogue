@@ -1,7 +1,6 @@
 package nokori.jdialogue.ui.window_design;
 
 import java.io.File;
-
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Scene;
@@ -32,7 +31,9 @@ public class MainWindowDesigner {
 		Scene scene = window.getScene();
 		
 		//Set window theme
-		window.setIcon(new File("res/icon_pngs/").listFiles());
+		File[] files = new File("res/icons/").listFiles();
+		
+		window.setIcon(".png", files);
 		
 		JDialogueTheme theme = new JDialogueTheme();
 		Theme.setTheme(theme);
