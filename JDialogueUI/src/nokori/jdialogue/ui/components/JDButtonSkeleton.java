@@ -23,6 +23,7 @@ public class JDButtonSkeleton extends FloatingPane {
 	protected static final int CORNER_RADIUS = 3;
 	protected static final int DROP_SHADOW_SIZE_OFFSET = 3;
 	protected static final double HIGHLIGHT_OPACITY = 0.25;
+	protected static final int FONT_SIZE = 26;
 	
 	protected DropShadow dropShadow;
 	protected Rectangle background, highlight;
@@ -31,7 +32,7 @@ public class JDButtonSkeleton extends FloatingPane {
 	
 	private boolean highlighted = false;
 	
-	public JDButtonSkeleton(int absoluteX, int absoluteY, int width, int height, boolean backgroundEnabled) {
+	public JDButtonSkeleton(int absoluteX, int absoluteY, int width, int height, boolean backgroundEnabled, boolean highlightingEnabled) {
 		setAbsolutePosition(absoluteX, absoluteY);
 		setAlignment(Pos.TOP_LEFT);
 		
@@ -45,20 +46,28 @@ public class JDButtonSkeleton extends FloatingPane {
 			getChildren().addAll(dropShadow, background);
 		}
 		
-		highlight = new Rectangle(width, height, Color.TRANSPARENT);
-		highlight.setCornerRadius(CORNER_RADIUS);
-		highlight.setMouseTransparent(true);
-		getChildren().add(highlight);
+		if (highlightingEnabled) {
+			highlight = new Rectangle(width, height, Color.TRANSPARENT);
+			highlight.setCornerRadius(CORNER_RADIUS);
+			highlight.setMouseTransparent(true);
+			getChildren().add(highlight);
+		}
 		
 		setOnMouseEntered(e -> {
-			playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.WHITE.opaque(HIGHLIGHT_OPACITY)));
-			highlighted = true;
+			if (highlightingEnabled) {
+				playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.WHITE.opaque(HIGHLIGHT_OPACITY)));
+				highlighted = true;
+			}
+			
 			mouseEntered(e);
 		});
 		
 		setOnMouseExited(e -> {
-			playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.TRANSPARENT));
-			highlighted = false;
+			if (highlightingEnabled) {
+				playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.TRANSPARENT));
+				highlighted = false;
+			}
+			
 			mouseExited(e);
 		});
 		

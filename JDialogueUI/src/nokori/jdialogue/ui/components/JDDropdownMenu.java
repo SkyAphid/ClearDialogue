@@ -28,7 +28,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 	private HeightTransition heightTransition = null;
 
 	public JDDropdownMenu(int absoluteX, int absoluteY, Font font, String title, String[] optionTitles) {
-		super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, true);
+		super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, true);
 		
 		//Add button title
 		getChildren().add(buildLabel(font, title));
@@ -49,7 +49,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 		Label label = new Label(text);
 		label.setTextFill(Theme.currentTheme().getTextAlt());
 		label.setFont(font);
-		label.setFontSize(26);
+		label.setFontSize(FONT_SIZE);
 		label.setPadding(new Insets(10, 0, 0, 20));
 		label.setMouseTransparent(true);
 		
@@ -166,7 +166,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 		private Label label;
 
 		public MenuOption(int absoluteX, int absoluteY, Font font, String text) {
-			super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, false);
+			super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, false, true);
 			
 			label = buildLabel(font, text);
 			label.setFontStyle(FontStyle.LIGHT);

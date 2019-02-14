@@ -20,7 +20,7 @@ import lwjgui.theme.Theme;
 import nokori.jdialogue.ui.JDUIController;
 import nokori.jdialogue.ui.components.JDDropdownMenu;
 import nokori.jdialogue.ui.components.JDSelectableLabel;
-import nokori.jdialogue.ui.components.JDTextField;
+import nokori.jdialogue.ui.components.JDProjectNameField;
 import nokori.jdialogue.ui.theme.JDialogueTheme;
 
 import static nokori.jdialogue.ui.JDialogueUICore.*;
@@ -82,9 +82,11 @@ public class MainWindowDesigner {
 		uiPaneTop.getChildren().add(newFileMenu(sansFont));
 		uiPaneTop.getChildren().add(newToolMenu(sansFont));
 		uiPaneTop.getChildren().add(newNodeMenu(sansFont));
-		uiPaneTop.getChildren().add(newProjectNameField(sansFont));
+		uiPaneTop.getChildren().add(newProjectNameField(sansFont, controller));
 		
 		//Create program information and context hints pane
+		int fontSize = 24;
+		
 		GridPane uiPaneBottom = new GridPane();
 		uiPaneBottom.setHgap(50);
 		rootPane.getChildren().add(uiPaneBottom);
@@ -100,7 +102,7 @@ public class MainWindowDesigner {
 			}
 		};
 		programInformation.setFont(sansFont);
-		programInformation.setFontSize(22);
+		programInformation.setFontSize(fontSize);
 		programInformation.setFontStyle(FontStyle.LIGHT);
 		programInformation.setClickingEnabled(Desktop.isDesktopSupported());
 
@@ -112,7 +114,7 @@ public class MainWindowDesigner {
 			}
 		};
 		contextHint.setFont(sansFont);
-		contextHint.setFontSize(22);
+		contextHint.setFontSize(fontSize);
 		contextHint.setFontStyle(FontStyle.LIGHT);
 		
 		uiPaneBottom.add(programInformation, 0, 0);
@@ -181,10 +183,8 @@ public class MainWindowDesigner {
 	 * Project Name Field
 	 */
 	
-	private JDTextField newProjectNameField(Font sansFont) {
-		JDTextField field = new JDTextField(getToolbarAbsoluteX(3), PADDING, "Default Project");
-		
-		return field;
+	private JDProjectNameField newProjectNameField(Font sansFont, JDUIController controller) {
+		return new JDProjectNameField(getToolbarAbsoluteX(3), PADDING, sansFont, controller);
 	}
 	
 	/**
