@@ -3,6 +3,7 @@ package nokori.jdialogue.ui.components;
 
 import lwjgui.Color;
 import lwjgui.event.Event;
+import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.layout.floating.FloatingPane;
 import lwjgui.scene.shape.DropShadow;
@@ -24,6 +25,8 @@ public class JDButtonSkeleton extends FloatingPane {
 	protected static final int DROP_SHADOW_SIZE_OFFSET = 3;
 	protected static final double HIGHLIGHT_OPACITY = 0.25;
 	protected static final int FONT_SIZE = 26;
+	
+	protected static final Insets TEXT_PADDING = new Insets(10, 0, 0, 20);
 	
 	protected DropShadow dropShadow;
 	protected Rectangle background, highlight;

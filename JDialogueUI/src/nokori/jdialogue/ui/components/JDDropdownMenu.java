@@ -2,7 +2,6 @@ package nokori.jdialogue.ui.components;
 
 import lwjgui.Color;
 import lwjgui.event.Event;
-import lwjgui.geometry.Insets;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.Font;
@@ -50,7 +49,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 		label.setTextFill(Theme.currentTheme().getTextAlt());
 		label.setFont(font);
 		label.setFontSize(FONT_SIZE);
-		label.setPadding(new Insets(10, 0, 0, 20));
+		label.setPadding(TEXT_PADDING);
 		label.setMouseTransparent(true);
 		
 		return label;

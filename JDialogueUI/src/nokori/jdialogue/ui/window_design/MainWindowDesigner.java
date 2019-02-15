@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
 
+import lwjgui.Color;
 import lwjgui.event.Event;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
@@ -22,6 +23,7 @@ import nokori.jdialogue.ui.components.JDDropdownMenu;
 import nokori.jdialogue.ui.components.JDSelectableLabel;
 import nokori.jdialogue.ui.components.JDProjectNameField;
 import nokori.jdialogue.ui.theme.JDialogueTheme;
+import nokori.jdialogue.ui.transitions.LabelFillTransition;
 
 import static nokori.jdialogue.ui.JDialogueUICore.*;
 
@@ -109,7 +111,10 @@ public class MainWindowDesigner {
 		Label contextHint = new Label() {
 			@Override
 			public void render(Context context) {
-				setText(controller.getContextHint());
+				if (!this.getText().equals(controller.getContextHint())) {
+					new LabelFillTransition(200, this, Color.TRANSPARENT, Theme.currentTheme().getText()).play();
+					setText(controller.getContextHint());
+				}
 				super.render(context);
 			}
 		};
