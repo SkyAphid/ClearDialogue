@@ -2,12 +2,14 @@ package nokori.jdialogue.ui.components;
 
 import lwjgui.Color;
 import lwjgui.event.Event;
+import lwjgui.geometry.Insets;
+import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.FontStyle;
 import lwjgui.theme.Theme;
-import lwjgui.transition.Transition;
+import lwjgui.transition.SizeTransition;
 
 import nokori.jdialogue.ui.transitions.LabelFillTransition;
 
@@ -29,8 +31,10 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 	public JDDropdownMenu(int absoluteX, int absoluteY, Font font, String title, String[] optionTitles) {
 		super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, true);
 		
+		setAlignment(Pos.TOP_LEFT);
+		
 		//Add button title
-		getChildren().add(buildLabel(font, title));
+		getChildren().add(buildLabel(font, title, new Insets(PADDING, 0, 0, PADDING)));
 		
 		//Add menu options
 		options = new MenuOption[optionTitles.length];
@@ -44,15 +48,20 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 	/**
 	 * Gets a Label object configured for this component specifically.
 	 */
-	private Label buildLabel(Font font, String text) {
+	private Label buildLabel(Font font, String text, Insets padding) {
 		Label label = new Label(text);
-		label.setTextFill(Theme.currentTheme().getTextAlt());
+		label.setTextFill(Theme.current().getTextAlt());
 		label.setFont(font);
 		label.setFontSize(FONT_SIZE);
-		label.setPadding(TEXT_PADDING);
 		label.setMouseTransparent(true);
+		label.setPadding(padding);
 		
 		return label;
+	}
+	
+	private void setHeight(double height) {
+		background.setPrefHeight(height);
+		dropShadow.setPrefHeight(height);
 	}
 	
 	/*
@@ -76,7 +85,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 	
 	private void addOptions() {
 		for (int i = 0; i < options.length; i++) {
-			new LabelFillTransition(200, options[i].label, Color.TRANSPARENT, Theme.currentTheme().getTextAlt()).play();
+			new LabelFillTransition(200, options[i].label, Color.TRANSPARENT, Theme.current().getTextAlt()).play();
 		}
 		
 		getChildren().addAll(options);
@@ -147,11 +156,6 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 		heightTransition.play();
 	}
 	
-	private void setHeight(double height) {
-		background.setPrefHeight(height);
-		dropShadow.setPrefHeight(height + DROP_SHADOW_SIZE_OFFSET);
-	}
-	
 	/*
 	 * 
 	 * 
@@ -167,7 +171,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 		public MenuOption(int absoluteX, int absoluteY, Font font, String text) {
 			super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, false, true);
 			
-			label = buildLabel(font, text);
+			label = buildLabel(font, text, new Insets(0, 0, 0, PADDING));
 			label.setFontStyle(FontStyle.LIGHT);
 			getChildren().add(label);
 			
@@ -177,34 +181,35 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 		}
 	}
 	
-	private class HeightTransition extends Transition {
+	private class HeightTransition extends SizeTransition {
 		private JDDropdownMenu button;
-		private double targetHeight;
 		
 		public HeightTransition(long durationInMillis, JDDropdownMenu button, double targetHeight) {
-			super(durationInMillis);
+			super(durationInMillis, -1, targetHeight);
 			this.button = button;
-			this.targetHeight = targetHeight;
 		}
 
-		@Override
-		public void tick(double progress) {
-			double bgHeight = button.background.getHeight();
-			
-			if (bgHeight > targetHeight) {
-				double dH = (bgHeight - targetHeight);
-				setHeight(targetHeight + (dH * (1f - progress)));
-			} else {
-				double dH = (targetHeight - bgHeight);
-				setHeight(bgHeight + (dH * progress));
-			}
-		}
-		
 		@Override
 		public void completedCallback() {
 			if (button.isHighlighted()) {
 				button.addOptions();
 			}
+		}
+
+		@Override
+		protected double getCurrentWidth() {return 0;}
+
+		@Override
+		protected double getCurrentHeight() {
+			return button.getHeight();
+		}
+
+		@Override
+		protected void setWidth(double width) {}
+
+		@Override
+		protected void setHeight(double height) {
+			button.setHeight(height);
 		}
 	}
 }

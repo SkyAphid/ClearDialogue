@@ -15,7 +15,7 @@ public class LabelFillTransition extends Transition {
 		this.fromFill = fromFill;
 		this.toFill = toFill;
 		
-		storeFill = new Color(fromFill);
+		storeFill = fromFill.copy();
 	}
 
 	@Override

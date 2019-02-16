@@ -13,19 +13,19 @@ import nokori.jdialogue.throwable.NullConnectorError;
  * This allows nodes like Dialogue Nodes to only have one connection, but allow response nodes to have as many as needed.
  *
  */
-public class DialogueNodeConnector implements Serializable {
+public class DialogueConnector implements Serializable {
 	
 	private static final long serialVersionUID = -1047642658457698535L;
 	
 	private String uid;
 	
 	private Project project;
-	private DialogueNode parent;
+	private Dialogue parent;
 	
 	/**
 	 * @param parent the DialogueNode that this connector is stored in
 	 */
-	public DialogueNodeConnector(Project project, DialogueNode parent, String uid) {
+	public DialogueConnector(Project project, Dialogue parent, String uid) {
 		this.project = project;
 		this.parent = parent;
 		this.uid = uid;
@@ -34,7 +34,7 @@ public class DialogueNodeConnector implements Serializable {
 	/**
 	 * @param parent the DialogueNode that this connector is stored in
 	 */
-	public DialogueNodeConnector(Project project, DialogueNode parent) {
+	public DialogueConnector(Project project, Dialogue parent) {
 		this(project, parent, new UID().toString());
 	}
 	
@@ -42,7 +42,7 @@ public class DialogueNodeConnector implements Serializable {
 		return uid;
 	}
 
-	public DialogueNode getParent() {
+	public Dialogue getParent() {
 		return parent;
 	}
 	
@@ -53,7 +53,7 @@ public class DialogueNodeConnector implements Serializable {
 	 * 
 	 */
 	
-	public void connect(DialogueNodeConnector connector) {
+	public void connect(DialogueConnector connector) {
 		if (connector != null) {
 			if (!project.connectionExists(this, connector)) {
 				project.addConnection(new Connection(this, connector));
@@ -63,7 +63,7 @@ public class DialogueNodeConnector implements Serializable {
 		}
 	}
 	
-	public void disconnect(DialogueNodeConnector connector) {
+	public void disconnect(DialogueConnector connector) {
 		project.disconnect(this, connector);
 	}
 	
@@ -71,7 +71,7 @@ public class DialogueNodeConnector implements Serializable {
 		project.disconnectAll(this);
 	}
 	
-	public boolean isConnected(DialogueNodeConnector connector) {
+	public boolean isConnected(DialogueConnector connector) {
 		return project.isConnected(this, connector);
 	}
 	
@@ -84,7 +84,7 @@ public class DialogueNodeConnector implements Serializable {
 	 * 
 	 * @return
 	 */
-	public DialogueNodeConnector getConnectedTo() {
+	public DialogueConnector getConnectedTo() {
 		for (int i = 0; i < project.getNumConnections(); i++) {
 			Connection c = project.getConnection(i);
 			
@@ -101,8 +101,8 @@ public class DialogueNodeConnector implements Serializable {
 	 * 
 	 * Returns null if not connected to anything.
 	 */
-	public DialogueNode getNodeConnectedTo() {
-		DialogueNodeConnector connector = getConnectedTo();
+	public Dialogue getNodeConnectedTo() {
+		DialogueConnector connector = getConnectedTo();
 		return (connector != null ? connector.getParent() : null);
 	} 
 }

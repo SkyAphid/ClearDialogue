@@ -3,13 +3,12 @@ package nokori.jdialogue.ui.components;
 
 import lwjgui.Color;
 import lwjgui.event.Event;
-import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.layout.floating.FloatingPane;
 import lwjgui.scene.shape.DropShadow;
 import lwjgui.scene.shape.Rectangle;
 import lwjgui.theme.Theme;
-import lwjgui.transition.ShapeFillTransition;
+import lwjgui.transition.FillTransition;
 
 /**
  * This class serves as the skeleton for all of the Toolbar buttons on the HUD.
@@ -21,44 +20,42 @@ public class JDButtonSkeleton extends FloatingPane {
 	
 	protected static final int HIGHLIGHT_SPEED_IN_MILLIS = 200;
 	
-	protected static final int CORNER_RADIUS = 3;
-	protected static final int DROP_SHADOW_SIZE_OFFSET = 3;
-	protected static final double HIGHLIGHT_OPACITY = 0.25;
-	protected static final int FONT_SIZE = 26;
+	protected static final int PADDING = 10;
 	
-	protected static final Insets TEXT_PADDING = new Insets(10, 0, 0, 20);
+	protected static final int CORNER_RADIUS = 3;
+	protected static final float HIGHLIGHT_OPACITY = 0.25f;
+	protected static final int FONT_SIZE = 26;
 	
 	protected DropShadow dropShadow;
 	protected Rectangle background, highlight;
 	
-	private ShapeFillTransition fillTransition = null;
+	private FillTransition fillTransition = null;
 	
 	private boolean highlighted = false;
 	
 	public JDButtonSkeleton(int absoluteX, int absoluteY, int width, int height, boolean backgroundEnabled, boolean highlightingEnabled) {
 		setAbsolutePosition(absoluteX, absoluteY);
-		setAlignment(Pos.TOP_LEFT);
+		setAlignment(Pos.CENTER_LEFT);
 		
 		if (backgroundEnabled) {
-			dropShadow = new DropShadow(width + DROP_SHADOW_SIZE_OFFSET, height + DROP_SHADOW_SIZE_OFFSET, 5);
+			dropShadow = new DropShadow(width, height);
 			dropShadow.setMouseTransparent(true);
 			
-			background = new Rectangle(width, height, Theme.currentTheme().getSelection());
-			background.setCornerRadius(CORNER_RADIUS);
+			background = new Rectangle(width, height, CORNER_RADIUS, Theme.current().getControl());
 			background.setMouseTransparent(true);
 			getChildren().addAll(dropShadow, background);
 		}
 		
 		if (highlightingEnabled) {
-			highlight = new Rectangle(width, height, Color.TRANSPARENT);
+			highlight = new Rectangle(width, height, CORNER_RADIUS, Color.TRANSPARENT.copy());
 			highlight.setCornerRadius(CORNER_RADIUS);
 			highlight.setMouseTransparent(true);
 			getChildren().add(highlight);
 		}
-		
+
 		setOnMouseEntered(e -> {
 			if (highlightingEnabled) {
-				playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.WHITE.opaque(HIGHLIGHT_OPACITY)));
+				playShapeFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Theme.current().getSelection().alpha(HIGHLIGHT_OPACITY)));
 				highlighted = true;
 			}
 			
@@ -67,7 +64,7 @@ public class JDButtonSkeleton extends FloatingPane {
 		
 		setOnMouseExited(e -> {
 			if (highlightingEnabled) {
-				playShapeFillTransition(new ShapeFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight, highlight.getFill(), Color.TRANSPARENT));
+				playShapeFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Color.TRANSPARENT));
 				highlighted = false;
 			}
 			
@@ -79,7 +76,7 @@ public class JDButtonSkeleton extends FloatingPane {
 		});
 	}
 	
-	private void playShapeFillTransition(ShapeFillTransition transition) {
+	private void playShapeFillTransition(FillTransition transition) {
 		if (fillTransition != null) {
 			fillTransition.stop();
 			fillTransition = null;

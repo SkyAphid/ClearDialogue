@@ -45,6 +45,8 @@ public class JDialogueUICore {
 	
 		//Initialize LWJGUI for this window ID.
 		window = LWJGUI.initialize(windowID);
+		window.getContext().setContextSizeLimits(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		
 		new MainWindowDesigner(window, controller);
 	}
 

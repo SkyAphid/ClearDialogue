@@ -33,7 +33,7 @@ public class Project implements Serializable {
 	private double viewportX, viewportY, viewportScale;
 	
 	//All nodes contained by this project
-	private ArrayList<DialogueNode> nodes = new ArrayList<DialogueNode>();
+	private ArrayList<Dialogue> nodes = new ArrayList<Dialogue>();
 	
 	//All connections between the various nodes are stored here
 	private ArrayList<Connection> connections = new ArrayList<Connection>();
@@ -111,16 +111,16 @@ public class Project implements Serializable {
 	 * references
 	 */
 	
-	public void addNode(DialogueNode node) {
+	public void addNode(Dialogue node) {
 		nodes.add(node);
 	}
 	
-	public void removeNode(DialogueNode node) {
+	public void removeNode(Dialogue node) {
 		
 		nodes.remove(node);
 	}
 	
-	public DialogueNode getNode(int index) {
+	public Dialogue getNode(int index) {
 		return nodes.get(index);
 	}
 	
@@ -143,11 +143,11 @@ public class Project implements Serializable {
 	 * @param exactMatch - if true, it will only return a node that equals() the input. Otherwise, contains() will be used.
 	 * @return the DialogueNode that meets the criteria, returns null if a match is not found
 	 */
-	public Stack<DialogueNode> findNodeWithTag(String tag, boolean exactMatch) {
+	public Stack<Dialogue> findNodeWithTag(String tag, boolean exactMatch) {
 		return findNode(new SearchRule() {
 
 			@Override
-			public boolean check(DialogueNode node) {
+			public boolean check(Dialogue node) {
 				String nodeTag = node.getTag();
 				
 				boolean hasTag = (exactMatch ? nodeTag.equals(tag) : nodeTag.contains(tag));
@@ -168,11 +168,11 @@ public class Project implements Serializable {
 	 * @param exactMatch - if true, it will only return a node that equals() the input. Otherwise, contains() will be used.
 	 * @return the DialogueNode that meets the criteria, returns null if a match is not found
 	 */
-	public Stack<DialogueNode> findNodeWithName(String name, boolean exactMatch) {
+	public Stack<Dialogue> findNodeWithName(String name, boolean exactMatch) {
 		return findNode(new SearchRule() {
 
 			@Override
-			public boolean check(DialogueNode node) {
+			public boolean check(Dialogue node) {
 				String nodeName = node.getName();
 				
 				boolean hasName = (exactMatch ? nodeName.equals(name) : nodeName.contains(name));
@@ -193,12 +193,12 @@ public class Project implements Serializable {
 	 * @param rule
 	 * @return
 	 */
-	public Stack<DialogueNode> findNode(SearchRule rule) {
+	public Stack<Dialogue> findNode(SearchRule rule) {
 		
-		Stack<DialogueNode> found = new Stack<DialogueNode>();
+		Stack<Dialogue> found = new Stack<Dialogue>();
 		
 		for (int i = 0; i < nodes.size(); i++) {
-			DialogueNode node = nodes.get(i);
+			Dialogue node = nodes.get(i);
 			
 			if (rule.check(node)) {
 				found.push(node);
@@ -218,7 +218,7 @@ public class Project implements Serializable {
 		 * @param node
 		 * @return
 		 */
-		public boolean check(DialogueNode node);
+		public boolean check(Dialogue node);
 	}
 	
 	/*
@@ -245,7 +245,7 @@ public class Project implements Serializable {
 	/**
 	 * Disconnects all connections between the two connectors.
 	 */
-	public void disconnect(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
+	public void disconnect(DialogueConnector connector1, DialogueConnector connector2) {
 		for (int i = 0; i < connections.size(); i++) {
 			Connection c = connections.get(i);
 			
@@ -259,7 +259,7 @@ public class Project implements Serializable {
 	/**
 	 * Delete all Connections to this connector.
 	 */
-	public void disconnectAll(DialogueNodeConnector connector) {
+	public void disconnectAll(DialogueConnector connector) {
 		for (int i = 0; i < connections.size(); i++) {
 			Connection c = connections.get(i);
 			
@@ -273,7 +273,7 @@ public class Project implements Serializable {
 	/**
 	 * Checks if the two connectors have a Connection.
 	 */
-	public boolean isConnected(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
+	public boolean isConnected(DialogueConnector connector1, DialogueConnector connector2) {
 		for (int i = 0; i < connections.size(); i++) {
 			Connection c = connections.get(i);
 			
@@ -288,7 +288,7 @@ public class Project implements Serializable {
 	/**
 	 * Checks if a similar Connection already exists.
 	 */
-	public boolean connectionExists(DialogueNodeConnector connector1, DialogueNodeConnector connector2) {
+	public boolean connectionExists(DialogueConnector connector1, DialogueConnector connector2) {
 		for (int i = 0; i < connections.size(); i++) {
 			Connection c = connections.get(i);
 			
@@ -303,12 +303,12 @@ public class Project implements Serializable {
 	/**
 	 * Utility function for fetching a DialogueNodeConnector with its UID.
 	 */
-	public DialogueNodeConnector getDialogueNodeConnector(String uid) {
+	public DialogueConnector getDialogueNodeConnector(String uid) {
 		for (int i = 0; i < nodes.size(); i++) {
-			ArrayList<DialogueNodeConnector> connectors = nodes.get(i).getAllConnectors();
+			ArrayList<DialogueConnector> connectors = nodes.get(i).getAllConnectors();
 			
 			for (int j = 0; j < connectors.size(); j++) {
-				DialogueNodeConnector connector = connectors.get(j);
+				DialogueConnector connector = connectors.get(j);
 				
 				if (connector.getUID().equals(uid)) {
 					return connector;

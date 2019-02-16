@@ -28,12 +28,12 @@ public class JDialogueTheme extends Theme {
 	
 	@Override
 	public Color getPane() {
-		return Color.WHITE_SMOKE;
+		return Color.WHITE;
 	}
 
 	@Override
 	public Color getSelection() {
-		return Color.CORAL;
+		return Color.LIGHT_GRAY;
 	}
 
 	@Override
@@ -63,17 +63,17 @@ public class JDialogueTheme extends Theme {
 	
 	@Override
 	public Color getControl() {
-		return new Color(240, 240, 240);
+		return Color.CORAL;
 	}
 
 	@Override
 	public Color getControlAlt() {
-		return new Color(230, 230, 230);
+		return Color.WHITE_SMOKE;
 	}
 
 	@Override
 	public Color getControlOutline() {
-		return Color.WHITE;
+		return Color.CORAL;
 	}
 
 	@Override

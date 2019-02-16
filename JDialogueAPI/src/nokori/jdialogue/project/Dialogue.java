@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * This is the skeleton for all nodes, hosting only basic fundamental data.
  *
  */
-public abstract class DialogueNode implements Serializable {
+public abstract class Dialogue implements Serializable {
 	
 	private static final long serialVersionUID = 9061233295902786274L;
 
@@ -25,9 +25,9 @@ public abstract class DialogueNode implements Serializable {
 	private double x, y;
 	
 	//Connector so that other nodes can input into this one
-	private DialogueNodeConnector inConnector;
+	private DialogueConnector inConnector;
 
-	public DialogueNode(Project project, String uid, String name, String tag, double x, double y) {
+	public Dialogue(Project project, String uid, String name, String tag, double x, double y) {
 		this.project = project;
 		this.uid = uid;
 		this.name = name;
@@ -36,7 +36,7 @@ public abstract class DialogueNode implements Serializable {
 		this.y = y;
 	}
 
-	public DialogueNode(Project project, String name, String tag, double x, double y) {
+	public Dialogue(Project project, String name, String tag, double x, double y) {
 		this.project = project;
 		this.name = name;
 		this.tag = tag;
@@ -45,7 +45,7 @@ public abstract class DialogueNode implements Serializable {
 		
 		uid = new UID().toString();
 		
-		inConnector = new DialogueNodeConnector(project, this);
+		inConnector = new DialogueConnector(project, this);
 	}
 	
 	public Project getProject() {
@@ -88,18 +88,18 @@ public abstract class DialogueNode implements Serializable {
 		this.y = y;
 	}
 
-	public void setInConnector(DialogueNodeConnector inConnector) {
+	public void setInConnector(DialogueConnector inConnector) {
 		this.inConnector = inConnector;
 	}
 
-	public DialogueNodeConnector getInConnector() {
+	public DialogueConnector getInConnector() {
 		return inConnector;
 	}
 	
 	/**
 	 * Utility function for getting all DialogueNodeConnectors that this DialogueNode has.
 	 */
-	public abstract ArrayList<DialogueNodeConnector> getAllConnectors();
+	public abstract ArrayList<DialogueConnector> getAllConnectors();
 	
 	/**
 	 * Disconnect all connectors (for when nodes are deleted).
@@ -113,5 +113,5 @@ public abstract class DialogueNode implements Serializable {
 	 * 
 	 * @return the duplicated node.
 	 */
-	public abstract DialogueNode duplicate();
+	public abstract Dialogue duplicate();
 }

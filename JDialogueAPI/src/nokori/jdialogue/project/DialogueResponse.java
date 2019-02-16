@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * This dialogue node is customized for handling player responses.
  * 
  */
-public class DialogueResponseNode extends DialogueNode {
+public class DialogueResponse extends Dialogue {
 
 	private static final long serialVersionUID = -6673674509676451177L;
 	
@@ -19,19 +19,19 @@ public class DialogueResponseNode extends DialogueNode {
 	 */
 	private ArrayList<Response> responses = new ArrayList<Response>();
 	
-	public DialogueResponseNode(Project project, String uid, String name, String tag, double x, double y) {
+	public DialogueResponse(Project project, String uid, String name, String tag, double x, double y) {
 		super(project, uid, name, tag, x, y);
 	}
 	
-	public DialogueResponseNode(Project project, String name, String tag, double x, double y) {
+	public DialogueResponse(Project project, String name, String tag, double x, double y) {
 		super(project, name, tag, x, y);
 
 		addResponse("Default Response");
 	}
 	
 	@Override
-	public ArrayList<DialogueNodeConnector> getAllConnectors() {
-		ArrayList<DialogueNodeConnector> connectors = new ArrayList<DialogueNodeConnector>();
+	public ArrayList<DialogueConnector> getAllConnectors() {
+		ArrayList<DialogueConnector> connectors = new ArrayList<DialogueConnector>();
 		connectors.add(getInConnector());
 		
 		for (int i = 0; i < responses.size(); i++) {
@@ -54,11 +54,11 @@ public class DialogueResponseNode extends DialogueNode {
 	 * Shortcut function for adding a new response to this node.
 	 */
 	public void addResponse(String text) {
-		responses.add(new Response(text, new DialogueNodeConnector(getProject(), this)));
+		responses.add(new Response(text, new DialogueConnector(getProject(), this)));
 	}
 	
 	public void addResponse(String text, String outConnectorUID) {
-		responses.add(new Response(text, new DialogueNodeConnector(getProject(), this, outConnectorUID)));
+		responses.add(new Response(text, new DialogueConnector(getProject(), this, outConnectorUID)));
 	}
 
 	public ArrayList<Response> getResponses() {
@@ -70,9 +70,9 @@ public class DialogueResponseNode extends DialogueNode {
 		private static final long serialVersionUID = 7097284104250711558L;
 		
 		private String text;
-		private DialogueNodeConnector outConnector;
+		private DialogueConnector outConnector;
 
-		public Response(String text, DialogueNodeConnector outConnector) {
+		public Response(String text, DialogueConnector outConnector) {
 			this.text = text;
 			this.outConnector = outConnector;
 		}
@@ -85,18 +85,18 @@ public class DialogueResponseNode extends DialogueNode {
 			this.text = text;
 		}
 
-		public DialogueNodeConnector getOutConnector() {
+		public DialogueConnector getOutConnector() {
 			return outConnector;
 		}
 
-		public void setOutConnector(DialogueNodeConnector outConnector) {
+		public void setOutConnector(DialogueConnector outConnector) {
 			this.outConnector = outConnector;
 		}
 	}
 
 	@Override
-	public DialogueNode duplicate() {
-		DialogueResponseNode node = new DialogueResponseNode(getProject(), getName(), getTag(), getX(), getY());
+	public Dialogue duplicate() {
+		DialogueResponse node = new DialogueResponse(getProject(), getName(), getTag(), getX(), getY());
 		node.responses.addAll(responses);
 		return node;
 	}

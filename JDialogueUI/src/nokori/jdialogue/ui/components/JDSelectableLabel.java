@@ -16,13 +16,13 @@ public class JDSelectableLabel extends Label {
 		
 		setOnMouseEntered(e -> {
 			if (clickingEnabled) {
-				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.currentTheme().getSelection()).play();
+				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.current().getSelection()).play();
 			}
 		});
 		
 		setOnMouseExited(e -> {
 			if (clickingEnabled) {
-				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.currentTheme().getText()).play();
+				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.current().getText()).play();
 			}
 		});
 		

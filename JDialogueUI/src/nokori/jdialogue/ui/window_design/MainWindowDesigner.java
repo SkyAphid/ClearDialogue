@@ -5,22 +5,30 @@ import java.io.File;
 import java.net.URL;
 
 import lwjgui.Color;
+import lwjgui.LWJGUI;
 import lwjgui.event.Event;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
+import lwjgui.scene.control.Button;
 import lwjgui.scene.control.Label;
+import lwjgui.scene.layout.floating.DraggablePane;
 import lwjgui.scene.layout.floating.FloatingPane;
+import lwjgui.scene.layout.floating.PannablePane;
+import lwjgui.scene.shape.Rectangle;
+import lwjgui.scene.shape.SectorCircle;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.FontStyle;
 import lwjgui.scene.layout.GridPane;
+import lwjgui.scene.layout.HBox;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
 import nokori.jdialogue.ui.JDUIController;
 import nokori.jdialogue.ui.components.JDDropdownMenu;
 import nokori.jdialogue.ui.components.JDSelectableLabel;
+import nokori.jdialogue.ui.dialogue_nodes.DialogueNode;
 import nokori.jdialogue.ui.components.JDProjectNameField;
 import nokori.jdialogue.ui.theme.JDialogueTheme;
 import nokori.jdialogue.ui.transitions.LabelFillTransition;
@@ -38,7 +46,9 @@ public class MainWindowDesigner {
 	
 	public MainWindowDesigner(Window window, JDUIController controller) {
 		/*
+		 * 
 		 * Main Window settings
+		 * 
 		 */
 		
 		Scene scene = window.getScene();
@@ -55,7 +65,9 @@ public class MainWindowDesigner {
 		Font serifFont = theme.getSerifFont();
 		
 		/*
+		 * 
 		 * Create user-interface
+		 * 
 		 */
 		
 		int windowWidth = window.getContext().getWidth();
@@ -68,15 +80,15 @@ public class MainWindowDesigner {
 		rootPane.setAlignment(Pos.BOTTOM_LEFT);
 		rootPane.setPadding(new Insets(0, 0, PADDING, PADDING));
 		scene.setRoot(rootPane);
+
+		//Create canvas (DialogueNode management)
+		createCanvas(window, controller, rootPane, sansFont, serifFont);
 		
-		//Set canvas pane
-		FloatingPane canvasPane = new FloatingPane();
-		canvasPane.setAlignment(Pos.CENTER);
-		canvasPane.setAbsolutePosition(windowWidth/2, windowHeight/2);
-		canvasPane.setMinWidth(windowWidth);
-		canvasPane.setMinHeight(windowHeight);
-		rootPane.getChildren().add(canvasPane);
-		
+		//Create HUD (toolbar, etc)
+		createHUD(window, controller, rootPane, sansFont, serifFont);
+	}
+	
+	private void createHUD(Window window, JDUIController controller, StackPane rootPane, Font sansFont, Font serifFont) {
 		//Create "toolbar" pane
 		FloatingPane uiPaneTop = new FloatingPane();
 		rootPane.getChildren().add(uiPaneTop);
@@ -112,7 +124,7 @@ public class MainWindowDesigner {
 			@Override
 			public void render(Context context) {
 				if (!this.getText().equals(controller.getContextHint())) {
-					new LabelFillTransition(200, this, Color.TRANSPARENT, Theme.currentTheme().getText()).play();
+					new LabelFillTransition(200, this, Color.TRANSPARENT, Theme.current().getText()).play();
 					setText(controller.getContextHint());
 				}
 				super.render(context);
@@ -124,6 +136,25 @@ public class MainWindowDesigner {
 		
 		uiPaneBottom.add(programInformation, 0, 0);
 		uiPaneBottom.add(contextHint, 1, 0);
+	}
+	
+	private void createCanvas(Window window, JDUIController controller, StackPane rootPane, Font sansFont, Font serifFont) {
+		// Create a pannable pane in the root
+		PannablePane pane = new PannablePane();
+		rootPane.getChildren().add(pane);
+		
+		// This crosshair represents the center
+		int crosshairSize = 10;
+		int crosshairCenterReticle = 2;
+		Color crosshairFill = Color.DARK_GRAY;
+		
+		pane.getChildren().add(new Rectangle(crosshairCenterReticle, crosshairCenterReticle, crosshairFill));
+		pane.getChildren().add(new Rectangle(1, crosshairSize, crosshairFill));
+		pane.getChildren().add(new Rectangle(crosshairSize, 1, crosshairFill));
+		
+		// Create a draggable pane
+		DialogueNode n = new DialogueNode(null, sansFont, serifFont);
+		pane.getChildren().add(n);
 	}
 	
 	/*

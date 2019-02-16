@@ -20,12 +20,12 @@ import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
 
 import nokori.jdialogue.project.Connection;
-import nokori.jdialogue.project.DialogueNode;
-import nokori.jdialogue.project.DialogueNodeConnector;
-import nokori.jdialogue.project.DialogueResponseNode;
-import nokori.jdialogue.project.DialogueTextNode;
+import nokori.jdialogue.project.Dialogue;
+import nokori.jdialogue.project.DialogueConnector;
+import nokori.jdialogue.project.DialogueResponse;
+import nokori.jdialogue.project.DialogueText;
 import nokori.jdialogue.project.Project;
-import nokori.jdialogue.project.DialogueResponseNode.Response;
+import nokori.jdialogue.project.DialogueResponse.Response;
 import nokori.jdialogue.throwable.FailedToFindConnectorsException;
 import nokori.jdialogue.throwable.FailedToInstantiateNodeException;
 
@@ -107,7 +107,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 		JsonArrayBuilder nodes = Json.createArrayBuilder();
 		
 		for (int i = 0; i < project.getNumNodes(); i++) {
-			DialogueNode node = project.getNode(i);
+			Dialogue node = project.getNode(i);
 			
 			JsonObjectBuilder nodeBuilder = Json.createObjectBuilder();
 			
@@ -125,12 +125,12 @@ public class JDialogueJsonIO implements JDialogueIO{
 			 * Text Node Data
 			 */
 			
-			if (node instanceof DialogueTextNode) {
+			if (node instanceof DialogueText) {
 				//Store node-type for easy access in the importer
 				nodeBuilder.add(JSON_NODE_TYPE, JSON_NODE_TYPE_DIALOGUE);
 				
 				//Store text of node
-				DialogueTextNode textNode = (DialogueTextNode) node;
+				DialogueText textNode = (DialogueText) node;
 				nodeBuilder.add(JSON_TEXT, textNode.getText());
 				
 				//Store the out-connector
@@ -141,14 +141,14 @@ public class JDialogueJsonIO implements JDialogueIO{
 			 * Dialogue Node Data 
 			 */
 			
-			if (node instanceof DialogueResponseNode) {
+			if (node instanceof DialogueResponse) {
 				//Store node-type
 				nodeBuilder.add(JSON_NODE_TYPE, JSON_NODE_TYPE_RESPONSE);
 				
 				JsonArrayBuilder responsesBuilder = Json.createArrayBuilder();
 				
 				//Insert each response into the responsesBuilder
-				ArrayList<Response> responses = ((DialogueResponseNode) node).getResponses();
+				ArrayList<Response> responses = ((DialogueResponse) node).getResponses();
 				
 				for (int j = 0; j < responses.size(); j++) {
 					Response response = responses.get(j);
@@ -256,23 +256,23 @@ public class JDialogueJsonIO implements JDialogueIO{
 			double nodeX = nodeObject.getJsonNumber(JSON_NODE_X).doubleValue();
 			double nodeY = nodeObject.getJsonNumber(JSON_NODE_Y).doubleValue();
 
-			DialogueNode node = null;
+			Dialogue node = null;
 
 			// Load type-specific data
 			String type = nodeObject.getString(JSON_NODE_TYPE);
 
 			// Dialogue-type
 			if (type.equals(JSON_NODE_TYPE_DIALOGUE)) {
-				node = new DialogueTextNode(project, uid, name, tag, nodeX, nodeY, nodeObject.getString(JSON_TEXT));
+				node = new DialogueText(project, uid, name, tag, nodeX, nodeY, nodeObject.getString(JSON_TEXT));
 
 				String outConnectorUID = nodeObject.getString(JSON_OUT_CONNECTOR_UID);
-				((DialogueTextNode) node).setOutConnector(new DialogueNodeConnector(project, node, outConnectorUID));
+				((DialogueText) node).setOutConnector(new DialogueConnector(project, node, outConnectorUID));
 			}
 
 			// Response-type
 			if (type.equals(JSON_NODE_TYPE_RESPONSE)) {
-				node = new DialogueResponseNode(project, uid, name, tag, nodeX, nodeY);
-				DialogueResponseNode responseNode = (DialogueResponseNode) node;
+				node = new DialogueResponse(project, uid, name, tag, nodeX, nodeY);
+				DialogueResponse responseNode = (DialogueResponse) node;
 
 				JsonArray responseArray = nodeObject.getJsonArray(JSON_RESPONSES_ARRAY);
 
@@ -290,7 +290,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 			if (node != null) {
 				// Set in-connector now that node is instantiated
 				String inConnectorUID = nodeObject.getString(JSON_IN_CONNECTOR_UID);
-				node.setInConnector(new DialogueNodeConnector(project, node, inConnectorUID));
+				node.setInConnector(new DialogueConnector(project, node, inConnectorUID));
 
 				// Add node to project
 				project.addNode(node);
@@ -313,8 +313,8 @@ public class JDialogueJsonIO implements JDialogueIO{
 			String connector2UID = connectionObject.getString(JSON_CONNECTOR_2_UID);
 
 			// Build a Connection from the UIDs
-			DialogueNodeConnector connector1 = project.getDialogueNodeConnector(connector1UID);
-			DialogueNodeConnector connector2 = project.getDialogueNodeConnector(connector2UID);
+			DialogueConnector connector1 = project.getDialogueNodeConnector(connector1UID);
+			DialogueConnector connector2 = project.getDialogueNodeConnector(connector2UID);
 
 			if (connector1 != null && connector2 != null) {
 				Connection connection = new Connection(connector1, connector2);
