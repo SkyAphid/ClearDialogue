@@ -1,0 +1,69 @@
+
+{
+    "projectName": "ButThouMust",
+    "projectVersion": 2,
+    "projectCanvasWidth": 1000,
+    "projectCanvasHeight": 1000,
+    "projectViewportX": 104.70356877644872,
+    "projectViewportY": -186.15299429098764,
+    "projectViewportScale": 1.0,
+    "nodesArray": [
+        {
+            "uid": "4d11dfb7:16444438fe5:-7ffb",
+            "name": "Response",
+            "tag": "No Tag",
+            "nodeX": 400.5000000000001,
+            "nodeY": 416.34000000000003,
+            "inConnectorUID": "4d11dfb7:16444438fe5:-7ffa",
+            "type": "typeResponse",
+            "responsesArray": [
+                {
+                    "text": "Yes",
+                    "outConnectorUID": "4d11dfb7:16444438fe5:-7ff9"
+                },
+                {
+                    "text": "No",
+                    "outConnectorUID": "4d11dfb7:16444438fe5:-7ff8"
+                }
+            ]
+        },
+        {
+            "uid": "4d11dfb7:16444438fe5:-7ff2",
+            "name": "Dialogue",
+            "tag": "No Tag",
+            "nodeX": 730.26,
+            "nodeY": 486.9000000000001,
+            "inConnectorUID": "4d11dfb7:16444438fe5:-7ff1",
+            "type": "typeDialogue",
+            "text": "But thou must.",
+            "outConnectorUID": "4d11dfb7:16444438fe5:-7ff0"
+        },
+        {
+            "uid": "45ec64fe:16444451c2b:-7fff",
+            "name": "Dialogue",
+            "tag": "$DIALOGUE_START",
+            "nodeX": 96.66000000000007,
+            "nodeY": 416.34000000000003,
+            "inConnectorUID": "45ec64fe:16444451c2b:-7ffe",
+            "type": "typeDialogue",
+            "text": "Dost thou love me $PLAYER_NAME?",
+            "outConnectorUID": "45ec64fe:16444451c2b:-7ffd"
+        }
+    ],
+    "connectionsArray": [
+        {
+            "connector1UID": "4d11dfb7:16444438fe5:-7ff8",
+            "connector2UID": "4d11dfb7:16444438fe5:-7ff1"
+        },
+        {
+            "connector1UID": "45ec64fe:16444451c2b:-7ffd",
+            "connector2UID": "4d11dfb7:16444438fe5:-7ffa"
+        },
+        {
+            "connector1UID": "4d11dfb7:16444438fe5:-7ff0",
+            "connector2UID": "45ec64fe:16444451c2b:-7ffe"
+        }
+    ]
+}     }
+    ]
+}
