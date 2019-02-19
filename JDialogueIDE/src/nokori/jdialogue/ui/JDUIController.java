@@ -1,9 +1,11 @@
 package nokori.jdialogue.ui;
 
 import lwjgui.theme.Theme;
+import lwjgui.util.Cursor;
+import lwjgui.util.Cursor.CursorType;
 import nokori.jdialogue.project.Project;
-import nokori.jdialogue.ui.components.CanvasPane;
 import nokori.jdialogue.ui.dialogue_nodes.DialogueNode;
+import nokori.jdialogue.ui.layout.CanvasPane;
 import nokori.jdialogue.ui.theme.JDialogueTheme;
 
 /**
@@ -17,11 +19,14 @@ public class JDUIController {
 	
 	private Project project = new Project();
 	
+	public static final Cursor ARROW_CURSOR = new Cursor(CursorType.ARROW);
+	public static final Cursor HAND_CURSOR = new Cursor(CursorType.HAND);
+	
 	public JDUIController() {
 		theme = new JDialogueTheme();
 		Theme.setTheme(theme);
 		
-		canvasPane = new CanvasPane(this, theme.getSansFont(), theme.getSerifFont());
+		canvasPane = new CanvasPane(this);
 		
 		resetContextHint();
 	}
@@ -58,5 +63,9 @@ public class JDUIController {
 	public void removeDialogueNode(DialogueNode node) {
 		canvasPane.getChildren().remove(node);
 		project.removeDialogue(node.getDialogue());
+	}
+	
+	public void disposeCursors() {
+		
 	}
 }

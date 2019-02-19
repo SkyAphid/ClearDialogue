@@ -1,46 +1,27 @@
-package nokori.jdialogue.ui.window_design;
+package nokori.jdialogue.ui.theme;
 
 import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
 
-import org.joml.Vector2d;
-
 import lwjgui.Color;
-import lwjgui.LWJGUI;
-import lwjgui.LWJGUIDialog;
 import lwjgui.event.Event;
-import lwjgui.event.MouseEvent;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
-import lwjgui.scene.control.Button;
 import lwjgui.scene.control.Label;
-import lwjgui.scene.layout.floating.DraggablePane;
 import lwjgui.scene.layout.floating.FloatingPane;
-import lwjgui.scene.layout.floating.PannablePane;
-import lwjgui.scene.shape.Rectangle;
-import lwjgui.scene.shape.SectorCircle;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.FontStyle;
-import lwjgui.scene.layout.GridPane;
-import lwjgui.scene.layout.HBox;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
-import nokori.jdialogue.project.DialogueResponse;
-import nokori.jdialogue.project.DialogueText;
-import nokori.jdialogue.project.Project;
 import nokori.jdialogue.ui.JDUIController;
-import nokori.jdialogue.ui.components.CanvasPane;
 import nokori.jdialogue.ui.components.JDDropdownMenu;
 import nokori.jdialogue.ui.components.JDSelectableLabel;
-import nokori.jdialogue.ui.dialogue_nodes.DialogueNode;
-import nokori.jdialogue.ui.dialogue_nodes.DialogueResponseNode;
-import nokori.jdialogue.ui.dialogue_nodes.DialogueTextNode;
+import nokori.jdialogue.ui.layout.CanvasPane;
 import nokori.jdialogue.ui.components.JDProjectNameField;
-import nokori.jdialogue.ui.theme.JDialogueTheme;
 import nokori.jdialogue.ui.transitions.LabelFillTransition;
 
 import static nokori.jdialogue.ui.JDialogueUICore.*;
@@ -50,11 +31,11 @@ import static nokori.jdialogue.ui.JDialogueUICore.*;
  * @author Brayden
  *
  */
-public class MainWindowDesigner {
+public class JDialogueWindowDesigner {
 	
 	private static final int PADDING = 10;
 	
-	public MainWindowDesigner(Window window, JDUIController controller) {
+	public JDialogueWindowDesigner(Window window, JDUIController controller) {
 		/*
 		 * 
 		 * Main Window settings
@@ -74,9 +55,6 @@ public class MainWindowDesigner {
 		 * 
 		 */
 		
-		int windowWidth = window.getContext().getWidth();
-		int windowHeight = window.getContext().getHeight();
-		
 		//Set root pane
 		StackPane rootPane = new StackPane();
 		rootPane.setFillToParentWidth(true);
@@ -95,7 +73,6 @@ public class MainWindowDesigner {
 	private void createHUD(Window window, JDUIController controller, StackPane rootPane) {
 		
 		Font sansFont = controller.getTheme().getSansFont();
-		Font serifFont = controller.getTheme().getSerifFont();
 		
 		/*
 		 * Create "toolbar" pane

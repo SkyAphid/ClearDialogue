@@ -3,7 +3,7 @@ package nokori.jdialogue.ui;
 import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
 import lwjgui.scene.Window;
-import nokori.jdialogue.ui.window_design.MainWindowDesigner;
+import nokori.jdialogue.ui.theme.JDialogueWindowDesigner;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -47,7 +47,7 @@ public class JDialogueUICore {
 		window = LWJGUI.initialize(windowID);
 		window.getContext().setContextSizeLimits(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		
-		new MainWindowDesigner(window, controller);
+		new JDialogueWindowDesigner(window, controller);
 	}
 
 	public void run() {

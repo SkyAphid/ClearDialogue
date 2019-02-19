@@ -1,17 +1,18 @@
-package nokori.jdialogue.ui.components;
+package nokori.jdialogue.ui.layout;
 
 import org.lwjgl.glfw.GLFW;
 
 import lwjgui.Color;
-import lwjgui.LWJGUIDialog;
 import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.MenuItem;
+import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.PannablePane;
 import lwjgui.scene.shape.Rectangle;
+import nokori.jdialogue.project.DialogueResponse;
 import nokori.jdialogue.project.DialogueText;
 import nokori.jdialogue.ui.JDUIController;
-import nokori.jdialogue.ui.dialogue_nodes.DialogueNode;
+import nokori.jdialogue.ui.dialogue_nodes.DialogueResponseNode;
 import nokori.jdialogue.ui.dialogue_nodes.DialogueTextNode;
 
 /**
@@ -21,29 +22,35 @@ import nokori.jdialogue.ui.dialogue_nodes.DialogueTextNode;
  */
 public class CanvasPane extends PannablePane {
 	
-	public CanvasPane(JDUIController controller, Font sansFont, Font serifFont) {
-		ContextMenu contextMenu = new ContextMenu();
+	public CanvasPane(JDUIController controller) {
+		Font sansFont = controller.getTheme().getSansFont();
 		
+		ContextMenu contextMenu = new ContextMenu();
+
 		/*
 		 * Add Nodes
 		 */
-		MenuItem newDialogueTextNode = new MenuItem("+Text Node");
+		MenuItem newDialogueTextNode = new MenuItem("+Text Node", sansFont);
 		newDialogueTextNode.setOnAction(e -> {
-			DialogueText text = new DialogueText(controller.getProject(), "Dialogueeeeeeeeeeeeeeeeeeeeeee", "", cached_context.getMouseX(), cached_context.getMouseY());
-			DialogueTextNode node = new DialogueTextNode(controller, text, sansFont, serifFont);
+			DialogueText text = new DialogueText(controller.getProject(), "Dialogue", "No tag", cached_context.getMouseX(), cached_context.getMouseY());
+			DialogueTextNode node = new DialogueTextNode(controller, text);
+			node.setAbsolutePosition(text.getX(), text.getY());
 			controller.addDialogueNode(node);
 		});
 		
-		MenuItem newDialogueResponseNode = new MenuItem("+Response Node");
+		MenuItem newDialogueResponseNode = new MenuItem("+Response Node", sansFont);
 		newDialogueResponseNode.setOnAction(e -> {
-			
+			DialogueResponse text = new DialogueResponse(controller.getProject(), "Response", "", cached_context.getMouseX(), cached_context.getMouseY());
+			DialogueResponseNode node = new DialogueResponseNode(controller, text);
+			node.setAbsolutePosition(text.getX(), text.getY());
+			controller.addDialogueNode(node);
 		});
 		
 		/*
 		 * Tools
 		 */
 		
-		MenuItem center = new MenuItem("Center Viewport");
+		MenuItem center = new MenuItem("Center Viewport", sansFont);
 		center.setOnAction(e -> {
 			center();
 		});
@@ -52,7 +59,7 @@ public class CanvasPane extends PannablePane {
 		 * Configure Context Menu
 		 */
 
-		contextMenu.getItems().addAll(newDialogueTextNode, newDialogueResponseNode, center);
+		contextMenu.getItems().addAll(newDialogueTextNode, newDialogueResponseNode, new SeparatorMenuItem(), center);
 		contextMenu.setAutoHide(false);
 		
 		setOnMouseClicked(e -> {
