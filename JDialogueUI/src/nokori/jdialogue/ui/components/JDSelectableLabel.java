@@ -16,7 +16,7 @@ public class JDSelectableLabel extends Label {
 		
 		setOnMouseEntered(e -> {
 			if (clickingEnabled) {
-				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.current().getSelection()).play();
+				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.current().getControl()).play();
 			}
 		});
 		

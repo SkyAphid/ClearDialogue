@@ -4,9 +4,13 @@ import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
 
+import org.joml.Vector2d;
+
 import lwjgui.Color;
 import lwjgui.LWJGUI;
+import lwjgui.LWJGUIDialog;
 import lwjgui.event.Event;
+import lwjgui.event.MouseEvent;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
@@ -25,10 +29,16 @@ import lwjgui.scene.layout.GridPane;
 import lwjgui.scene.layout.HBox;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
+import nokori.jdialogue.project.DialogueResponse;
+import nokori.jdialogue.project.DialogueText;
+import nokori.jdialogue.project.Project;
 import nokori.jdialogue.ui.JDUIController;
+import nokori.jdialogue.ui.components.CanvasPane;
 import nokori.jdialogue.ui.components.JDDropdownMenu;
 import nokori.jdialogue.ui.components.JDSelectableLabel;
 import nokori.jdialogue.ui.dialogue_nodes.DialogueNode;
+import nokori.jdialogue.ui.dialogue_nodes.DialogueResponseNode;
+import nokori.jdialogue.ui.dialogue_nodes.DialogueTextNode;
 import nokori.jdialogue.ui.components.JDProjectNameField;
 import nokori.jdialogue.ui.theme.JDialogueTheme;
 import nokori.jdialogue.ui.transitions.LabelFillTransition;
@@ -45,6 +55,8 @@ public class MainWindowDesigner {
 	private static final int PADDING = 10;
 	
 	public MainWindowDesigner(Window window, JDUIController controller) {
+		LWJGUIDialog.showMessageDialog("fuck", "you");
+		
 		/*
 		 * 
 		 * Main Window settings
@@ -57,13 +69,7 @@ public class MainWindowDesigner {
 		File[] files = new File("res/icons/").listFiles();
 		
 		window.setIcon(".png", files);
-		
-		JDialogueTheme theme = new JDialogueTheme();
-		Theme.setTheme(theme);
-		
-		Font sansFont = theme.getSansFont();
-		Font serifFont = theme.getSerifFont();
-		
+
 		/*
 		 * 
 		 * Create user-interface
@@ -81,30 +87,39 @@ public class MainWindowDesigner {
 		rootPane.setPadding(new Insets(0, 0, PADDING, PADDING));
 		scene.setRoot(rootPane);
 
-		//Create canvas (DialogueNode management)
-		createCanvas(window, controller, rootPane, sansFont, serifFont);
+		//Refresh canvas (DialogueNode management)
+		refreshCanvas(window, controller, rootPane);
 		
 		//Create HUD (toolbar, etc)
-		createHUD(window, controller, rootPane, sansFont, serifFont);
+		createHUD(window, controller, rootPane);
 	}
 	
-	private void createHUD(Window window, JDUIController controller, StackPane rootPane, Font sansFont, Font serifFont) {
-		//Create "toolbar" pane
+	private void createHUD(Window window, JDUIController controller, StackPane rootPane) {
+		
+		Font sansFont = controller.getTheme().getSansFont();
+		Font serifFont = controller.getTheme().getSerifFont();
+		
+		/*
+		 * Create "toolbar" pane
+		 */
 		FloatingPane uiPaneTop = new FloatingPane();
 		rootPane.getChildren().add(uiPaneTop);
 		
-		uiPaneTop.getChildren().add(newFileMenu(sansFont));
-		uiPaneTop.getChildren().add(newToolMenu(sansFont));
-		uiPaneTop.getChildren().add(newNodeMenu(sansFont));
-		uiPaneTop.getChildren().add(newProjectNameField(sansFont, controller));
+		uiPaneTop.getChildren().add(newFileMenu(controller));
+		uiPaneTop.getChildren().add(newToolMenu(controller));
+		uiPaneTop.getChildren().add(newProjectNameField(controller));
 		
-		//Create program information and context hints pane
+		/*
+		 * Create program information and context hints pane
+		 */
+		
 		int fontSize = 24;
 		
-		GridPane uiPaneBottom = new GridPane();
-		uiPaneBottom.setHgap(50);
+		StackPane uiPaneBottom = new StackPane();
+		uiPaneBottom.setAlignment(Pos.BOTTOM_LEFT);
 		rootPane.getChildren().add(uiPaneBottom);
 		
+		//Program information
 		JDSelectableLabel programInformation = new JDSelectableLabel(PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER) {
 			@Override
 			protected void mouseClicked(Event e) {
@@ -119,7 +134,10 @@ public class MainWindowDesigner {
 		programInformation.setFontSize(fontSize);
 		programInformation.setFontStyle(FontStyle.LIGHT);
 		programInformation.setClickingEnabled(Desktop.isDesktopSupported());
-
+		
+		uiPaneBottom.getChildren().add(programInformation);
+		
+		//context hint
 		Label contextHint = new Label() {
 			@Override
 			public void render(Context context) {
@@ -133,28 +151,20 @@ public class MainWindowDesigner {
 		contextHint.setFont(sansFont);
 		contextHint.setFontSize(fontSize);
 		contextHint.setFontStyle(FontStyle.LIGHT);
-		
-		uiPaneBottom.add(programInformation, 0, 0);
-		uiPaneBottom.add(contextHint, 1, 0);
+		contextHint.setPadding(new Insets(0, 0, 0, 350));
+
+		uiPaneBottom.getChildren().add(contextHint);
 	}
-	
-	private void createCanvas(Window window, JDUIController controller, StackPane rootPane, Font sansFont, Font serifFont) {
-		// Create a pannable pane in the root
-		PannablePane pane = new PannablePane();
-		rootPane.getChildren().add(pane);
+
+	/**
+	 * Refreshes the canvas by clearing it and re-populating it with data from the current project. Call this if you load a new project or initialize the program.
+	 */
+	public void refreshCanvas(Window window, JDUIController controller, StackPane rootPane) {
+		//Fetch the CanvasPane from the controller and clear it.
+		CanvasPane canvasPane = controller.getCanvasPane().clear();
+		rootPane.getChildren().add(canvasPane);
 		
-		// This crosshair represents the center
-		int crosshairSize = 10;
-		int crosshairCenterReticle = 2;
-		Color crosshairFill = Color.DARK_GRAY;
-		
-		pane.getChildren().add(new Rectangle(crosshairCenterReticle, crosshairCenterReticle, crosshairFill));
-		pane.getChildren().add(new Rectangle(1, crosshairSize, crosshairFill));
-		pane.getChildren().add(new Rectangle(crosshairSize, 1, crosshairFill));
-		
-		// Create a draggable pane
-		DialogueNode n = new DialogueNode(null, sansFont, serifFont);
-		pane.getChildren().add(n);
+		//TODO: Add loading nodes from Projects here.
 	}
 	
 	/*
@@ -167,60 +177,51 @@ public class MainWindowDesigner {
 	private static final String EXPORT_JSON = "EXPORT JSON...";
 	private static final String IMPORT_JSON = "IMPORT JSON...";
 	
-	private JDDropdownMenu newFileMenu(Font sansFont) {
+	private JDDropdownMenu newFileMenu(JDUIController controller) {
 		String[] options = new String[] {
 			NEW_PROJECT, SELECT_PROJECT_DIRECTORY, MERGE_PROJECT, EXPORT_JSON, IMPORT_JSON	
 		};
 		
-		JDDropdownMenu file = new JDDropdownMenu(getToolbarAbsoluteX(0), PADDING, sansFont, "FILE", options);
+		JDDropdownMenu file = new JDDropdownMenu(getToolbarAbsoluteX(0), PADDING, controller.getTheme().getSansFont(), "FILE", options);
 		
 		return file;
 	}
 	
 	/*
 	 * Tool Menu
+	 * 
+	 * Contains various useful tools for dialogue editing.
 	 */
 	
-	private static final String CANVAS_SIZE = "CANVAS SIZE...";
-	private static final String REPLACE = "REPLACE...";
-	private static final String MULTIREPLACE = "MULTI-REPLACE...";
 	private static final String VIEW_SYNTAX = "VIEW SYNTAX";
 	private static final String REFRESH_SYNTAX = "REFRESH SYNTAX";
 	private static final String SET_SYNTAX = "SET SYNTAX...";
+	private static final String REPLACE = "REPLACE...";
+	private static final String MULTIREPLACE = "MULTI-REPLACE...";
 	
-	private JDDropdownMenu newToolMenu(Font sansFont) {
+	private JDDropdownMenu newToolMenu(JDUIController controller) {
 		String[] options = new String[] {
-			CANVAS_SIZE, REPLACE, MULTIREPLACE, VIEW_SYNTAX, REFRESH_SYNTAX, SET_SYNTAX	
+				VIEW_SYNTAX, REFRESH_SYNTAX, SET_SYNTAX, REPLACE, MULTIREPLACE
 		};
 		
-		JDDropdownMenu tool = new JDDropdownMenu(getToolbarAbsoluteX(1), PADDING, sansFont, "TOOL", options);
+		JDDropdownMenu tool = new JDDropdownMenu(getToolbarAbsoluteX(1), PADDING, controller.getTheme().getSansFont(), "TOOL", options) {
+			@Override
+			public void optionClicked(Event e, String option) {
+				switch(option) {
+				
+				}
+			}
+		};
 		
 		return tool;
-	}
-	
-	/*
-	 * Node Menu
-	 */
-	
-	private static final String DIALOGUE = "DIALOGUE...";
-	private static final String RESPONSE = "RESPONSE...";
-	
-	private JDDropdownMenu newNodeMenu(Font sansFont) {
-		String[] options = new String[] {
-			DIALOGUE, RESPONSE	
-		};
-		
-		JDDropdownMenu node = new JDDropdownMenu(getToolbarAbsoluteX(2), PADDING, sansFont, "+NODE", options);
-		
-		return node;
 	}
 	
 	/*
 	 * Project Name Field
 	 */
 	
-	private JDProjectNameField newProjectNameField(Font sansFont, JDUIController controller) {
-		return new JDProjectNameField(getToolbarAbsoluteX(3), PADDING, sansFont, controller);
+	private JDProjectNameField newProjectNameField(JDUIController controller) {
+		return new JDProjectNameField(controller, getToolbarAbsoluteX(2), PADDING, controller.getTheme().getSansFont());
 	}
 	
 	/**

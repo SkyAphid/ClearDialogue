@@ -12,7 +12,7 @@ public class JDProjectNameField extends JDButtonSkeleton {
 
 	public static final int DEFAULT_WIDTH = 500;
 	
-	public JDProjectNameField(int absoluteX, int absoluteY, Font font, JDUIController controller) {
+	public JDProjectNameField(JDUIController controller, int absoluteX, int absoluteY, Font font) {
 		super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, false);
 		
 		Insets padding = new Insets(0, 0, 0, PADDING);

@@ -3,8 +3,13 @@ package nokori.jdialogue.ui.dialogue_nodes;
 import org.lwjgl.glfw.GLFW;
 
 import lwjgui.Color;
+import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
+import lwjgui.scene.Context;
+import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.Label;
+import lwjgui.scene.control.MenuItem;
+import lwjgui.scene.control.text_input.TextField;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.DraggablePane;
 import lwjgui.scene.shape.DropShadow;
@@ -13,29 +18,36 @@ import lwjgui.theme.Theme;
 import lwjgui.transition.FillTransition;
 import lwjgui.transition.SizeTransition;
 import nokori.jdialogue.project.Dialogue;
+import nokori.jdialogue.ui.JDUIController;
 
-public class DialogueNode extends DraggablePane {
+public abstract class DialogueNode extends DraggablePane {
 	
-	protected static final int MINI_WIDTH = 80;
-	protected static final int MINI_HEIGHT = 80;
+	public static final int MINI_WIDTH = 80;
+	public static final int MINI_HEIGHT = 80;
 	
-	protected static final int EXPANDED_WIDTH = MINI_WIDTH * 2;
-	protected static final int EXPANDED_HEIGHT = MINI_HEIGHT * 2;
+	public static final int EXPANDED_WIDTH = MINI_WIDTH * 2;
+	public static final int EXPANDED_HEIGHT = MINI_HEIGHT * 2;
 	
-	private boolean highlighted = false;
 	private boolean expanded = false;
 	
-	//Components
+	//Background
 	private DropShadow dropShadow;
 	private Rectangle background;
 	
-	private Label title, tags;
+	//Title/Tags
+	private TextField title, tags;
 	
-	public DialogueNode(Dialogue dialogue, Font sansFont, Font serifFont) {
-		setAlignment(Pos.CENTER);
+	//Data
+	private Dialogue dialogue;
+	
+	public DialogueNode(JDUIController controller, Dialogue dialogue, Font sansFont, Font serifFont) {
+		setAbsolutePosition(dialogue.getX(), dialogue.getY());
+		setAlignment(Pos.TOP_LEFT);
 		
 		/*
+		 * 
 		 * Background
+		 * 
 		 */
 		
 		dropShadow = new DropShadow(MINI_WIDTH, MINI_HEIGHT, 3, 3, 5);
@@ -57,39 +69,81 @@ public class DialogueNode extends DraggablePane {
 		 * 
 		 */
 		
+		title = new TextField(dialogue.getName()) {
+			@Override
+			public void render(Context context) {
+				setMaxWidth(DialogueNode.this.getWidth()-10);
+				super.render(context);
+			}
+		};
+		title.setFont(sansFont);
+		title.setFontSize(22);
+		title.setMouseTransparent(true);
 		
+		title.setBackground(null);
+		title.setEditable(false);
+		title.setDecorated(false);
+		title.setSelectionOutlineEnabled(false);
+		title.setPadding(new Insets(5, 0, 0, 5));
+		
+		tags = new TextField(dialogue.getTag()) {
+			@Override
+			public void render(Context context) {
+				setMaxWidth(DialogueNode.this.getWidth()-10);
+				super.render(context);
+			}
+		};
+		tags.setFontSize(14);
+		tags.setMouseTransparent(true);
+		
+		getChildren().addAll(title);
+		
+		/*
+		 * 
+		 * Context Menu
+		 * 
+		 */
+		
+		ContextMenu contextMenu = new ContextMenu();
+		
+		MenuItem editNode = new MenuItem("Edit Node");
+		editNode.setOnAction(e -> {
+			System.out.println("Open node editor");
+		});
+		
+		MenuItem deleteNode = new MenuItem("Delete Node");
+		deleteNode.setOnAction(e -> {
+			controller.removeDialogueNode(this);
+		});
+		
+		contextMenu.getItems().addAll(editNode, deleteNode);
+		contextMenu.setAutoHide(false);
 
 		/*
+		 * 
 		 * Events
+		 * 
 		 */
 		
 		setOnMouseEntered(e -> {
 			new FillTransition(200, bgStrokeFill, bgStrokeFillSelected).play();
-			highlighted = true;
+			
+			String expandHint = expanded ? "2xLMB = Contract" : "2xLMB = Expand";
+			controller.setContextHint("LMB = Drag node | " + expandHint + " | RMB = Context Menu"); 
 		});
 		
 		setOnMouseExited(e -> {
-			new FillTransition(200, bgStrokeFill, bgStrokeFillDefault).play();
-			highlighted = false;
+			new FillTransition(200, bgStrokeFill, bgStrokeFillDefault).play();;
+			controller.resetContextHint();
 		});
 		
 		setOnMouseClicked(e -> {
-			if (e.getClickCount() == 2) {
-				if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-					System.err.println("Edit Node");
-				}
-				
-				if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-					toggleExpanded();
-				}
+			if (e.getClickCount() >= 2 && e.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+				toggleExpanded();
 			}
-		});
-		
-		setOnKeyPressed(e -> {
-			if (highlighted) {
-				if (e.getKey() == GLFW.GLFW_KEY_D) {
-					System.err.println("Delete node");
-				}
+				
+			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+				contextMenu.show(getScene(), cached_context.getMouseX(), cached_context.getMouseY());
 			}
 		});
 	}
@@ -139,5 +193,13 @@ public class DialogueNode extends DraggablePane {
 	public void setHeight(double height) {
 		background.setPrefHeight(height);
 		dropShadow.setPrefHeight(height);
+	}
+
+	public boolean isExpanded() {
+		return expanded;
+	}
+	
+	public Dialogue getDialogue() {
+		return dialogue;
 	}
 }
