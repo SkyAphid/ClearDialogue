@@ -55,8 +55,6 @@ public class MainWindowDesigner {
 	private static final int PADDING = 10;
 	
 	public MainWindowDesigner(Window window, JDUIController controller) {
-		LWJGUIDialog.showMessageDialog("fuck", "you");
-		
 		/*
 		 * 
 		 * Main Window settings

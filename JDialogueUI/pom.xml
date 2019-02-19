@@ -125,6 +125,17 @@
 			<version>${lwjgl.version}</version>
 			<classifier>natives-${platform}</classifier>
 		</dependency>
+		<dependency>
+			<groupId>org.lwjgl</groupId>
+			<artifactId>lwjgl-tinyfd</artifactId>
+			<version>${lwjgl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.lwjgl</groupId>
+			<artifactId>lwjgl-tinyfd</artifactId>
+			<version>${lwjgl.version}</version>
+			<classifier>natives-${platform}</classifier>
+		</dependency>
 	</dependencies>
 	<groupId>nokoriware.jdialogue</groupId>
 	<artifactId>jdialogue-ui</artifactId>
