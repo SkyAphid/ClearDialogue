@@ -36,10 +36,8 @@ public class JDialogueJsonIO implements JDialogueIO{
 	 */
 	public static final String JSON_PROJECT_VERSION = "projectVersion";
 	public static final String JSON_PROJECT_NAME = "projectName";
-	
 	public static final String JSON_PROJECT_VIEWPORT_X = "projectViewportX";
 	public static final String JSON_PROJECT_VIEWPORT_Y = "projectViewportY";
-	public static final String JSON_PROJECT_VIEWPORT_SCALE = "projectViewportScale";
 	
 	/*
 	 * Basic Node data JSON tags
@@ -52,6 +50,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 	public static final String JSON_TAG = "tag";
 	public static final String JSON_NODE_X = "nodeX";
 	public static final String JSON_NODE_Y = "nodeY";
+	public static final String JSON_EXPANDED = "expanded";
 	
 	public static final String JSON_IN_CONNECTOR_UID = "inConnectorUID";
 	public static final String JSON_OUT_CONNECTOR_UID = "outConnectorUID";
@@ -93,7 +92,6 @@ public class JDialogueJsonIO implements JDialogueIO{
 		
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_X, project.getViewportX());
 		projectBuilder.add(JSON_PROJECT_VIEWPORT_Y, project.getViewportY());
-		projectBuilder.add(JSON_PROJECT_VIEWPORT_SCALE, project.getViewportScale());
 		
 		/*
 		 * Save Nodes
@@ -113,6 +111,8 @@ public class JDialogueJsonIO implements JDialogueIO{
 			
 			nodeBuilder.add(JSON_NODE_X, node.getX());
 			nodeBuilder.add(JSON_NODE_Y, node.getY());
+			
+			nodeBuilder.add(JSON_EXPANDED, node.isExpanded());
 			
 			nodeBuilder.add(JSON_IN_CONNECTOR_UID, node.getInConnector().getUID());
 			
@@ -226,9 +226,8 @@ public class JDialogueJsonIO implements JDialogueIO{
 
 		double viewportX = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_X).doubleValue();
 		double viewportY = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_Y).doubleValue();
-		double viewportScale = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_SCALE).doubleValue();
 
-		Project project = new Project(projectVersion, projectName, viewportX, viewportY, viewportScale);
+		Project project = new Project(projectVersion, projectName, viewportX, viewportY);
 
 		/*
 		 * Node Data
@@ -246,6 +245,8 @@ public class JDialogueJsonIO implements JDialogueIO{
 
 			double nodeX = nodeObject.getJsonNumber(JSON_NODE_X).doubleValue();
 			double nodeY = nodeObject.getJsonNumber(JSON_NODE_Y).doubleValue();
+			
+			boolean expanded = nodeObject.getBoolean(JSON_EXPANDED);
 
 			Dialogue node = null;
 
@@ -254,7 +255,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 
 			// Dialogue-type
 			if (type.equals(JSON_NODE_TYPE_DIALOGUE)) {
-				node = new DialogueText(project, uid, name, tag, nodeX, nodeY, nodeObject.getString(JSON_TEXT));
+				node = new DialogueText(project, uid, name, tag, nodeX, nodeY, expanded, nodeObject.getString(JSON_TEXT));
 
 				String outConnectorUID = nodeObject.getString(JSON_OUT_CONNECTOR_UID);
 				((DialogueText) node).setOutConnector(new DialogueConnector(project, node, outConnectorUID));
@@ -262,7 +263,7 @@ public class JDialogueJsonIO implements JDialogueIO{
 
 			// Response-type
 			if (type.equals(JSON_NODE_TYPE_RESPONSE)) {
-				node = new DialogueResponse(project, uid, name, tag, nodeX, nodeY);
+				node = new DialogueResponse(project, uid, name, tag, nodeX, nodeY, expanded);
 				DialogueResponse responseNode = (DialogueResponse) node;
 
 				JsonArray responseArray = nodeObject.getJsonArray(JSON_RESPONSES_ARRAY);
@@ -337,6 +338,6 @@ public class JDialogueJsonIO implements JDialogueIO{
 
 	@Override
 	public String getTypeName() {
-		return "json";
+		return "JSON";
 	}
 }

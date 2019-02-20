@@ -15,6 +15,7 @@ public class HalfCircle extends SectorCircle {
 
 	@Override
 	protected void resize() {
-		this.setPrefSize(radius, radius*2);
+		setMaxSize(radius, radius*2);
+		setPrefSize(getMaxWidth(), getMaxHeight());
 	}
 }

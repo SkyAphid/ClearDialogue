@@ -19,8 +19,8 @@ public class DialogueResponse extends Dialogue {
 	 */
 	private ArrayList<Response> responses = new ArrayList<Response>();
 	
-	public DialogueResponse(Project project, String uid, String name, String tag, double x, double y) {
-		super(project, uid, name, tag, x, y);
+	public DialogueResponse(Project project, String uid, String name, String tag, double x, double y, boolean expanded) {
+		super(project, uid, name, tag, x, y, expanded);
 	}
 	
 	public DialogueResponse(Project project, String name, String tag, double x, double y) {
@@ -61,6 +61,12 @@ public class DialogueResponse extends Dialogue {
 		responses.add(new Response(text, new DialogueConnector(getProject(), this, outConnectorUID)));
 	}
 
+	public void addResponses(String[] text) {
+		for (int i = 0; i < text.length; i++) {
+			addResponse(text[i]);
+		}
+	}
+	
 	public ArrayList<Response> getResponses() {
 		return responses;
 	}

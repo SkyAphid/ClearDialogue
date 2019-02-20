@@ -1,7 +1,6 @@
-package nokori.jdialogue.ui.theme;
+package nokori.jdialogue.ui;
 
 import java.awt.Desktop;
-import java.io.File;
 import java.net.URL;
 
 import lwjgui.Color;
@@ -17,37 +16,27 @@ import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.FontStyle;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
-import nokori.jdialogue.ui.JDUIController;
+import lwjgui.transition.FillTransition;
+import nokori.jdialogue.io.JDialogueJsonIO;
+import nokori.jdialogue.project.Project;
 import nokori.jdialogue.ui.components.JDDropdownMenu;
 import nokori.jdialogue.ui.components.JDSelectableLabel;
-import nokori.jdialogue.ui.layout.CanvasPane;
 import nokori.jdialogue.ui.components.JDProjectNameField;
-import nokori.jdialogue.ui.transitions.LabelFillTransition;
+import nokori.jdialogue.ui.util.JDialogueIDEUtil;
 
-import static nokori.jdialogue.ui.JDialogueUICore.*;
+import static nokori.jdialogue.ui.JDialogueIDECore.*;
 
 /**
  * This class assembles the design of the main window; such as the UI and canvas.
- * @author Brayden
- *
+ * 
+ * After it's intially called, it shouldn't ever be needed for the rest of runtime.
  */
-public class JDialogueWindowDesigner {
+public class JDialogueIDEDesigner {
 	
 	private static final int PADDING = 10;
 	
-	public JDialogueWindowDesigner(Window window, JDUIController controller) {
-		/*
-		 * 
-		 * Main Window settings
-		 * 
-		 */
-		
+	public JDialogueIDEDesigner(Window window, SharedResources sharedResources) {
 		Scene scene = window.getScene();
-		
-		//Set window theme
-		File[] files = new File("res/icons/").listFiles();
-		
-		window.setIcon(".png", files);
 
 		/*
 		 * 
@@ -63,16 +52,16 @@ public class JDialogueWindowDesigner {
 		rootPane.setPadding(new Insets(0, 0, PADDING, PADDING));
 		scene.setRoot(rootPane);
 
-		//Refresh canvas (DialogueNode management)
-		refreshCanvas(window, controller, rootPane);
+		//Add canvas to root
+		rootPane.getChildren().add(sharedResources.getCanvasPane());
 		
 		//Create HUD (toolbar, etc)
-		createHUD(window, controller, rootPane);
+		createHUD(window, sharedResources, rootPane);
 	}
 	
-	private void createHUD(Window window, JDUIController controller, StackPane rootPane) {
+	private void createHUD(Window window, SharedResources sharedResources, StackPane rootPane) {
 		
-		Font sansFont = controller.getTheme().getSansFont();
+		Font sansFont = sharedResources.getTheme().getSansFont();
 		
 		/*
 		 * Create "toolbar" pane
@@ -80,9 +69,9 @@ public class JDialogueWindowDesigner {
 		FloatingPane uiPaneTop = new FloatingPane();
 		rootPane.getChildren().add(uiPaneTop);
 		
-		uiPaneTop.getChildren().add(newFileMenu(controller));
-		uiPaneTop.getChildren().add(newToolMenu(controller));
-		uiPaneTop.getChildren().add(newProjectNameField(controller));
+		uiPaneTop.getChildren().add(newFileMenu(sharedResources));
+		uiPaneTop.getChildren().add(newToolMenu(sharedResources));
+		uiPaneTop.getChildren().add(newProjectNameField(sharedResources));
 		
 		/*
 		 * Create program information and context hints pane
@@ -116,30 +105,23 @@ public class JDialogueWindowDesigner {
 		Label contextHint = new Label() {
 			@Override
 			public void render(Context context) {
-				if (!this.getText().equals(controller.getContextHint())) {
-					new LabelFillTransition(200, this, Color.TRANSPARENT, Theme.current().getText()).play();
-					setText(controller.getContextHint());
+				//Context hint was changed (fade it back in)
+				if (!this.getText().equals(sharedResources.getContextHint())) {
+					new FillTransition(200, Color.TRANSPARENT, Theme.current().getText(), getTextFill()).play();
+					setText(sharedResources.getContextHint());
 				}
+				
 				super.render(context);
 			}
 		};
+
+		contextHint.setTextFill(Theme.current().getText().copy());
 		contextHint.setFont(sansFont);
 		contextHint.setFontSize(fontSize);
 		contextHint.setFontStyle(FontStyle.LIGHT);
 		contextHint.setPadding(new Insets(0, 0, 0, 350));
-
-		uiPaneBottom.getChildren().add(contextHint);
-	}
-
-	/**
-	 * Refreshes the canvas by clearing it and re-populating it with data from the current project. Call this if you load a new project or initialize the program.
-	 */
-	public void refreshCanvas(Window window, JDUIController controller, StackPane rootPane) {
-		//Fetch the CanvasPane from the controller and clear it.
-		CanvasPane canvasPane = controller.getCanvasPane().clear();
-		rootPane.getChildren().add(canvasPane);
 		
-		//TODO: Add loading nodes from Projects here.
+		uiPaneBottom.getChildren().add(contextHint);
 	}
 	
 	/*
@@ -152,12 +134,42 @@ public class JDialogueWindowDesigner {
 	private static final String EXPORT_JSON = "EXPORT JSON...";
 	private static final String IMPORT_JSON = "IMPORT JSON...";
 	
-	private JDDropdownMenu newFileMenu(JDUIController controller) {
+	private JDDropdownMenu newFileMenu(SharedResources sharedResources) {
 		String[] options = new String[] {
 			NEW_PROJECT, SELECT_PROJECT_DIRECTORY, MERGE_PROJECT, EXPORT_JSON, IMPORT_JSON	
 		};
 		
-		JDDropdownMenu file = new JDDropdownMenu(getToolbarAbsoluteX(0), PADDING, controller.getTheme().getSansFont(), "FILE", options);
+		JDDropdownMenu file = new JDDropdownMenu(getToolbarAbsoluteX(0), PADDING, sharedResources.getTheme().getSansFont(), "FILE", options) {
+			@Override
+			public void optionClicked(Event e, String option) {
+				switch(option) {
+				case NEW_PROJECT:
+					break;
+				case SELECT_PROJECT_DIRECTORY:
+					JDialogueIDEUtil.showProjectDirectorySelectDialog();
+					break;
+				case MERGE_PROJECT:
+					Project mergeProject = JDialogueIDEUtil.showImportProjectDialog("Merge JSON Project", new JDialogueJsonIO());
+					
+					if (mergeProject != null) {
+						sharedResources.getProject().mergeProject(mergeProject);
+						sharedResources.getCanvasPane().refresh();
+					}
+					
+					break;
+				case EXPORT_JSON:
+					JDialogueIDEUtil.showExportProjectDialog(sharedResources.getProject(), new JDialogueJsonIO());
+					break;
+				case IMPORT_JSON:
+					Project importProject = JDialogueIDEUtil.showImportProjectDialog("Import JSON Project", new JDialogueJsonIO());
+					
+					if (importProject != null) {
+						sharedResources.setProject(importProject);
+					}
+					break;
+				}
+			}
+		};
 		
 		return file;
 	}
@@ -172,18 +184,26 @@ public class JDialogueWindowDesigner {
 	private static final String REFRESH_SYNTAX = "REFRESH SYNTAX";
 	private static final String SET_SYNTAX = "SET SYNTAX...";
 	private static final String REPLACE = "REPLACE...";
-	private static final String MULTIREPLACE = "MULTI-REPLACE...";
 	
-	private JDDropdownMenu newToolMenu(JDUIController controller) {
+	private JDDropdownMenu newToolMenu(SharedResources sharedResources) {
 		String[] options = new String[] {
-				VIEW_SYNTAX, REFRESH_SYNTAX, SET_SYNTAX, REPLACE, MULTIREPLACE
+				VIEW_SYNTAX, REFRESH_SYNTAX, SET_SYNTAX, REPLACE
 		};
 		
-		JDDropdownMenu tool = new JDDropdownMenu(getToolbarAbsoluteX(1), PADDING, controller.getTheme().getSansFont(), "TOOL", options) {
+		JDDropdownMenu tool = new JDDropdownMenu(getToolbarAbsoluteX(1), PADDING, sharedResources.getTheme().getSansFont(), "TOOL", options) {
 			@Override
 			public void optionClicked(Event e, String option) {
 				switch(option) {
-				
+				case VIEW_SYNTAX:
+					break;
+				case REFRESH_SYNTAX:
+					break;
+				case SET_SYNTAX:
+					JDialogueIDEUtil.showSyntaxFileSelectDialog();
+					
+					break;
+				case REPLACE:
+					break;
 				}
 			}
 		};
@@ -195,8 +215,8 @@ public class JDialogueWindowDesigner {
 	 * Project Name Field
 	 */
 	
-	private JDProjectNameField newProjectNameField(JDUIController controller) {
-		return new JDProjectNameField(controller, getToolbarAbsoluteX(2), PADDING, controller.getTheme().getSansFont());
+	private JDProjectNameField newProjectNameField(SharedResources sharedResources) {
+		return new JDProjectNameField(sharedResources, getToolbarAbsoluteX(2), PADDING, sharedResources.getTheme().getSansFont());
 	}
 	
 	/**

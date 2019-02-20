@@ -3,7 +3,7 @@ package nokori.jdialogue.ui.components;
 import lwjgui.event.Event;
 import lwjgui.scene.control.Label;
 import lwjgui.theme.Theme;
-import nokori.jdialogue.ui.transitions.LabelFillTransition;
+import lwjgui.transition.FillTransition;
 
 public class JDSelectableLabel extends Label {
 	
@@ -13,16 +13,17 @@ public class JDSelectableLabel extends Label {
 	
 	public JDSelectableLabel(String text) {
 		super(text);
+		setTextFill(Theme.current().getText().copy());
 		
 		setOnMouseEntered(e -> {
 			if (clickingEnabled) {
-				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.current().getControl()).play();
+				new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, getTextFill(), Theme.current().getControl()).play();
 			}
 		});
 		
 		setOnMouseExited(e -> {
 			if (clickingEnabled) {
-				new LabelFillTransition(HIGHLIGHT_SPEED_IN_MILLIS, this, getTextFill(), Theme.current().getText()).play();
+				new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, getTextFill(), Theme.current().getText()).play();
 			}
 		});
 		

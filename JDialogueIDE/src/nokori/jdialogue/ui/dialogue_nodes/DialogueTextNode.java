@@ -1,109 +1,138 @@
 package nokori.jdialogue.ui.dialogue_nodes;
 
+import lwjgui.Color;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.text_input.TextArea;
-import lwjgui.scene.layout.Font;
+import lwjgui.scene.control.text_input.TextInputControl.TextAreaScrollPane;
+import lwjgui.scene.layout.StackPane;
 import lwjgui.scene.layout.floating.FloatingPane;
+import nokori.jdialogue.project.Dialogue;
+import nokori.jdialogue.project.DialogueConnector;
 import nokori.jdialogue.project.DialogueText;
-import nokori.jdialogue.ui.JDUIController;
-import nokori.jdialogue.ui.dialogue_nodes.DialogueNodeConnector.ConnectorType;
+import nokori.jdialogue.ui.SharedResources;
+import nokori.jdialogue.ui.dialogue_nodes.DialogueConnectorNode.ConnectorType;
 
 public class DialogueTextNode extends DialogueNode {
 
-	private FloatingPane textAreaPane;
-	private TextArea textArea;
+	protected FloatingPane textAreaPane;
+	protected TextArea textArea;
 	
-	public DialogueTextNode(JDUIController controller, DialogueText dialogue) {
-		super(controller, dialogue);
+	private DialogueConnectorNode outConnector = null;
+	
+	public DialogueTextNode(SharedResources sharedResources, Dialogue dialogue) {
+		super(sharedResources, dialogue);
 		
-		Font serifFont = controller.getTheme().getSerifFont();
-		
-		int edgePadding = 10;
-		int topPadding = 70;
-		
-		/*
-		 * Text Area
-		 */
 		textAreaPane = new FloatingPane();
-		textAreaPane.setAbsolutePosition(LEFT_PADDING, TOP_PADDING + 70);
+		textAreaPane.setAbsolutePosition(LEFT_PADDING, TOP_PADDING + TEXT_AREA_TOP_PADDING);
 		textAreaPane.setAlignment(Pos.TOP_LEFT);
-		textAreaPane.setMouseTransparent(true);
 		
-		textArea = new TextArea() {
-			@Override
-			public void render(Context context) {
-				setMaxWidth(background.getWidth()- edgePadding);
-				setPrefWidth(getMaxWidth());
-				
-				setMaxHeight(background.getHeight() - topPadding - edgePadding);
-				setPrefHeight(getMaxHeight());
-				
-				super.render(context);
-			}
-		};
-		textArea.setText(dialogue.getText());
-		textArea.setWordWrap(true);
-		
-		textArea.setFont(serifFont);
-		textArea.setFontSize(16);
+		//The constructor is generic so that it can be easily extended by similar DialogueNodes
+		if (dialogue instanceof DialogueText) {
+			DialogueText t = (DialogueText) dialogue;
+			
+			/*
+			 * 
+			 * Text Area
+			 * 
+			 */
+			
+			textArea = new TextArea(t.getText()) {
+				@Override
+				public void render(Context context) {
+					positionTextArea(this);
+					super.render(context);
+				}
+			};
+			
+			textArea.setOnDeselected(e -> {
+				System.err.println("Deselected");
+				t.setText(textArea.getText());
+			});
 
+			styleTextArea(textArea);
+			textArea.setWordWrap(true);
+			
+			//Finalize text area
+			textAreaPane.getChildren().add(textArea);
+			getChildren().add(textAreaPane);
+			
+			/*
+			 * 
+			 * Out Connector
+			 * 
+			 */
+			
+			outConnector = new DialogueConnectorNode(this, t.getOutConnector(), ConnectorType.OUT);
+			getChildren().add(0, outConnector);
+		}
+	}
+	
+	@Override
+	public void setExpanded(boolean expanded) {
+		super.setExpanded(expanded);
+		textArea.getInternalScrollPane().setVisible(expanded);
+	}
+	
+	@Override
+	protected void setEditing(boolean editing) {
+		super.setEditing(editing);
+		textArea.getInternalScrollPane().setVisible(editing);
+		textArea.setMouseTransparent(!editing);
+	}
+
+	@Override
+	public DialogueConnectorNode getDialogueNodeConnectorOf(DialogueConnector connector) {
+		if (outConnector != null && outConnector.getConnector() == connector) {
+			return outConnector;
+		}
+		
+		return super.getDialogueNodeConnectorOf(connector);
+	}
+	
+	/*
+	 * 
+	 * TextArea Management
+	 * 
+	 */
+	
+	/**
+	 * Call this from position() of the TextArea to keep its position in sync with its parent.
+	 */
+	protected void positionTextArea(TextArea textArea) {
+		int edgePadding = 25;
+		
+		textArea.setMaxWidth(background.getWidth() - (edgePadding - 5));
+		textArea.setPrefWidth(getMaxWidth());
+		
+		textArea.setMaxHeight(background.getHeight() - TEXT_AREA_TOP_PADDING - edgePadding);
+		textArea.setPrefHeight(getMaxHeight());
+	}
+	
+	/**
+	 * Styles a given TextArea so that every DialogueNode will have a consistent look and feel.
+	 */
+	protected void styleTextArea(TextArea textArea) {
+		textArea.setMouseTransparent(!editing);
+		
+		//Font
+		textArea.setFont(sharedResources.getTheme().getSerifFont());
+		textArea.setFontSize(18);
+
+		//Background/Decoration
 		textArea.setBackground(null);
 		textArea.setDecorated(false);
 		textArea.setSelectionOutlineEnabled(false);
 		
+		//Scrollbar customization
+		TextAreaScrollPane s = textArea.getInternalScrollPane();
+		s.setControlFill(Color.TRANSPARENT);
+		s.setControlOutlineFill(Color.GRAY);
+		s.setSelectionFill(Color.TRANSPARENT);
+		s.setSelectionPassiveFill(Color.TRANSPARENT);
+		s.setVisible(expanded);
+		
+		//Context menu
 		textArea.setContextMenu(contextMenu);
-		
-		textAreaPane.getChildren().add(textArea);
-		
-		getChildren().add(textAreaPane);
-		
-		/*
-		 * 
-		 * Connectors
-		 * 
-		 */
-		
-		int connectorOffset = 1;
-		
-		DialogueNodeConnector inConnector = new DialogueNodeConnector(dialogue.getInConnector(), ConnectorType.IN) {
-			@Override
-			public void render(Context context) {
-				double parentX = DialogueTextNode.this.getX();
-				double parentY = DialogueTextNode.this.getY();
-				double parentH = background.getHeight();
-				
-				double w = getWidth();
-				double h = getHeight();
-				
-				setAbsolutePosition(parentX - w + connectorOffset, parentY + parentH/2 - h/2);
-				
-				super.render(context);
-			}
-		};
-		getChildren().add(0, inConnector);
-		
-		DialogueNodeConnector outConnector = new DialogueNodeConnector(dialogue.getOutConnector(), ConnectorType.OUT) {
-			@Override
-			public void render(Context context) {
-				double parentX = DialogueTextNode.this.getX();
-				double parentY = DialogueTextNode.this.getY();
-				double parentW = background.getWidth();
-				double parentH = background.getHeight();
-				
-				double h = getHeight();
-				
-				setAbsolutePosition(parentX + parentW - connectorOffset, parentY + parentH/2 - h/2);
-				
-				super.render(context);
-			}
-		};
-		getChildren().add(1, outConnector);
-	}
-	
-	@Override
-	protected void toggleEditing() {
-		super.toggleEditing();
-		textAreaPane.setMouseTransparent(!editing);
 	}
 }

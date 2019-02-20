@@ -23,6 +23,7 @@ public abstract class Dialogue implements Serializable {
 	private String name;
 	private String tag;
 	private double x, y;
+	private boolean expanded = false;
 	
 	//Connector so that other nodes can input into this one
 	private DialogueConnector inConnector;
@@ -31,13 +32,14 @@ public abstract class Dialogue implements Serializable {
 	 * This constructor allows you to input the UID as well, for in cases where you're trying to load a copy of a dialogue node from a file.
 	 * 
 	 */
-	public Dialogue(Project project, String uid, String name, String tag, double x, double y) {
+	public Dialogue(Project project, String uid, String name, String tag, double x, double y, boolean expanded) {
 		this.project = project;
 		this.uid = uid;
 		this.name = name;
 		this.tag = tag;
 		this.x = x;
 		this.y = y;
+		this.expanded = expanded;
 	}
 
 	/**
@@ -79,6 +81,11 @@ public abstract class Dialogue implements Serializable {
 		this.tag = tag;
 	}
 	
+	public void setPosition(double x, double y) {
+		setX(x);
+		setY(y);
+	}
+	
 	public double getX() {
 		return x;
 	}
@@ -93,6 +100,14 @@ public abstract class Dialogue implements Serializable {
 	
 	public void setY(double y) {
 		this.y = y;
+	}
+
+	public boolean isExpanded() {
+		return expanded;
+	}
+
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
 	}
 
 	public void setInConnector(DialogueConnector inConnector) {

@@ -9,9 +9,8 @@ import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.FontStyle;
 import lwjgui.theme.Theme;
+import lwjgui.transition.FillTransition;
 import lwjgui.transition.SizeTransition;
-
-import nokori.jdialogue.ui.transitions.LabelFillTransition;
 
 /**
  * This is the general-use class for all buttons that expand when you hover over them on the "toolbar" interface of the UI (File, Tool, etc)
@@ -50,7 +49,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 	 */
 	private Label buildLabel(Font font, String text, Insets padding) {
 		Label label = new Label(text);
-		label.setTextFill(Theme.current().getTextAlt());
+		label.setTextFill(Theme.current().getTextAlt().copy());
 		label.setFont(font);
 		label.setFontSize(FONT_SIZE);
 		label.setMouseTransparent(true);
@@ -85,7 +84,7 @@ public class JDDropdownMenu extends JDButtonSkeleton {
 	
 	private void addOptions() {
 		for (int i = 0; i < options.length; i++) {
-			new LabelFillTransition(200, options[i].label, Color.TRANSPARENT, Theme.current().getTextAlt()).play();
+			new FillTransition(200, Color.TRANSPARENT, Theme.current().getTextAlt(), options[i].label.getTextFill()).play();
 		}
 		
 		getChildren().addAll(options);

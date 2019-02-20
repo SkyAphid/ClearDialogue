@@ -55,7 +55,7 @@ public class JDButtonSkeleton extends FloatingPane {
 
 		setOnMouseEntered(e -> {
 			if (highlightingEnabled) {
-				playShapeFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Theme.current().getSelection().alpha(HIGHLIGHT_OPACITY)));
+				playHighlightFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Color.WHITE_SMOKE.alpha(0.25f)));
 				highlighted = true;
 			}
 			
@@ -64,7 +64,7 @@ public class JDButtonSkeleton extends FloatingPane {
 		
 		setOnMouseExited(e -> {
 			if (highlightingEnabled) {
-				playShapeFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Color.TRANSPARENT));
+				playHighlightFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Color.TRANSPARENT));
 				highlighted = false;
 			}
 			
@@ -76,7 +76,7 @@ public class JDButtonSkeleton extends FloatingPane {
 		});
 	}
 	
-	private void playShapeFillTransition(FillTransition transition) {
+	private void playHighlightFillTransition(FillTransition transition) {
 		if (fillTransition != null) {
 			fillTransition.stop();
 			fillTransition = null;

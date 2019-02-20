@@ -16,8 +16,8 @@ public class DialogueText extends Dialogue {
 	//Out connector for connecting to other nodes
 	private DialogueConnector outConnector;
 	
-	public DialogueText(Project project, String uid, String name, String tag, double x, double y, String text) {
-		super(project, uid, name, tag, x, y);
+	public DialogueText(Project project, String uid, String name, String tag, double x, double y, boolean expanded, String text) {
+		super(project, uid, name, tag, x, y, expanded);
 		this.text = text;
 	}
 	

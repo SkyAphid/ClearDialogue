@@ -3,16 +3,20 @@ package nokori.jdialogue.ui.dialogue_nodes;
 import org.lwjgl.glfw.GLFW;
 
 import lwjgui.Color;
+import lwjgui.LWJGUI;
 import lwjgui.LWJGUIDialog;
 import lwjgui.LWJGUIDialog.DialogIcon;
 import lwjgui.LWJGUIDialog.DialogType;
+import lwjgui.event.MouseEvent;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.SeparatorMenuItem;
+import lwjgui.scene.control.text_input.TextArea;
 import lwjgui.scene.control.text_input.TextField;
+import lwjgui.scene.control.text_input.TextInputControl.TextAreaScrollPane;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.DraggablePane;
 import lwjgui.scene.layout.floating.FloatingPane;
@@ -22,7 +26,9 @@ import lwjgui.theme.Theme;
 import lwjgui.transition.FillTransition;
 import lwjgui.transition.SizeTransition;
 import nokori.jdialogue.project.Dialogue;
-import nokori.jdialogue.ui.JDUIController;
+import nokori.jdialogue.project.DialogueConnector;
+import nokori.jdialogue.ui.SharedResources;
+import nokori.jdialogue.ui.dialogue_nodes.DialogueConnectorNode.ConnectorType;
 
 public abstract class DialogueNode extends DraggablePane {
 	
@@ -35,9 +41,16 @@ public abstract class DialogueNode extends DraggablePane {
 	public static final int EDITING_WIDTH = EXPANDED_WIDTH * 6;
 	public static final int EDITING_HEIGHT = EXPANDED_HEIGHT * 3;
 
-	protected static final int TOP_PADDING = 15;
+	protected static final int TOP_PADDING = 20;
 	protected static final int LEFT_PADDING = 15;
 	protected static final int EDGE_PADDING = LEFT_PADDING * 2;
+	
+	protected static final int TEXT_AREA_TOP_PADDING = 70;
+	
+	protected static final int CONNECTOR_OFFSET = 1;
+	
+	protected SharedResources sharedResources;
+	protected Dialogue dialogue;
 	
 	protected boolean expanded = false;
 	protected boolean editing = false;
@@ -49,6 +62,9 @@ public abstract class DialogueNode extends DraggablePane {
 	private DropShadow dropShadow;
 	protected Rectangle background;
 	
+	//In-Connector
+	protected DialogueConnectorNode inConnector;
+	
 	//Title/Tags
 	private FloatingPane namePane, tagPane;
 	private TextField name, tags;
@@ -56,15 +72,15 @@ public abstract class DialogueNode extends DraggablePane {
 	//Context menu
 	protected ContextMenu contextMenu = new ContextMenu();
 	
-	//Data
-	private Dialogue dialogue;
-	
-	public DialogueNode(JDUIController controller, Dialogue dialogue) {
+	public DialogueNode(SharedResources sharedResources, Dialogue dialogue) {
+		this.sharedResources = sharedResources;
+		this.dialogue = dialogue;
+		
 		setAlignment(Pos.TOP_LEFT);
+		Font sansFont = sharedResources.getTheme().getSansFont();
 		
-		Font sansFont = controller.getTheme().getSansFont();
-		
-		//setBackground(Color.BLACK)
+		//for debugging
+		//setBackground(Color.BLACK);
 		
 		/*
 		 * 
@@ -96,8 +112,8 @@ public abstract class DialogueNode extends DraggablePane {
 		namePane.setAbsolutePosition(LEFT_PADDING, TOP_PADDING);
 		namePane.setAlignment(Pos.TOP_LEFT);
 		namePane.setBackground(null);
-		namePane.setMouseTransparent(true);
-		
+		namePane.setMouseTransparent(!editing);
+
 		name = new TextField(dialogue.getName()) {
 			@Override
 			public void render(Context context) {
@@ -106,9 +122,10 @@ public abstract class DialogueNode extends DraggablePane {
 				super.render(context);
 			}
 		};
+
 		name.setFont(sansFont);
 		name.setFontSize(22);
-
+		
 		name.setBackground(null);
 		name.setDecorated(false);
 		name.setSelectionOutlineEnabled(false);
@@ -119,8 +136,6 @@ public abstract class DialogueNode extends DraggablePane {
 			dialogue.setName(name.getText());
 		});
 		
-
-		
 		namePane.getChildren().add(name);
 		
 		//Tag field
@@ -128,8 +143,8 @@ public abstract class DialogueNode extends DraggablePane {
 		tagPane.setAbsolutePosition(LEFT_PADDING, TOP_PADDING + 40);
 		tagPane.setAlignment(Pos.TOP_LEFT);
 		tagPane.setBackground(null);
-		tagPane.setMouseTransparent(true);
-
+		tagPane.setMouseTransparent(!editing);
+		
 		tags = new TextField(dialogue.getTag()) {
 			@Override
 			public void render(Context context) {
@@ -138,8 +153,9 @@ public abstract class DialogueNode extends DraggablePane {
 				super.render(context);
 			}
 		};
+		
 		tags.setFont(sansFont);
-		tags.setFontSize(14);
+		tags.setFontSize(16);
 
 		tags.setBackground(null);
 		tags.setDecorated(false);
@@ -159,21 +175,36 @@ public abstract class DialogueNode extends DraggablePane {
 		
 		/*
 		 * 
+		 * In Connector
+		 * 
+		 * This is a default connector that every node will have. Out Connectors on the other hand will vary.
+		 * 
+		 */
+		
+		inConnector = new DialogueConnectorNode(this, dialogue.getInConnector(), ConnectorType.IN);
+		getChildren().add(0, inConnector);
+		
+		/*
+		 * 
 		 * Context Menu
 		 * 
 		 */
 
-		MenuItem editNode = new MenuItem("Edit Node", sansFont);
-		editNode.setOnAction(e -> {
-			toggleEditing();
-			
-			setContextHint(controller);
-			
-			if (editing) {
-				editNode.setContent("End Editing", sansFont, null);
-			} else {
-				editNode.setContent("Edit Node", sansFont, null);
+		MenuItem editNode = new MenuItem("Edit Node", sansFont) {
+			@Override
+			public void render(Context context) {
+				if (editing) {
+					setContent("End Editing", sansFont, null);
+				} else {
+					setContent("Edit Node", sansFont, null);
+				}
+				
+				super.render(context);
 			}
+		};
+		editNode.setOnAction(e -> {
+			setEditing(!editing);
+			setDialogueNodeContextHint();
 		});
 		
 		MenuItem deleteNode = new MenuItem("Delete Node", sansFont);
@@ -181,13 +212,14 @@ public abstract class DialogueNode extends DraggablePane {
 			if (LWJGUIDialog.showConfirmDialog("Delete Node", "Are you sure you want to delete this node?", 
 					DialogType.YES_NO, DialogIcon.QUESTION, false)) {
 				
-				controller.removeDialogueNode(this);
+				sharedResources.removeDialogueNode(this);
 			}
 		});
 		
 		MenuItem toggleSize = new MenuItem("Toggle Size", sansFont);
 		toggleSize.setOnAction(e -> {
-			toggleExpanded(true);
+			setEditing(false);
+			setExpanded(!expanded);
 		});
 		
 		contextMenu.getItems().addAll(editNode, deleteNode, new SeparatorMenuItem(), toggleSize);
@@ -201,18 +233,17 @@ public abstract class DialogueNode extends DraggablePane {
 		
 		setOnMouseEntered(e -> {
 			new FillTransition(200, bgStrokeFill, bgStrokeFillSelected).play();
-			
-			setContextHint(controller);
+			setDialogueNodeContextHint();
 		});
 		
 		setOnMouseExited(e -> {
 			new FillTransition(200, bgStrokeFill, bgStrokeFillDefault).play();;
-			controller.resetContextHint();
+			sharedResources.resetContextHint();
 		});
 		
 		setOnMouseClicked(e -> {
 			if (e.getClickCount() >= 2 && e.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && !editing) {
-				toggleExpanded(true);
+				setExpanded(!expanded);
 			}
 			
 			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
@@ -222,16 +253,36 @@ public abstract class DialogueNode extends DraggablePane {
 		
 		setOnKeyPressed(e -> {
 			if (editing && e.getKey() == GLFW.GLFW_KEY_ESCAPE) {
-				toggleEditing();
-				setContextHint(controller);
+				setEditing(false);
+				setDialogueNodeContextHint();
 			}
 		});
+		
+		/*
+		 * 
+		 * Sync to Dialogue later (that way everything is finished initializing by the time we call it)
+		 * 
+		 */
+		
+		LWJGUI.runLater(()-> {
+			setExpanded(dialogue.isExpanded());
+			setAbsolutePosition(dialogue.getX(), dialogue.getY());
+		});
+	}
+	
+	/**
+	 * Updates the dialogue's position every time this Node is dragged by the mouse.
+	 */
+	@Override
+	public void drag(MouseEvent e) {
+		super.drag(e);
+		dialogue.setPosition(getX(), getY());
 	}
 	
 	/**
 	 * Sets the context hint for this Dialogue Node.
 	 */
-	private void setContextHint(JDUIController controller) {
+	private void setDialogueNodeContextHint() {
 		String expandHint = expanded ? "2xLMB = Contract" : "2xLMB = Expand";
 		String hint = "LMB = Drag node | " + expandHint + " | RMB = Context Menu";
 		
@@ -239,40 +290,97 @@ public abstract class DialogueNode extends DraggablePane {
 			hint += " | ESC-Key = End Editing";
 		}
 		
-		controller.setContextHint(hint); 
+		sharedResources.setContextHint(hint); 
 	}
 
 	/**
-	 * Toggles whether or not the DialogueNode is expanded. This doesn't have an effect if the node is currently being edited.
-	 * 
-	 * @param changeMode - if false, this function merely acts as a "refresh" to set the dimensions back to the current setting and doesn't actually change the expand state.
+	 * Toggles editing mode for this DialogueNode.
 	 */
-	protected void toggleExpanded(boolean changeMode) {
-		if (changeMode) {
-			expanded = !expanded;
+	protected void setEditing(boolean editing) {
+		this.editing = editing;
+		
+		if (editing) {
+			new Resizer(200, EDITING_WIDTH, EDITING_HEIGHT).play();
+		} else {
+			refreshExpanded();
+		}
+
+		namePane.setMouseTransparent(!editing);
+		tagPane.setMouseTransparent(!editing);
+	}
+	
+	public Dialogue getDialogue() {
+		return dialogue;
+	}
+
+	/*
+	 * 
+	 * 
+	 * Dialogue Connector tools
+	 * 
+	 * 
+	 */
+	
+	public DialogueConnectorNode getDialogueNodeConnectorOf(DialogueConnector connector) {
+		if (inConnector.getConnector() == connector) {
+			return inConnector;
 		}
 		
+		return null;
+	}
+	
+	protected double getInConnectorX(double connectorWidth) {
+		return (getX() - connectorWidth + CONNECTOR_OFFSET);
+	}
+	
+	protected double getOutConnectorX() {
+		double parentX = getX();
+		double parentW = background.getWidth();
+		
+		return (parentX + parentW - CONNECTOR_OFFSET);
+	}
+	
+	protected double getCenteredConnectorY(double connectorHeight) {
+		return (getY() + background.getHeight()/2 - connectorHeight/2);
+	}
+	
+	/*
+	 * 
+	 * 
+	 * Expand/Contract Tools
+	 * 
+	 * 
+	 */
+	
+	public void setWidth(double width) {
+		if (!widthResizable) return;
+		
+		background.setPrefWidth(width);
+		dropShadow.setPrefWidth(width);
+	}
+	
+	public void setHeight(double height) {
+		if (!heightResizable) return;
+		
+		background.setPrefHeight(height);
+		dropShadow.setPrefHeight(height);
+	}
+
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
+		refreshExpanded();
+	}
+	
+	public boolean isExpanded() {
+		return expanded;
+	}
+	
+	private void refreshExpanded() {
 		if (expanded) {
 			new Resizer(200, EXPANDED_WIDTH, EXPANDED_HEIGHT).play();
 		} else {
 			new Resizer(200, MINI_WIDTH, MINI_HEIGHT).play();
 		}
-	}
-	
-	/**
-	 * Toggles editing mode for this DialogueNode.
-	 */
-	protected void toggleEditing() {
-		if (!editing) {
-			new Resizer(200, EDITING_WIDTH, EDITING_HEIGHT).play();
-			editing = true;
-		} else {
-			toggleExpanded(false);
-			editing = false;
-		}
-
-		namePane.setMouseTransparent(!editing);
-		tagPane.setMouseTransparent(!editing);
 	}
 	
 	private class Resizer extends SizeTransition {
@@ -300,27 +408,5 @@ public abstract class DialogueNode extends DraggablePane {
 		protected void setHeight(double height) {
 			DialogueNode.this.setHeight(height);
 		}
-	}
-	
-	public void setWidth(double width) {
-		if (!widthResizable) return;
-		
-		background.setPrefWidth(width);
-		dropShadow.setPrefWidth(width);
-	}
-	
-	public void setHeight(double height) {
-		if (!heightResizable) return;
-		
-		background.setPrefHeight(height);
-		dropShadow.setPrefHeight(height);
-	}
-
-	public boolean isExpanded() {
-		return expanded;
-	}
-	
-	public Dialogue getDialogue() {
-		return dialogue;
 	}
 }

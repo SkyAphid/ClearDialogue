@@ -6,13 +6,13 @@ import lwjgui.scene.control.text_input.TextField;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
-import nokori.jdialogue.ui.JDUIController;
+import nokori.jdialogue.ui.SharedResources;
 
 public class JDProjectNameField extends JDButtonSkeleton {
 
 	public static final int DEFAULT_WIDTH = 500;
 	
-	public JDProjectNameField(JDUIController controller, int absoluteX, int absoluteY, Font font) {
+	public JDProjectNameField(SharedResources sharedResources, int absoluteX, int absoluteY, Font font) {
 		super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, false);
 		
 		Insets padding = new Insets(0, 0, 0, PADDING);
@@ -22,7 +22,7 @@ public class JDProjectNameField extends JDButtonSkeleton {
 		textFieldContainerPane.setBackground(null);
 		textFieldContainerPane.setAlignment(Pos.CENTER);
 		
-		TextField textField = new TextField(controller.getProject().getName());
+		TextField textField = new TextField(sharedResources.getProject().getName());
 		textField.setPrefWidth(DEFAULT_WIDTH - 20);
 		textField.setFillToParentWidth(true);
 		
@@ -40,7 +40,7 @@ public class JDProjectNameField extends JDButtonSkeleton {
 		textField.setCaretFading(true);
 		
 		textField.setOnTextInput(e -> {
-			controller.getProject().setName(textField.getText());
+			sharedResources.getProject().setName(textField.getText());
 		});
 		
 		textFieldContainerPane.getChildren().add(textField);
