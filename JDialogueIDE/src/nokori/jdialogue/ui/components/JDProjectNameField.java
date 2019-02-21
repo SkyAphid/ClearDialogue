@@ -39,6 +39,14 @@ public class JDProjectNameField extends JDButtonSkeleton {
 		textField.setCaretFill(Theme.current().getTextAlt());
 		textField.setCaretFading(true);
 		
+		textField.setOnMousePressed(e -> {
+			System.err.println("Pressed");
+		});
+		
+		textField.setOnMouseClicked(e -> {
+			System.err.println("Click");
+		});
+		
 		textField.setOnTextInput(e -> {
 			sharedResources.getProject().setName(textField.getText());
 		});

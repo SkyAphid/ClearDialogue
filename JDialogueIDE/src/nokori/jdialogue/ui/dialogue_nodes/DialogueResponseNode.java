@@ -7,7 +7,6 @@ import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.text_input.CodeArea;
 import lwjgui.scene.control.text_input.TextArea;
-import lwjgui.scene.control.text_input.TextInputControl.TextAreaScrollPane;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.FloatingPane;
 import nokori.jdialogue.project.DialogueConnector;

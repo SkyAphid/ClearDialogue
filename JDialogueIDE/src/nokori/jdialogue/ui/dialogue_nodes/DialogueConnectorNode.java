@@ -49,10 +49,12 @@ public class DialogueConnectorNode extends FloatingPane {
 		
 		circle.setOnMouseEntered(e -> {
 			new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, circle.getFill(), type.color.brighter());
+			System.out.println(type + " entered");
 		});
 		
 		circle.setOnMouseExited(e -> {
 			new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, circle.getFill(), type.color);
+			System.out.println(type + " exited");
 		});
 	}
 	

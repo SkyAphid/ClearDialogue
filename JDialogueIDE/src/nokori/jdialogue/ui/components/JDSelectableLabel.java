@@ -16,12 +16,14 @@ public class JDSelectableLabel extends Label {
 		setTextFill(Theme.current().getText().copy());
 		
 		setOnMouseEntered(e -> {
+			System.err.println("Label entered");
 			if (clickingEnabled) {
 				new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, getTextFill(), Theme.current().getControl()).play();
 			}
 		});
 		
 		setOnMouseExited(e -> {
+			System.err.println("Label exited");
 			if (clickingEnabled) {
 				new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, getTextFill(), Theme.current().getText()).play();
 			}

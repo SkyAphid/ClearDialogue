@@ -16,7 +16,6 @@ import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.text_input.TextArea;
 import lwjgui.scene.control.text_input.TextField;
-import lwjgui.scene.control.text_input.TextInputControl.TextAreaScrollPane;
 import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.DraggablePane;
 import lwjgui.scene.layout.floating.FloatingPane;
@@ -80,7 +79,7 @@ public abstract class DialogueNode extends DraggablePane {
 		Font sansFont = sharedResources.getTheme().getSansFont();
 		
 		//for debugging
-		//setBackground(Color.BLACK);
+		setBackground(Color.BLACK);
 		
 		/*
 		 * 
