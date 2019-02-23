@@ -3,11 +3,11 @@ package nokori.jdialogue.ui.dialogue_nodes;
 import java.util.ArrayList;
 
 import lwjgui.Color;
+import lwjgui.font.Font;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.text_input.CodeArea;
 import lwjgui.scene.control.text_input.TextArea;
-import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.FloatingPane;
 import nokori.jdialogue.project.DialogueConnector;
 import nokori.jdialogue.project.DialogueResponse;

@@ -5,6 +5,8 @@ import java.net.URL;
 
 import lwjgui.Color;
 import lwjgui.event.Event;
+import lwjgui.font.Font;
+import lwjgui.font.FontStyle;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
@@ -12,16 +14,16 @@ import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.floating.FloatingPane;
-import lwjgui.scene.layout.Font;
-import lwjgui.scene.layout.FontStyle;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
 import lwjgui.transition.FillTransition;
 import nokori.jdialogue.io.JDialogueJsonIO;
 import nokori.jdialogue.project.Project;
-import nokori.jdialogue.ui.components.JDDropdownMenu;
-import nokori.jdialogue.ui.components.JDSelectableLabel;
-import nokori.jdialogue.ui.components.JDProjectNameField;
+import nokori.jdialogue.ui.components.SelectableLabel;
+import nokori.jdialogue.ui.components.dropdown.DropdownDivider;
+import nokori.jdialogue.ui.components.dropdown.DropdownMenu;
+import nokori.jdialogue.ui.components.dropdown.DropdownOption;
+import nokori.jdialogue.ui.components.ProjectNameField;
 import nokori.jdialogue.ui.util.JDialogueIDEUtil;
 
 import static nokori.jdialogue.ui.JDialogueIDECore.*;
@@ -84,7 +86,7 @@ public class JDialogueIDEDesigner {
 		rootPane.getChildren().add(uiPaneBottom);
 		
 		//Program information
-		JDSelectableLabel programInformation = new JDSelectableLabel(PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER) {
+		SelectableLabel programInformation = new SelectableLabel(PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER) {
 			@Override
 			protected void mouseClicked(Event e) {
 				try {
@@ -128,48 +130,45 @@ public class JDialogueIDEDesigner {
 	 * File Menu
 	 */
 	
-	private static final String NEW_PROJECT = "NEW PROJECT";
-	private static final String SELECT_PROJECT_DIRECTORY = "PROJECT DIR...";
-	private static final String MERGE_PROJECT = "MERGE PROJECT...";
-	private static final String EXPORT_JSON = "EXPORT JSON...";
-	private static final String IMPORT_JSON = "IMPORT JSON...";
-	
-	private JDDropdownMenu newFileMenu(SharedResources sharedResources) {
-		String[] options = new String[] {
-			NEW_PROJECT, SELECT_PROJECT_DIRECTORY, MERGE_PROJECT, EXPORT_JSON, IMPORT_JSON	
-		};
+	private DropdownMenu newFileMenu(SharedResources sharedResources) {
+
+		DropdownOption newProject = new DropdownOption("NEW PROJECT...", e -> {
+			JDialogueIDEUtil.showProjectDirectorySelectDialog();
+		});
 		
-		JDDropdownMenu file = new JDDropdownMenu(getToolbarAbsoluteX(0), PADDING, sharedResources.getTheme().getSansFont(), "FILE", options) {
-			@Override
-			public void optionClicked(Event e, String option) {
-				switch(option) {
-				case NEW_PROJECT:
-					break;
-				case SELECT_PROJECT_DIRECTORY:
-					JDialogueIDEUtil.showProjectDirectorySelectDialog();
-					break;
-				case MERGE_PROJECT:
-					Project mergeProject = JDialogueIDEUtil.showImportProjectDialog("Merge JSON Project", new JDialogueJsonIO());
-					
-					if (mergeProject != null) {
-						sharedResources.getProject().mergeProject(mergeProject);
-						sharedResources.getCanvasPane().refresh();
-					}
-					
-					break;
-				case EXPORT_JSON:
-					JDialogueIDEUtil.showExportProjectDialog(sharedResources.getProject(), new JDialogueJsonIO());
-					break;
-				case IMPORT_JSON:
-					Project importProject = JDialogueIDEUtil.showImportProjectDialog("Import JSON Project", new JDialogueJsonIO());
-					
-					if (importProject != null) {
-						sharedResources.setProject(importProject);
-					}
-					break;
-				}
+		DropdownOption setProjectDirectory = new DropdownOption("PROJECT DIR...", e -> {
+			JDialogueIDEUtil.showProjectDirectorySelectDialog();
+		});
+		
+		DropdownOption mergeProject = new DropdownOption("MERGE PROJECT...", e -> {
+			Project merge = JDialogueIDEUtil.showImportProjectDialog("Merge JSON Project", new JDialogueJsonIO());
+			
+			if (merge!= null) {
+				sharedResources.getProject().mergeProject(merge);
+				sharedResources.getCanvasPane().refresh();
 			}
-		};
+			
+		});
+		
+		DropdownOption exportJson = new DropdownOption("EXPORT JSON...", e -> {
+			JDialogueIDEUtil.showExportProjectDialog(sharedResources.getProject(), new JDialogueJsonIO());
+		});
+		
+		DropdownOption importJson = new DropdownOption("IMPORT JSON...", e -> {
+			Project importProject = JDialogueIDEUtil.showImportProjectDialog("Import JSON Project", new JDialogueJsonIO());
+			
+			if (importProject != null) {
+				sharedResources.setProject(importProject);
+			}
+		});
+		
+		DropdownMenu file = new DropdownMenu(getToolbarAbsoluteX(0), PADDING, sharedResources.getTheme().getSansFont(), "FILE", 
+				newProject, 
+				setProjectDirectory, 
+				mergeProject, 
+				new DropdownDivider(),
+				exportJson, 
+				importJson);
 		
 		return file;
 	}
@@ -180,33 +179,30 @@ public class JDialogueIDEDesigner {
 	 * Contains various useful tools for dialogue editing.
 	 */
 	
-	private static final String VIEW_SYNTAX = "VIEW SYNTAX";
-	private static final String REFRESH_SYNTAX = "REFRESH SYNTAX";
-	private static final String SET_SYNTAX = "SET SYNTAX...";
-	private static final String REPLACE = "REPLACE...";
-	
-	private JDDropdownMenu newToolMenu(SharedResources sharedResources) {
-		String[] options = new String[] {
-				VIEW_SYNTAX, REFRESH_SYNTAX, SET_SYNTAX, REPLACE
-		};
+
+	private DropdownMenu newToolMenu(SharedResources sharedResources) {
+		DropdownOption viewSyntax = new DropdownOption("VIEW SYNTAX", e -> {
+			
+		});
 		
-		JDDropdownMenu tool = new JDDropdownMenu(getToolbarAbsoluteX(1), PADDING, sharedResources.getTheme().getSansFont(), "TOOL", options) {
-			@Override
-			public void optionClicked(Event e, String option) {
-				switch(option) {
-				case VIEW_SYNTAX:
-					break;
-				case REFRESH_SYNTAX:
-					break;
-				case SET_SYNTAX:
-					JDialogueIDEUtil.showSyntaxFileSelectDialog();
-					
-					break;
-				case REPLACE:
-					break;
-				}
-			}
-		};
+		DropdownOption refreshSyntax = new DropdownOption("REFRESH SYNTAX", e -> {
+			
+		});
+		
+		DropdownOption setSyntax = new DropdownOption("SET SYNTAX...", e -> {
+			JDialogueIDEUtil.showSyntaxFileSelectDialog();
+		});
+		
+		DropdownOption replace = new DropdownOption("REPLACE...", e -> {
+			
+		});
+
+		DropdownMenu tool = new DropdownMenu(getToolbarAbsoluteX(1), PADDING, sharedResources.getTheme().getSansFont(), "TOOL", 
+				viewSyntax, 
+				refreshSyntax, 
+				setSyntax, 
+				new DropdownDivider(),
+				replace);
 		
 		return tool;
 	}
@@ -215,8 +211,8 @@ public class JDialogueIDEDesigner {
 	 * Project Name Field
 	 */
 	
-	private JDProjectNameField newProjectNameField(SharedResources sharedResources) {
-		return new JDProjectNameField(sharedResources, getToolbarAbsoluteX(2), PADDING, sharedResources.getTheme().getSansFont());
+	private ProjectNameField newProjectNameField(SharedResources sharedResources) {
+		return new ProjectNameField(sharedResources, getToolbarAbsoluteX(2), PADDING, sharedResources.getTheme().getSansFont());
 	}
 	
 	/**
@@ -226,6 +222,6 @@ public class JDialogueIDEDesigner {
 	 * @return
 	 */
 	private static int getToolbarAbsoluteX(int index) {
-		return PADDING + (JDDropdownMenu.DEFAULT_WIDTH + PADDING) * index;
+		return PADDING + (DropdownMenu.DEFAULT_WIDTH + PADDING) * index;
 	}
 }

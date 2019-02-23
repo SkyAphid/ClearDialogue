@@ -5,13 +5,13 @@ import lwjgui.scene.control.Label;
 import lwjgui.theme.Theme;
 import lwjgui.transition.FillTransition;
 
-public class JDSelectableLabel extends Label {
+public class SelectableLabel extends Label {
 	
 	private static final int HIGHLIGHT_SPEED_IN_MILLIS = 200;
 	
 	private boolean clickingEnabled = true;
 	
-	public JDSelectableLabel(String text) {
+	public SelectableLabel(String text) {
 		super(text);
 		setTextFill(Theme.current().getText().copy());
 		

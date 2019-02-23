@@ -42,6 +42,9 @@ public class DialogueConnectorNode extends FloatingPane {
 		this.connector = connector;
 		this.type = type;
 		
+		//for debugging
+		//setBackground(Color.PINK);
+		
 		setAlignment(Pos.CENTER);
 
 		circle = new HalfCircle(type.color.copy(), radius, type.flipped, 50);
@@ -56,6 +59,8 @@ public class DialogueConnectorNode extends FloatingPane {
 			new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, circle.getFill(), type.color);
 			System.out.println(type + " exited");
 		});
+		
+		syncPosition();
 	}
 	
 	/*

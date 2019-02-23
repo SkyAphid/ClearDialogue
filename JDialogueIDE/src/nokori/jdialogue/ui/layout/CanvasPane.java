@@ -5,10 +5,6 @@ import org.lwjgl.glfw.GLFW;
 import lwjgui.Color;
 import lwjgui.event.MouseEvent;
 import lwjgui.scene.Node;
-import lwjgui.scene.control.ContextMenu;
-import lwjgui.scene.control.MenuItem;
-import lwjgui.scene.control.SeparatorMenuItem;
-import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.PannablePane;
 import lwjgui.scene.shape.Rectangle;
 import nokori.jdialogue.project.Connection;
@@ -18,6 +14,9 @@ import nokori.jdialogue.project.DialogueResponse;
 import nokori.jdialogue.project.DialogueText;
 import nokori.jdialogue.project.Project;
 import nokori.jdialogue.ui.SharedResources;
+import nokori.jdialogue.ui.components.dropdown.ContextDropdownMenu;
+import nokori.jdialogue.ui.components.dropdown.DropdownDivider;
+import nokori.jdialogue.ui.components.dropdown.DropdownOption;
 import nokori.jdialogue.ui.dialogue_nodes.ConnectorLineNode;
 import nokori.jdialogue.ui.dialogue_nodes.DialogueNode;
 import nokori.jdialogue.ui.dialogue_nodes.DialogueConnectorNode;
@@ -34,26 +33,25 @@ public class CanvasPane extends PannablePane {
 	
 	private SharedResources sharedResources;
 	
+	public static final String CONTEXT_ADD_DIALOGUE = "";
+	public static final String CONTEXT_ADD_RESPONSE = "";
+	public static final String CONTEXT_CENTER_VIEWPORT = "";
+	
 	public CanvasPane(SharedResources sharedResources) {
 		this.sharedResources = sharedResources;
 		
-		Font sansFont = sharedResources.getTheme().getSansFont();
-		
-		ContextMenu contextMenu = new ContextMenu();
-
 		/*
-		 * Add Nodes
+		 * Add Node options
 		 */
-		MenuItem newDialogueTextNode = new MenuItem("+Text Node", sansFont);
-		newDialogueTextNode.setOnAction(e -> {
+		
+		DropdownOption newDialogueTextNode = new DropdownOption("+Text Node", e -> {
 			DialogueText text = new DialogueText(sharedResources.getProject(), "Dialogue", "No tag", cached_context.getMouseX(), cached_context.getMouseY());
 			DialogueTextNode node = new DialogueTextNode(sharedResources, text);
 			node.setAbsolutePosition(text.getX(), text.getY());
 			sharedResources.addDialogueNode(node);
 		});
 		
-		MenuItem newDialogueResponseNode = new MenuItem("+Response Node", sansFont);
-		newDialogueResponseNode.setOnAction(e -> {
+		DropdownOption newDialogueResponseNode = new DropdownOption("+Response Node", e -> {
 			DialogueResponse text = new DialogueResponse(sharedResources.getProject(), "Response", "", cached_context.getMouseX(), cached_context.getMouseY());
 			DialogueResponseNode node = new DialogueResponseNode(sharedResources, text);
 			node.setAbsolutePosition(text.getX(), text.getY());
@@ -61,24 +59,29 @@ public class CanvasPane extends PannablePane {
 		});
 		
 		/*
-		 * Tools
+		 * Misc. tools
 		 */
 		
-		MenuItem center = new MenuItem("Center Viewport", sansFont);
-		center.setOnAction(e -> {
+		DropdownOption centerViewport = new DropdownOption("Center Viewport", e -> {
 			center();
 		});
-		
+
 		/*
 		 * Configure Context Menu
 		 */
-
-		contextMenu.getItems().addAll(newDialogueTextNode, newDialogueResponseNode, new SeparatorMenuItem(), center);
-		contextMenu.setAutoHide(false);
+		
+		
+		ContextDropdownMenu contextMenu = new ContextDropdownMenu(sharedResources, newDialogueTextNode, newDialogueResponseNode, new DropdownDivider(), centerViewport);
+		
+		setOnMousePressed(e -> {
+			if (contextMenu.isActive() && !contextMenu.isMouseHoveringThis()) {
+				contextMenu.hide();
+			}
+		});
 		
 		setOnMouseClicked(e -> {
-			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-				contextMenu.show(getScene(), cached_context.getMouseX(), cached_context.getMouseY());
+			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !contextMenu.isActive()) {
+				contextMenu.show(e.getMouseX(), e.getMouseY());
 			}
 		});
 		

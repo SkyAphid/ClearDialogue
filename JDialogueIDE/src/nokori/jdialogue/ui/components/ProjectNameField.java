@@ -1,28 +1,37 @@
 package nokori.jdialogue.ui.components;
 
+import lwjgui.Color;
+import lwjgui.font.Font;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
+import lwjgui.scene.control.text_input.TextInputScrollPane;
 import lwjgui.scene.control.text_input.TextField;
-import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
 import nokori.jdialogue.ui.SharedResources;
 
-public class JDProjectNameField extends JDButtonSkeleton {
+public class ProjectNameField extends Button {
 
 	public static final int DEFAULT_WIDTH = 500;
 	
-	public JDProjectNameField(SharedResources sharedResources, int absoluteX, int absoluteY, Font font) {
+	public ProjectNameField(SharedResources sharedResources, int absoluteX, int absoluteY, Font font) {
 		super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, false);
 		
 		Insets padding = new Insets(0, 0, 0, PADDING);
 		
+		//container pane
 		StackPane textFieldContainerPane = new StackPane();
 		textFieldContainerPane.setPadding(padding);
 		textFieldContainerPane.setBackground(null);
 		textFieldContainerPane.setAlignment(Pos.CENTER);
 		
-		TextField textField = new TextField(sharedResources.getProject().getName());
+		//Internal scroll pane
+		TextInputScrollPane internalScrollPane = new TextInputScrollPane();
+		internalScrollPane.setBackground(Color.TRANSPARENT);
+		internalScrollPane.setControlOutlineFill(Color.TRANSPARENT);
+		
+		//Text field
+		TextField textField = new TextField(internalScrollPane, sharedResources.getProject().getName());
 		textField.setPrefWidth(DEFAULT_WIDTH - 20);
 		textField.setFillToParentWidth(true);
 		
@@ -39,14 +48,6 @@ public class JDProjectNameField extends JDButtonSkeleton {
 		textField.setCaretFill(Theme.current().getTextAlt());
 		textField.setCaretFading(true);
 		
-		textField.setOnMousePressed(e -> {
-			System.err.println("Pressed");
-		});
-		
-		textField.setOnMouseClicked(e -> {
-			System.err.println("Click");
-		});
-		
 		textField.setOnTextInput(e -> {
 			sharedResources.getProject().setName(textField.getText());
 		});
@@ -55,5 +56,4 @@ public class JDProjectNameField extends JDButtonSkeleton {
 		
 		getChildren().add(textFieldContainerPane);
 	}
-	
 }

@@ -1,7 +1,7 @@
 package nokori.jdialogue.ui.theme;
 
 import lwjgui.Color;
-import lwjgui.scene.layout.Font;
+import lwjgui.font.Font;
 import lwjgui.theme.ThemeCoral;
 
 public class JDialogueTheme extends ThemeCoral {

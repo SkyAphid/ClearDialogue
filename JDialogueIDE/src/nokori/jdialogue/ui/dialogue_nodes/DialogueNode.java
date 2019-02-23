@@ -8,15 +8,14 @@ import lwjgui.LWJGUIDialog;
 import lwjgui.LWJGUIDialog.DialogIcon;
 import lwjgui.LWJGUIDialog.DialogType;
 import lwjgui.event.MouseEvent;
+import lwjgui.font.Font;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.SeparatorMenuItem;
-import lwjgui.scene.control.text_input.TextArea;
 import lwjgui.scene.control.text_input.TextField;
-import lwjgui.scene.layout.Font;
 import lwjgui.scene.layout.floating.DraggablePane;
 import lwjgui.scene.layout.floating.FloatingPane;
 import lwjgui.scene.shape.DropShadow;
@@ -79,7 +78,7 @@ public abstract class DialogueNode extends DraggablePane {
 		Font sansFont = sharedResources.getTheme().getSansFont();
 		
 		//for debugging
-		setBackground(Color.BLACK);
+		//setBackground(Color.BLACK);
 		
 		/*
 		 * 

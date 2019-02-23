@@ -4,7 +4,7 @@ import lwjgui.Color;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.text_input.TextArea;
-import lwjgui.scene.control.text_input.TextInputControl.TextAreaScrollPane;
+import lwjgui.scene.control.text_input.TextInputScrollPane;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.scene.layout.floating.FloatingPane;
 import nokori.jdialogue.project.Dialogue;
@@ -125,7 +125,7 @@ public class DialogueTextNode extends DialogueNode {
 		textArea.setSelectionOutlineEnabled(false);
 		
 		//Scrollbar customization
-		TextAreaScrollPane s = textArea.getInternalScrollPane();
+		TextInputScrollPane s = textArea.getInternalScrollPane();
 		s.setControlFill(Color.TRANSPARENT);
 		s.setControlOutlineFill(Color.GRAY);
 		s.setSelectionFill(Color.TRANSPARENT);

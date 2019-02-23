@@ -14,7 +14,7 @@ import lwjgui.transition.FillTransition;
  * This class serves as the skeleton for all of the Toolbar buttons on the HUD.
  *
  */
-public class JDButtonSkeleton extends FloatingPane {
+public class Button extends FloatingPane {
 	
 	public static final int DEFAULT_HEIGHT = 50;
 	
@@ -31,9 +31,9 @@ public class JDButtonSkeleton extends FloatingPane {
 	
 	private FillTransition fillTransition = null;
 	
-	private boolean highlighted = false;
+	private boolean highlighting = false;
 	
-	public JDButtonSkeleton(int absoluteX, int absoluteY, int width, int height, boolean backgroundEnabled, boolean highlightingEnabled) {
+	public Button(int absoluteX, int absoluteY, int width, int height, boolean backgroundEnabled, boolean highlightingEnabled) {
 		setAbsolutePosition(absoluteX, absoluteY);
 		setAlignment(Pos.CENTER_LEFT);
 		
@@ -55,8 +55,12 @@ public class JDButtonSkeleton extends FloatingPane {
 
 		setOnMouseEntered(e -> {
 			if (highlightingEnabled) {
-				playHighlightFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Color.WHITE_SMOKE.alpha(0.25f)));
-				highlighted = true;
+				//Only show the highlight if the mouse is in its bounds (that way it doesn't glow in cases where the mouse is over a divider, etc)
+				if (cached_context.isMouseInside(highlight)) {
+					playHighlightFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Color.WHITE_SMOKE.alpha(0.25f)));
+				}
+				
+				highlighting = true;
 			}
 			
 			mouseEntered(e);
@@ -65,7 +69,7 @@ public class JDButtonSkeleton extends FloatingPane {
 		setOnMouseExited(e -> {
 			if (highlightingEnabled) {
 				playHighlightFillTransition(new FillTransition(HIGHLIGHT_SPEED_IN_MILLIS, highlight.getFill(), Color.TRANSPARENT));
-				highlighted = false;
+				highlighting = false;
 			}
 			
 			mouseExited(e);
@@ -74,6 +78,22 @@ public class JDButtonSkeleton extends FloatingPane {
 		setOnMouseClicked(e -> {
 			mouseClicked(e);
 		});
+	}
+	
+	/**
+	 * Modifies the width of the background and dropshadow for this JDButton.
+	 */
+	protected void setWidth(double width) {
+		background.forceWidth(width);
+		dropShadow.forceWidth(width);
+	}
+	
+	/**
+	 * Modifies the height of the background and dropshadow for this JDButton.
+	 */
+	protected void setHeight(double height) {
+		background.forceHeight(height);
+		dropShadow.forceHeight(height);
 	}
 	
 	private void playHighlightFillTransition(FillTransition transition) {
@@ -86,8 +106,8 @@ public class JDButtonSkeleton extends FloatingPane {
 		fillTransition.play();
 	}
 
-	public boolean isHighlighted() {
-		return highlighted;
+	public boolean isHighlighting() {
+		return highlighting;
 	}
 
 	protected void mouseEntered(Event e) {
