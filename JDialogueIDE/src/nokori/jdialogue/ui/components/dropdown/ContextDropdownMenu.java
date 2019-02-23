@@ -6,7 +6,7 @@ public class ContextDropdownMenu extends DropdownMenu {
 
 	private SharedResources sharedResources;
 	
-	private static final int CONTEXT_WIDTH = 150;
+	private static final int CONTEXT_WIDTH = 125;
 	private static final int CONTEXT_HEIGHT = 25;
 	
 	public ContextDropdownMenu(SharedResources sharedResources, DropdownOption...options) {
@@ -16,15 +16,17 @@ public class ContextDropdownMenu extends DropdownMenu {
 	}
 	
 	@Override
-	protected void childOptionSelected(DropdownOption o) {
+	protected void optionSelectedCallback(DropdownOption o) {
 		hide();
 	}
 	
 	public void show(double x, double y) {
-		setAbsolutePosition(x, y);
-		forceHeight(DEFAULT_HEIGHT);
-		setExpanded(true);
-		sharedResources.getCanvasPane().getChildren().add(this);
+		if (!isActive()) {
+			setAbsolutePosition(x, y);
+			forceHeight(DEFAULT_HEIGHT);
+			setExpanded(true);
+			sharedResources.getCanvasPane().getChildren().add(this);
+		}
 	}
 	
 	public void hide() {

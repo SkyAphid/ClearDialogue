@@ -12,9 +12,6 @@ import lwjgui.font.Font;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
-import lwjgui.scene.control.ContextMenu;
-import lwjgui.scene.control.MenuItem;
-import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.text_input.TextField;
 import lwjgui.scene.layout.floating.DraggablePane;
 import lwjgui.scene.layout.floating.FloatingPane;
@@ -26,6 +23,9 @@ import lwjgui.transition.SizeTransition;
 import nokori.jdialogue.project.Dialogue;
 import nokori.jdialogue.project.DialogueConnector;
 import nokori.jdialogue.ui.SharedResources;
+import nokori.jdialogue.ui.components.dropdown.ContextDropdownMenu;
+import nokori.jdialogue.ui.components.dropdown.DropdownDivider;
+import nokori.jdialogue.ui.components.dropdown.DropdownOption;
 import nokori.jdialogue.ui.dialogue_nodes.DialogueConnectorNode.ConnectorType;
 
 public abstract class DialogueNode extends DraggablePane {
@@ -68,7 +68,7 @@ public abstract class DialogueNode extends DraggablePane {
 	private TextField name, tags;
 	
 	//Context menu
-	protected ContextMenu contextMenu = new ContextMenu();
+	protected ContextDropdownMenu contextMenu;
 	
 	public DialogueNode(SharedResources sharedResources, Dialogue dialogue) {
 		this.sharedResources = sharedResources;
@@ -165,8 +165,6 @@ public abstract class DialogueNode extends DraggablePane {
 			dialogue.setTag(tags.getText());
 		});
 		
-		tags.setContextMenu(contextMenu);
-		
 		tagPane.getChildren().add(tags);
 		
 		getChildren().addAll(namePane, tagPane);
@@ -187,41 +185,37 @@ public abstract class DialogueNode extends DraggablePane {
 		 * Context Menu
 		 * 
 		 */
-
-		MenuItem editNode = new MenuItem("Edit Node", sansFont) {
-			@Override
-			public void render(Context context) {
-				if (editing) {
-					setContent("End Editing", sansFont, null);
-				} else {
-					setContent("Edit Node", sansFont, null);
-				}
-				
-				super.render(context);
-			}
-		};
-		editNode.setOnAction(e -> {
+		
+		DropdownOption editNode = new DropdownOption("Edit Node", e -> {
 			setEditing(!editing);
 			setDialogueNodeContextHint();
 		});
-		
-		MenuItem deleteNode = new MenuItem("Delete Node", sansFont);
-		deleteNode.setOnAction(e -> {
+
+		DropdownOption deleteNode = new DropdownOption("Delete Node", e -> {
 			if (LWJGUIDialog.showConfirmDialog("Delete Node", "Are you sure you want to delete this node?", 
 					DialogType.YES_NO, DialogIcon.QUESTION, false)) {
 				
 				sharedResources.removeDialogueNode(this);
 			}
 		});
-		
-		MenuItem toggleSize = new MenuItem("Toggle Size", sansFont);
-		toggleSize.setOnAction(e -> {
+
+		DropdownOption toggleSize = new DropdownOption("Toggle Size", e -> {
 			setEditing(false);
 			setExpanded(!expanded);
 		});
-		
-		contextMenu.getItems().addAll(editNode, deleteNode, new SeparatorMenuItem(), toggleSize);
-		contextMenu.setAutoHide(false);
+
+		contextMenu = new ContextDropdownMenu(sharedResources, editNode, deleteNode, new DropdownDivider(), toggleSize) {
+			@Override
+			public void render(Context context) {
+				if (editing) {
+					editNode.setName("End Editing");
+				} else {
+					editNode.setName("Edit Node");
+				}
+				
+				super.render(context);
+			}
+		};
 
 		/*
 		 * 
@@ -240,12 +234,17 @@ public abstract class DialogueNode extends DraggablePane {
 		});
 		
 		setOnMouseClicked(e -> {
+			//Any node that uses context menus will need to call this 
+			sharedResources.getCanvasPane().hideContextMenus();
+			
+			//Double left click to expand this node
 			if (e.getClickCount() >= 2 && e.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && !editing) {
 				setExpanded(!expanded);
 			}
 			
+			//Right click to open the context menu
 			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-				contextMenu.show(getScene(), cached_context.getMouseX(), cached_context.getMouseY());
+				contextMenu.show(cached_context.getMouseX(), cached_context.getMouseY());
 			}
 		});
 		
@@ -375,11 +374,23 @@ public abstract class DialogueNode extends DraggablePane {
 	
 	private void refreshExpanded() {
 		if (expanded) {
-			new Resizer(200, EXPANDED_WIDTH, EXPANDED_HEIGHT).play();
+			new Resizer(200, EXPANDED_WIDTH, EXPANDED_HEIGHT) {
+				@Override
+				public void completedCallback() {
+					resizeCompleteCallback(expanded);
+				}
+			}.play();
 		} else {
-			new Resizer(200, MINI_WIDTH, MINI_HEIGHT).play();
+			new Resizer(200, MINI_WIDTH, MINI_HEIGHT) {
+				@Override
+				public void completedCallback() {
+					resizeCompleteCallback(expanded);
+				}
+			}.play();
 		}
 	}
+	
+	protected void resizeCompleteCallback(boolean expanded) {}
 	
 	private class Resizer extends SizeTransition {
 

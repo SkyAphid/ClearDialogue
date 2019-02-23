@@ -20,7 +20,7 @@ public class JDialogueIDECore extends LWJGUIProgram {
 		window.setIcon(".png", new File("res/icons/").listFiles());
 		window.getContext().setContextSizeLimits(getDefaultWindowWidth(), getDefaultWindowHeight());
 		
-		new JDialogueIDEDesigner(window, new SharedResources());
+		new JDialogueIDEDesigner(new SharedResources(window));
 	}
 
 	@Override

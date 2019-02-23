@@ -5,7 +5,6 @@ import lwjgui.geometry.Pos;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.text_input.TextArea;
 import lwjgui.scene.control.text_input.TextInputScrollPane;
-import lwjgui.scene.layout.StackPane;
 import lwjgui.scene.layout.floating.FloatingPane;
 import nokori.jdialogue.project.Dialogue;
 import nokori.jdialogue.project.DialogueConnector;
@@ -69,12 +68,6 @@ public class DialogueTextNode extends DialogueNode {
 	}
 	
 	@Override
-	public void setExpanded(boolean expanded) {
-		super.setExpanded(expanded);
-		textArea.getInternalScrollPane().setVisible(expanded);
-	}
-	
-	@Override
 	protected void setEditing(boolean editing) {
 		super.setEditing(editing);
 		textArea.getInternalScrollPane().setVisible(editing);
@@ -89,6 +82,27 @@ public class DialogueTextNode extends DialogueNode {
 		
 		return super.getDialogueNodeConnectorOf(connector);
 	}
+	
+	/*
+	 * Scrollbar visibility
+	 */
+	
+	@Override
+	public void setExpanded(boolean expanded) {
+		super.setExpanded(expanded);
+		
+		//Set visibility to false as soon as the node starts to resize so that we don't get weird artifacts as it contracts
+		if (!expanded) {
+			textArea.getInternalScrollPane().setVisible(expanded);
+		}
+	}
+	
+	@Override
+	protected void resizeCompleteCallback(boolean expanded) {
+		//Only set it to visible AFTER its expanded to prevent graphical artifacts
+		textArea.getInternalScrollPane().setVisible(expanded);
+	}
+	
 	
 	/*
 	 * 
@@ -131,8 +145,5 @@ public class DialogueTextNode extends DialogueNode {
 		s.setSelectionFill(Color.TRANSPARENT);
 		s.setSelectionPassiveFill(Color.TRANSPARENT);
 		s.setVisible(expanded);
-		
-		//Context menu
-		textArea.setContextMenu(contextMenu);
 	}
 }

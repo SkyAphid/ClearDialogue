@@ -1,5 +1,6 @@
 package nokori.jdialogue.ui;
 
+import lwjgui.scene.Window;
 import lwjgui.theme.Theme;
 import nokori.jdialogue.project.Project;
 import nokori.jdialogue.ui.dialogue_nodes.DialogueNode;
@@ -10,13 +11,17 @@ import nokori.jdialogue.ui.theme.JDialogueTheme;
  * This is a pass-around class that allows JDialogue to communicate data around the program, such as the current project, context hints, etc.
  */
 public class SharedResources {
+	private Window window;
+	
 	private JDialogueTheme theme;
 	private CanvasPane canvasPane;
 	private String contextHint;
 	
 	private Project project = new Project();
 	
-	public SharedResources() {
+	public SharedResources(Window window) {
+		this.window = window;
+		
 		theme = new JDialogueTheme();
 		Theme.setTheme(theme);
 		
@@ -25,6 +30,10 @@ public class SharedResources {
 		resetContextHint();
 	}
 	
+	public Window getWindow() {
+		return window;
+	}
+
 	/**
 	 * Gets the current color theme for LWJGUI.
 	 * @return

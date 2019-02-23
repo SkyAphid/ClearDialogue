@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import lwjgui.Color;
 import lwjgui.event.MouseEvent;
+import lwjgui.event.listener.MouseButtonListener;
 import lwjgui.scene.Node;
 import lwjgui.scene.layout.floating.PannablePane;
 import lwjgui.scene.shape.Rectangle;
@@ -67,20 +68,25 @@ public class CanvasPane extends PannablePane {
 		});
 
 		/*
-		 * Configure Context Menu
+		 * Configure Context Menus
 		 */
 		
-		
-		ContextDropdownMenu contextMenu = new ContextDropdownMenu(sharedResources, newDialogueTextNode, newDialogueResponseNode, new DropdownDivider(), centerViewport);
-		
-		setOnMousePressed(e -> {
-			if (contextMenu.isActive() && !contextMenu.isMouseHoveringThis()) {
-				contextMenu.hide();
+		//Add context menu hiding to the window itself that way they'll be hidden regardless of where the click comes from.
+		//We add it in this class particularly because context menus are going to be children of this pane specifically.
+		sharedResources.getWindow().addEventListener(new MouseButtonListener() {
+			@Override
+			public void invoke(long window, int button, int downup, int modifier) {
+				if (downup == GLFW.GLFW_PRESS) {
+					hideContextMenus();
+				}
 			}
 		});
 		
+		//Create the context menu for this pane
+		ContextDropdownMenu contextMenu = new ContextDropdownMenu(sharedResources, newDialogueTextNode, newDialogueResponseNode, new DropdownDivider(), centerViewport);
+
 		setOnMouseClicked(e -> {
-			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !contextMenu.isActive()) {
+			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
 				contextMenu.show(e.getMouseX(), e.getMouseY());
 			}
 		});
@@ -90,6 +96,23 @@ public class CanvasPane extends PannablePane {
 		 */
 		
 		clear();
+	}
+	
+	/**
+	 * Finds and hides context menus if applicable. This is meant to be called from setOnMousePressed().
+	 */
+	public void hideContextMenus() {
+		for (int i = 0; i < getChildren().size(); i++) {
+			Node n = getChildren().get(i);
+			
+			if (n instanceof ContextDropdownMenu) {
+				ContextDropdownMenu m = (ContextDropdownMenu) n;
+				
+				if (m.isActive() && !m.isMouseHoveringThis()) {
+					m.hide();
+				}
+			}
+		}
 	}
 	
 	/**

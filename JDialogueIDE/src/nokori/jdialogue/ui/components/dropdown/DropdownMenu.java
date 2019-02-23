@@ -6,6 +6,7 @@ import lwjgui.font.Font;
 import lwjgui.font.FontStyle;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
+import lwjgui.scene.Context;
 import lwjgui.scene.Node;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.shape.Rectangle;
@@ -112,7 +113,7 @@ public class DropdownMenu extends Button {
 	 * 
 	 * @param o - the option selected
 	 */
-	protected void childOptionSelected(DropdownOption o) {
+	protected void optionSelectedCallback(DropdownOption o) {
 		
 	}
 	
@@ -196,6 +197,7 @@ public class DropdownMenu extends Button {
 		
 		private DropdownMenu parent;
 		private int index;
+		private DropdownOption option;
 		
 		private Color fill;
 		private Label label;
@@ -206,6 +208,7 @@ public class DropdownMenu extends Button {
 			super(-1, -1, parent.optionWidth, parent.optionHeight, false, option.highlightable);
 			this.parent = parent;
 			this.index = index;
+			this.option = option;
 			
 			fill = Theme.current().getTextAlt().copy();
 			
@@ -224,8 +227,8 @@ public class DropdownMenu extends Button {
 			}
 			
 			setOnMouseClicked(e -> {
-				parent.childOptionSelected(option);
-				option.h.select(e);
+				parent.optionSelectedCallback(option);
+				option.optionSelectHandler.select(e);
 			});
 			
 			pos();
@@ -242,6 +245,15 @@ public class DropdownMenu extends Button {
 		public void position(Node parent) {
 			pos();
 			super.position(parent);
+		}
+		
+		@Override
+		public void render(Context context) {
+			if (label != null) {
+				label.setText(option.name);
+			}
+			
+			super.render(context);
 		}
 	}
 	

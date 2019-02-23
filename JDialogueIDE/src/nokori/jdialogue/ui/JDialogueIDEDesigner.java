@@ -37,7 +37,8 @@ public class JDialogueIDEDesigner {
 	
 	private static final int PADDING = 10;
 	
-	public JDialogueIDEDesigner(Window window, SharedResources sharedResources) {
+	public JDialogueIDEDesigner(SharedResources sharedResources) {
+		Window window = sharedResources.getWindow();
 		Scene scene = window.getScene();
 
 		/*
@@ -58,10 +59,10 @@ public class JDialogueIDEDesigner {
 		rootPane.getChildren().add(sharedResources.getCanvasPane());
 		
 		//Create HUD (toolbar, etc)
-		createHUD(window, sharedResources, rootPane);
+		createHUD(sharedResources, rootPane);
 	}
 	
-	private void createHUD(Window window, SharedResources sharedResources, StackPane rootPane) {
+	private void createHUD(SharedResources sharedResources, StackPane rootPane) {
 		
 		Font sansFont = sharedResources.getTheme().getSansFont();
 		
