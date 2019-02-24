@@ -1,6 +1,5 @@
 package nokori.jdialogue.ui.components;
 
-import lwjgui.Color;
 import lwjgui.font.Font;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
@@ -27,8 +26,8 @@ public class ProjectNameField extends Button {
 		
 		//Internal scroll pane
 		TextInputScrollPane internalScrollPane = new TextInputScrollPane();
-		internalScrollPane.setBackground(Color.TRANSPARENT);
-		internalScrollPane.setControlOutlineFill(Color.TRANSPARENT);
+		internalScrollPane.setBackground(null);
+		internalScrollPane.setOutlineEnabled(false);
 		
 		//Text field
 		TextField textField = new TextField(internalScrollPane, sharedResources.getProject().getName());

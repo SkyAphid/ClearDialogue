@@ -12,7 +12,7 @@ public class JDialogueIDECore extends LWJGUIProgram {
 	public static final String PROGRAM_DEVELOPER = "NOKORI•WARE";
 
 	public static void main(String args[]) {
-		LWJGUIProgram.start(new JDialogueIDECore(), args);
+		LWJGUIProgram.launch(args);
 	}
 
 	@Override

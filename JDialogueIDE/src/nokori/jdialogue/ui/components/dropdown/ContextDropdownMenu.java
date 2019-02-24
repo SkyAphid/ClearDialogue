@@ -39,6 +39,6 @@ public class ContextDropdownMenu extends DropdownMenu {
 	}
 	
 	public boolean isMouseHoveringThis() {
-		return (cached_context.isMouseInside(this));
+		return (cached_context != null && cached_context.isMouseInside(this));
 	}
 }

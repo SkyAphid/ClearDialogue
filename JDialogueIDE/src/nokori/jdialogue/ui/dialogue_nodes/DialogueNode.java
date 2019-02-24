@@ -78,7 +78,7 @@ public abstract class DialogueNode extends DraggablePane {
 		Font sansFont = sharedResources.getTheme().getSansFont();
 		
 		//for debugging
-		//setBackground(Color.BLACK);
+		setBackground(Color.BLACK);
 		
 		/*
 		 * 
