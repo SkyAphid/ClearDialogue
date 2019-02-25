@@ -2,21 +2,21 @@ package nokori.jdialogue.ui;
 
 import java.io.File;
 
-import lwjgui.LWJGUIProgram;
+import lwjgui.LWJGUIApplication;
 import lwjgui.scene.Window;
 
-public class JDialogueIDECore extends LWJGUIProgram {
+public class JDialogueIDECore extends LWJGUIApplication {
 	
 	public static final String PROGRAM_NAME = "JDialogue";
 	public static final String PROGRAM_VERSION = "Rev. 10";
 	public static final String PROGRAM_DEVELOPER = "NOKORI•WARE";
 
 	public static void main(String args[]) {
-		LWJGUIProgram.launch(args);
+		launch(args);
 	}
-
+	
 	@Override
-	public void init(String[] args, Window window) {
+	public void start(String[] args, Window window) {
 		window.setIcon(".png", new File("res/icons/").listFiles());
 		window.getContext().setContextSizeLimits(getDefaultWindowWidth(), getDefaultWindowHeight());
 		
