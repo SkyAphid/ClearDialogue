@@ -1,6 +1,5 @@
 package nokori.jdialogue.ui;
 
-import java.awt.Desktop;
 import java.net.URL;
 
 import lwjgui.Color;
@@ -90,17 +89,17 @@ public class JDialogueIDEDesigner {
 		SelectableLabel programInformation = new SelectableLabel(PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER) {
 			@Override
 			protected void mouseClicked(Event e) {
-				try {
+				/*try {
 					Desktop.getDesktop().browse(new URL("https://github.com/SkyAphid/JDialogue").toURI());
 				} catch (Exception ex) {
 					ex.printStackTrace();
-				}
+				}*/
 			}
 		};
 		programInformation.setFont(sansFont);
 		programInformation.setFontSize(fontSize);
 		programInformation.setFontStyle(FontStyle.LIGHT);
-		programInformation.setClickingEnabled(Desktop.isDesktopSupported());
+		//programInformation.setClickingEnabled(Desktop.isDesktopSupported());
 		
 		uiPaneBottom.getChildren().add(programInformation);
 		
