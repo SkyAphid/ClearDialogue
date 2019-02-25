@@ -1,5 +1,6 @@
 package nokori.jdialogue.ui.components;
 
+import lwjgui.Color;
 import lwjgui.font.Font;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
@@ -17,6 +18,8 @@ public class ProjectNameField extends Button {
 		super(absoluteX, absoluteY, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, false);
 		
 		Insets padding = new Insets(0, 0, 0, PADDING);
+		
+		this.setAlignment(Pos.CENTER);
 		
 		//container pane
 		StackPane textFieldContainerPane = new StackPane();
