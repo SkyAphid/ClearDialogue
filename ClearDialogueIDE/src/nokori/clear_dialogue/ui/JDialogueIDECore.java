@@ -9,7 +9,6 @@ import nokori.clear.windows.GLFWException;
 import nokori.clear.windows.Window;
 import nokori.clear.windows.WindowManager;
 
-
 public class JDialogueIDECore extends ClearApplication {
 	
 	public static final String PROGRAM_NAME = "JDialogue";
