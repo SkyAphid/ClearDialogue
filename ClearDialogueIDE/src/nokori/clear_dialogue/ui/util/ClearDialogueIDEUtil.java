@@ -8,15 +8,15 @@ import java.util.Properties;
 
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear.windows.util.TinyFileDialog.Icon;
-import nokori.clear_dialogue.io.JDialogueIO;
+import nokori.clear_dialogue.io.ClearDialogueIO;
 import nokori.clear_dialogue.project.Project;
 
-public class JDialogueIDEUtil {
+public class ClearDialogueIDEUtil {
 	
 	/**
 	 * Opens a project import dialogue using the given JDialogue I/O system and returns the loaded project. If the project fails to load, null will be returned instead.
 	 */
-	public static Project showImportProjectDialog(String title, JDialogueIO io) {
+	public static Project showImportProjectDialog(String title, ClearDialogueIO io) {
 		String filetype = io.getTypeName();
 		
 		String filterDescription = filetype + " Files";
@@ -35,7 +35,7 @@ public class JDialogueIDEUtil {
 		return null;
 	}
 	
-	public static void showExportProjectDialog(Project project, JDialogueIO io) {
+	public static void showExportProjectDialog(Project project, ClearDialogueIO io) {
 		String filetype = io.getTypeName();
 		
 		String title = "Export " + io.getTypeName() + " Project";

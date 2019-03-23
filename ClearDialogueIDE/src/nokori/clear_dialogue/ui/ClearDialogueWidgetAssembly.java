@@ -9,7 +9,7 @@ import nokori.clear_dialogue.ui.widget.CDDropdownMenuTool;
 import nokori.clear_dialogue.ui.widget.CDGitRepoLink;
 import nokori.clear_dialogue.ui.widget.CDTextFieldProjectName;
 
-public class JDialogueWidgetAssembly extends WidgetAssembly {
+public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	
 	public static final int WIDGET_PADDING = 10;
 	
@@ -20,7 +20,7 @@ public class JDialogueWidgetAssembly extends WidgetAssembly {
 	public static final int CONTEXT_HINTS_FONT_SIZE = 28;
 	
 	
-	public JDialogueWidgetAssembly() {
+	public ClearDialogueWidgetAssembly() {
 		super();
 	}
 	

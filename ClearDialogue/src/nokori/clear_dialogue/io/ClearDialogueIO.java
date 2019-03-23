@@ -4,7 +4,7 @@ import java.io.File;
 
 import nokori.clear_dialogue.project.Project;
 
-public interface JDialogueIO {
+public interface ClearDialogueIO {
 	/**
 	 * Export functionality.
 	 */

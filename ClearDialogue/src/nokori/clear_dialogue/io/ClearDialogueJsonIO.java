@@ -29,7 +29,7 @@ import nokori.clear_dialogue.project.DialogueResponse.Response;
 import nokori.clear_dialogue.throwable.FailedToFindConnectorsException;
 import nokori.clear_dialogue.throwable.FailedToInstantiateNodeException;
 
-public class JDialogueJsonIO implements JDialogueIO{
+public class ClearDialogueJsonIO implements ClearDialogueIO{
 
 	/*
 	 * Project JSON tags

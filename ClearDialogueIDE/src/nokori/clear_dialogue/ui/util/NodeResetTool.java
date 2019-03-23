@@ -3,7 +3,7 @@ package nokori.clear_dialogue.ui.util;
 import java.io.File;
 
 import nokori.clear.windows.util.TinyFileDialog;
-import nokori.clear_dialogue.io.JDialogueJsonIO;
+import nokori.clear_dialogue.io.ClearDialogueJsonIO;
 import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.Project;
 
@@ -20,7 +20,7 @@ public class NodeResetTool {
 	}
 	
 	private void recursiveLoad(File[] files) {
-		JDialogueJsonIO io = new JDialogueJsonIO();
+		ClearDialogueJsonIO io = new ClearDialogueJsonIO();
 		
 		for (int i = 0; i < files.length; i++) {
 			File f = files[i];

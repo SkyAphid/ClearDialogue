@@ -9,10 +9,10 @@ import nokori.clear.windows.GLFWException;
 import nokori.clear.windows.Window;
 import nokori.clear.windows.WindowManager;
 
-public class JDialogueIDECore extends ClearApplication {
+public class ClearDialogueIDECore extends ClearApplication {
 	
-	public static final String PROGRAM_NAME = "JDialogue";
-	public static final String PROGRAM_VERSION = "Rev. 10";
+	public static final String PROGRAM_NAME = "ClearDialogue";
+	public static final String PROGRAM_VERSION = "Rev. 1";
 	public static final String PROGRAM_DEVELOPER = "NOKORI•WARE";
 	
 	public static final String PROGRAM_NAME_FULL = PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER;
@@ -21,11 +21,11 @@ public class JDialogueIDECore extends ClearApplication {
 	public static final int DEFAULT_WINDOW_HEIGHT = 720;
 
 	public static void main(String args[]) {
-		launch(new JDialogueIDECore(), args);
+		launch(new ClearDialogueIDECore(), args);
 	}
 
-	public JDialogueIDECore() {
-		super(new JDialogueWidgetAssembly());
+	public ClearDialogueIDECore() {
+		super(new ClearDialogueWidgetAssembly());
 	}
 	
 	@Override
@@ -41,7 +41,7 @@ public class JDialogueIDECore extends ClearApplication {
 		 * Initialize JDialogueWidgetAssembly (the user-interface)
 		 */
 		
-		JDialogueWidgetAssembly root = (JDialogueWidgetAssembly) rootWidgetAssembly;
+		ClearDialogueWidgetAssembly root = (ClearDialogueWidgetAssembly) rootWidgetAssembly;
 		root.init(sharedResources);
 	}
 

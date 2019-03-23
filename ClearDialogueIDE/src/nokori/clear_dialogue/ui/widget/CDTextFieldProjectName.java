@@ -1,6 +1,6 @@
 package nokori.clear_dialogue.ui.widget;
 
-import static nokori.clear_dialogue.ui.JDialogueWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
 
 import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.SharedResources;
