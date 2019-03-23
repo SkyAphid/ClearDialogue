@@ -11,7 +11,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/LWJGUI"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JDialogue"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ClearDialogue"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ClearVG"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ClearWindows"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
