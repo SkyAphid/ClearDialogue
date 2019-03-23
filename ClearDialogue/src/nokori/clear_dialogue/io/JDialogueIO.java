@@ -5,9 +5,11 @@ import java.io.File;
 import nokori.clear_dialogue.project.Project;
 
 public interface JDialogueIO {
+	
 	/**
 	 * Export functionality.
 	 */
+	
 	public void exportProject(Project project, File f) throws Exception;
 	
 	/**
