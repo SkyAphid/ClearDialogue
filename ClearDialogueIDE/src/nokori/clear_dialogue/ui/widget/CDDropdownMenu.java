@@ -11,9 +11,7 @@ import nokori.clear.vg.widget.LabelWidget;
 public abstract class CDDropdownMenu extends CDButton {
 	
 	public static final int WIDTH = 200;
-	
-	private boolean highlighted = false;
-	
+
 	/*
 	 * Options
 	 */
@@ -62,17 +60,12 @@ public abstract class CDDropdownMenu extends CDButton {
 		 * Dropdown Expansion
 		 */
 		
-		setOnMouseMotionEvent(e -> {
-			boolean bHighlighted = highlighted;
-			highlighted = isPointWithinThisWidget(e.getMouseX(), e.getMouseY());
-			
-			if (!bHighlighted && highlighted) {
-				expand();
-			}
-			
-			if (bHighlighted && !highlighted) {
-				collapse();
-			}
+		setOnMouseEnteredEvent(e -> {
+			expand();
+		});
+		
+		setOnMouseExitedEvent(e -> {
+			collapse();
 		});
 	}
 	

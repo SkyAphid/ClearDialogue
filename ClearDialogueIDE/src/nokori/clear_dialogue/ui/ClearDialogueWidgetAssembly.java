@@ -13,10 +13,10 @@ public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	
 	public static final int WIDGET_PADDING = 10;
 	
-	public static final ClearColor TOOLBAR_TEXT_FILL = ClearColor.WHITE_SMOKE;
+	public static final ClearColor TOOLBAR_TEXT_FILL = ClearColor.WHITE_SMOKE.copy();
 	public static final int TOOLBAR_FONT_SIZE = 28;
 	
-	public static final ClearColor CONTEXT_HINTS_TEXT_FILL = ClearColor.GRAY;
+	public static final ClearColor CONTEXT_HINTS_TEXT_FILL = ClearColor.GRAY.copy();
 	public static final int CONTEXT_HINTS_FONT_SIZE = 28;
 	
 	

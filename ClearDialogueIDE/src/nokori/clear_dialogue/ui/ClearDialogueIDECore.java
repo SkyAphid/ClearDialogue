@@ -15,7 +15,7 @@ public class ClearDialogueIDECore extends ClearApplication {
 	public static final String PROGRAM_VERSION = "Rev. 1";
 	public static final String PROGRAM_DEVELOPER = "NOKORI•WARE";
 	
-	public static final String PROGRAM_NAME_FULL = PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER;
+	public static final String PROGRAM_INFORMATION = PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER;
 	
 	public static final int DEFAULT_WINDOW_WIDTH = 1280;
 	public static final int DEFAULT_WINDOW_HEIGHT = 720;
