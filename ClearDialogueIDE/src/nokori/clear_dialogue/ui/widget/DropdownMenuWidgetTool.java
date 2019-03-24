@@ -4,7 +4,7 @@ import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
 
 import nokori.clear_dialogue.ui.SharedResources;
 
-public class CDDropdownMenuTool extends CDDropdownMenu {
+public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 
 	private static final String LABEL = "TOOL";
 	
@@ -16,7 +16,7 @@ public class CDDropdownMenuTool extends CDDropdownMenu {
 		"SET SYNTAX..."
 	};
 	
-	public CDDropdownMenuTool(SharedResources sharedResources) {
+	public DropdownMenuWidgetTool(SharedResources sharedResources) {
 		super(getToolbarAbsoluteX(1), WIDGET_PADDING, sharedResources.getNotoSans(), LABEL, OPTIONS);
 	}
 

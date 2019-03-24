@@ -4,25 +4,52 @@ import java.io.IOException;
 
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.font.Font;
+import nokori.clear.vg.widget.assembly.WidgetContainer;
 import nokori.clear_dialogue.project.Project;
 
 /**
  * This is a pass-around class that allows JDialogue to communicate data around the program, such as the current project, context hints, etc.
  */
 public class SharedResources {
-	private String contextHint;
-	
+
+	/*
+	 * Dialogue Data
+	 */
 	private Project project = new Project();
 	
+	/*
+	 * GUI Data
+	 */
+	
 	private Font notoSans, notoSerif;
+	private String contextHint;
+	private WidgetContainer toolbar, canvas;
 	
 	public void init(NanoVGContext context) {
+		resetContextHint();
+		
 		try {
 			notoSans = new Font("res/fonts/NotoSans/", "NotoSans-Regular", "NotoSans-Bold", "NotoSans-Italic", "NotoSans-Light").load(context);
 			notoSerif = new Font("res/fonts/NotoSerif/", "NotoSerif-Regular", "NotoSerif-Bold", "NotoSerif-Italic", "NotoSerif-Light").load(context);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public WidgetContainer getToolbar() {
+		return toolbar;
+	}
+
+	public void setToolbar(WidgetContainer toolbar) {
+		this.toolbar = toolbar;
+	}
+
+	public WidgetContainer getCanvas() {
+		return canvas;
+	}
+
+	public void setCanvas(WidgetContainer canvas) {
+		this.canvas = canvas;
 	}
 
 	/**

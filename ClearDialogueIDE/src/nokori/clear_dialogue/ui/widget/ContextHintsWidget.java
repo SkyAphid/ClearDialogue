@@ -1,0 +1,42 @@
+package nokori.clear_dialogue.ui.widget;
+
+import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
+
+import nokori.clear.vg.NanoVGContext;
+import nokori.clear.vg.font.FontStyle;
+import nokori.clear.vg.transition.FillTransition;
+import nokori.clear.vg.widget.LabelWidget;
+import nokori.clear.vg.widget.assembly.WidgetAssembly;
+import nokori.clear.vg.widget.assembly.WidgetClip;
+import nokori.clear_dialogue.ui.SharedResources;
+import nokori.clear.windows.Window;
+import nokori.clear.windows.WindowManager;
+
+public class ContextHintsWidget extends LabelWidget {
+	
+	public static final int CONTEXT_HINT_X_OFFSET = 400;
+	
+	private SharedResources sharedResources;
+	
+	public ContextHintsWidget(SharedResources sharedResources) {
+		super(CONTEXT_HINTS_TEXT_FILL.copy(), sharedResources.getContextHint(), sharedResources.getNotoSans(), FontStyle.LIGHT, CONTEXT_HINTS_FONT_SIZE);
+		this.sharedResources = sharedResources;
+		addChild(new WidgetClip(WidgetClip.Alignment.BOTTOM_LEFT, WIDGET_PADDING + CONTEXT_HINT_X_OFFSET, -WIDGET_PADDING));
+	}
+
+	@Override
+	public void tick(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+		super.tick(windowManager, window, context, rootWidgetAssembly);
+		
+		String contextHint = sharedResources.getContextHint();
+		
+		if (!getText().equals(contextHint)) {
+			getFill().alpha(0f);
+			setText(sharedResources.getContextHint());
+			
+			FillTransition t = new FillTransition(200, getFill(), CONTEXT_HINTS_TEXT_FILL);
+			t.setLinkedObject(this);
+			t.play();
+		}
+	}
+}

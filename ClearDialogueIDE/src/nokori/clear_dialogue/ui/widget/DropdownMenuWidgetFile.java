@@ -4,7 +4,7 @@ import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
 
 import nokori.clear_dialogue.ui.SharedResources;
 
-public class CDDropdownMenuFile extends CDDropdownMenu {
+public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 
 	private static final String LABEL = "FILE";
 	
@@ -16,7 +16,7 @@ public class CDDropdownMenuFile extends CDDropdownMenu {
 		"IMPORT JSON..."
 	};
 	
-	public CDDropdownMenuFile(SharedResources sharedResources) {
+	public DropdownMenuWidgetFile(SharedResources sharedResources) {
 		super(getToolbarAbsoluteX(0), WIDGET_PADDING, sharedResources.getNotoSans(), LABEL, OPTIONS);
 	}
 

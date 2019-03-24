@@ -4,7 +4,7 @@ import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
 
 import nokori.clear_dialogue.ui.SharedResources;
 
-public class CDDropdownMenuNode extends CDDropdownMenu {
+public class DropdownMenuWidgetNode extends DropdownMenuWidget {
 
 	private static final String LABEL = "+NODE";
 	
@@ -13,7 +13,7 @@ public class CDDropdownMenuNode extends CDDropdownMenu {
 		"RESPONSE",
 	};
 	
-	public CDDropdownMenuNode(SharedResources sharedResources) {
+	public DropdownMenuWidgetNode(SharedResources sharedResources) {
 		super(getToolbarAbsoluteX(2), WIDGET_PADDING, sharedResources.getNotoSans(), LABEL, OPTIONS);
 	}
 

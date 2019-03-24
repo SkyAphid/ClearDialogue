@@ -10,13 +10,13 @@ import nokori.clear.vg.widget.assembly.WidgetClip;
 import nokori.clear.windows.Window;
 import nokori.clear.windows.WindowManager;
 
-public class CDButton extends Widget {
+public class ButtonWidget extends WidgetAssembly {
 
 	public static final int HEIGHT = 50;
 	public static final int WIDGET_CLIP_X_PADDING = 20;
 	public static final int WIDGET_CLIP_Y_PADDING = 10;
 
-	public CDButton(float x, float y, float width) {
+	public ButtonWidget(float x, float y, float width) {
 		super(x, y, width, HEIGHT);
 
 		float cornerRadius = 3f;

@@ -5,6 +5,7 @@ import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
 import java.io.IOException;
 
 import nokori.clear.vg.ClearColor;
+import nokori.clear.vg.ClearStaticResources;
 import nokori.clear.vg.font.FontStyle;
 import nokori.clear.vg.transition.FillTransition;
 import nokori.clear.vg.widget.LabelWidget;
@@ -15,28 +16,34 @@ import nokori.clear.windows.util.TinyFileDialog.Icon;
 import nokori.clear_dialogue.ui.ClearDialogueIDECore;
 import nokori.clear_dialogue.ui.SharedResources;
 
-public class CDGitRepoLink extends LabelWidget {
+import nokori.clear.windows.Cursor.Type;
+
+public class GitRepoLinkWidget extends LabelWidget {
 	
-	public CDGitRepoLink(SharedResources sharedResources) {
+	public GitRepoLinkWidget(SharedResources sharedResources) {
 		super(CONTEXT_HINTS_TEXT_FILL.copy(), ClearDialogueIDECore.PROGRAM_INFORMATION, sharedResources.getNotoSans(), FontStyle.LIGHT, CONTEXT_HINTS_FONT_SIZE);
 		addChild(new WidgetClip(WidgetClip.Alignment.BOTTOM_LEFT, WIDGET_PADDING, -WIDGET_PADDING));
 		
 		setOnMouseEnteredEvent(e -> {
 			new FillTransition(200, getFill(), ClearColor.CORAL).play();
+			ClearStaticResources.getCursor(Type.HAND).apply(e.getWindow());
 		});
 		
 		setOnMouseExitedEvent(e -> {
 			new FillTransition(200, getFill(), CONTEXT_HINTS_TEXT_FILL).play();
+			ClearStaticResources.getCursor(Type.ARROW).apply(e.getWindow());
 		});
 		
 		setOnMouseButtonEvent(e -> {
-			String projectRepoURL = "https://github.com/SkyAphid/ClearDialogue";
-			
-			try {
-				ClearUtil.openURLInBrowser(projectRepoURL);
-			} catch (IOException e1) {
-				TinyFileDialog.showMessageDialog(ClearDialogueIDECore.PROGRAM_NAME + " About", ClearDialogueIDECore.PROGRAM_INFORMATION + "\n" + projectRepoURL, Icon.INFORMATION);
-				e1.printStackTrace();
+			if (isMouseWithinThisWidget()) {
+				String projectRepoURL = "https://github.com/SkyAphid/ClearDialogue";
+				
+				try {
+					ClearUtil.openURLInBrowser(projectRepoURL);
+				} catch (IOException e1) {
+					TinyFileDialog.showMessageDialog(ClearDialogueIDECore.PROGRAM_NAME + " About", ClearDialogueIDECore.PROGRAM_INFORMATION + "\n" + projectRepoURL, Icon.INFORMATION);
+					e1.printStackTrace();
+				}
 			}
 		});
 	}
