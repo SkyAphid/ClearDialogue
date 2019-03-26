@@ -19,14 +19,29 @@ public class DialogueResponse extends Dialogue {
 	 */
 	private ArrayList<Response> responses = new ArrayList<Response>();
 	
-	public DialogueResponse(Project project, String uid, String name, String tag, double x, double y, boolean expanded) {
+	public DialogueResponse(Project project, String uid, String name, String tag, float x, float y, boolean expanded) {
 		super(project, uid, name, tag, x, y, expanded);
 	}
 	
-	public DialogueResponse(Project project, String name, String tag, double x, double y) {
+	public DialogueResponse(Project project, String name, String tag, float x, float y) {
 		super(project, name, tag, x, y);
 
 		addResponse("Default Response");
+	}
+	
+	@Override
+	public String getRenderableContent() {
+		StringBuilder s = new StringBuilder();
+		
+		for (int i = 0; i < responses.size(); i++) {
+			if (i > 0) {
+				s.append("\n");
+			}
+			
+			s.append(responses.get(i));
+		}
+		
+		return s.toString();
 	}
 	
 	@Override

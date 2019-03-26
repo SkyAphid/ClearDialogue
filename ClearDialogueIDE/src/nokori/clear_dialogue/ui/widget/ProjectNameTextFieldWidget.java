@@ -20,7 +20,7 @@ public class ProjectNameTextFieldWidget extends ButtonWidget {
 		Project project = sharedResources.getProject();
 		Font font = sharedResources.getNotoSans();
 
-		TextFieldWidget field = new TextFieldWidget(getWidth() - (WIDGET_CLIP_X_PADDING * 3), getHeight() - 20, TOOLBAR_TEXT_FILL, project.getName(), font, TOOLBAR_FONT_SIZE);
+		TextFieldWidget field = new TextFieldWidget(getWidth() - (WIDGET_CLIP_X_PADDING * 3), TOOLBAR_TEXT_FILL, project.getName(), font, TOOLBAR_FONT_SIZE);
 		field.setHighlightFill(HIGHLIGHT_COLOR);
 		addJDButtonWidgetClip(field);
 		addChild(field);

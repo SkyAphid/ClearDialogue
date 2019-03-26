@@ -243,8 +243,8 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			String name = nodeObject.getString(JSON_NAME);
 			String tag = nodeObject.getString(JSON_TAG);
 
-			double nodeX = nodeObject.getJsonNumber(JSON_NODE_X).doubleValue();
-			double nodeY = nodeObject.getJsonNumber(JSON_NODE_Y).doubleValue();
+			float nodeX = (float) nodeObject.getJsonNumber(JSON_NODE_X).doubleValue();
+			float nodeY = (float) nodeObject.getJsonNumber(JSON_NODE_Y).doubleValue();
 			
 			boolean expanded = nodeObject.getBoolean(JSON_EXPANDED);
 

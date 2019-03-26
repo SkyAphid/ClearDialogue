@@ -22,7 +22,7 @@ public abstract class Dialogue implements Serializable {
 	//Basic user-settable information
 	private String name;
 	private String tag;
-	private double x, y;
+	private float x, y;
 	private boolean expanded = false;
 	
 	//Connector so that other nodes can input into this one
@@ -32,7 +32,7 @@ public abstract class Dialogue implements Serializable {
 	 * This constructor allows you to input the UID as well, for in cases where you're trying to load a copy of a dialogue node from a file.
 	 * 
 	 */
-	public Dialogue(Project project, String uid, String name, String tag, double x, double y, boolean expanded) {
+	public Dialogue(Project project, String uid, String name, String tag, float x, float y, boolean expanded) {
 		this.project = project;
 		this.uid = uid;
 		this.name = name;
@@ -45,7 +45,7 @@ public abstract class Dialogue implements Serializable {
 	/**
 	 * This constructor is used for making a brand new dialogue node. A UID is generated automatically.
 	 */
-	public Dialogue(Project project, String name, String tag, double x, double y) {
+	public Dialogue(Project project, String name, String tag, float x, float y) {
 		this.project = project;
 		this.name = name;
 		this.tag = tag;
@@ -56,6 +56,11 @@ public abstract class Dialogue implements Serializable {
 		
 		inConnector = new DialogueConnector(project, this);
 	}
+	
+	/**
+	 * @return the text content of this Dialogue in a single string format that can be easily rendered.
+	 */
+	public abstract String getRenderableContent();
 	
 	public Project getProject() {
 		return project;
@@ -81,24 +86,24 @@ public abstract class Dialogue implements Serializable {
 		this.tag = tag;
 	}
 	
-	public void setPosition(double x, double y) {
+	public void setPosition(float x, float y) {
 		setX(x);
 		setY(y);
 	}
 	
-	public double getX() {
+	public float getX() {
 		return x;
 	}
 
-	public void setX(double x) {
+	public void setX(float x) {
 		this.x = x;
 	}
 
-	public double getY() {
+	public float getY() {
 		return y;
 	}
 	
-	public void setY(double y) {
+	public void setY(float y) {
 		this.y = y;
 	}
 

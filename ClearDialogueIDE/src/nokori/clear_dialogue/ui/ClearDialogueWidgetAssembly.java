@@ -1,8 +1,11 @@
 package nokori.clear_dialogue.ui;
 
 import nokori.clear.vg.ClearColor;
+import nokori.clear.vg.widget.assembly.DraggableWidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetContainer;
+import nokori.clear_dialogue.project.Dialogue;
+import nokori.clear_dialogue.project.DialogueText;
 import nokori.clear_dialogue.ui.widget.ContextHintsWidget;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidget;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetFile;
@@ -10,6 +13,7 @@ import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetNode;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetTool;
 import nokori.clear_dialogue.ui.widget.GitRepoLinkWidget;
 import nokori.clear_dialogue.ui.widget.ProjectNameTextFieldWidget;
+import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget;
 
 public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	
@@ -34,10 +38,17 @@ public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	}
 	
 	private void initCanvas(SharedResources sharedResources) {
-		WidgetContainer canvas = new WidgetContainer();
+		DraggableWidgetAssembly canvas = new DraggableWidgetAssembly();
+		
+		//
+		DialogueText dialogue = new DialogueText(sharedResources.getProject(), "Test Title Test Title Test Title", "Tag Tag Tag Tag Tag Tag", 500, 500);
+		dialogue.setText("Content Content Content Content Content Content Content Content Content Content Content Content Content Content Content");
+		
+		DraggableDialogueWidget test = new DraggableDialogueWidget(sharedResources, dialogue);
+		canvas.addChild(test);
 		
 		//Finalize
-		addChildren(canvas);
+		addChild(canvas);
 		sharedResources.setCanvas(canvas);
 	}
 	
@@ -56,7 +67,7 @@ public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 		toolbar.addChild(new ContextHintsWidget(sharedResources));
 		
 		//Finalize
-		addChildren(toolbar);
+		addAllChildrenOfContainer(toolbar);
 		sharedResources.setToolbar(toolbar);
 	}
 	

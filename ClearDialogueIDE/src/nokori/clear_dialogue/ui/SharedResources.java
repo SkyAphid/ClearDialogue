@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.font.Font;
+import nokori.clear.vg.widget.assembly.DraggableWidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetContainer;
 import nokori.clear_dialogue.project.Project;
 
@@ -12,6 +13,8 @@ import nokori.clear_dialogue.project.Project;
  */
 public class SharedResources {
 
+	private NanoVGContext context;
+	
 	/*
 	 * Dialogue Data
 	 */
@@ -23,9 +26,12 @@ public class SharedResources {
 	
 	private Font notoSans, notoSerif;
 	private String contextHint;
-	private WidgetContainer toolbar, canvas;
+	private WidgetContainer toolbar;
+	private DraggableWidgetAssembly canvas;
 	
 	public void init(NanoVGContext context) {
+		this.context = context;
+		
 		resetContextHint();
 		
 		try {
@@ -36,6 +42,10 @@ public class SharedResources {
 		}
 	}
 	
+	public NanoVGContext getNanoVGContext() {
+		return context;
+	}
+
 	public WidgetContainer getToolbar() {
 		return toolbar;
 	}
@@ -44,11 +54,11 @@ public class SharedResources {
 		this.toolbar = toolbar;
 	}
 
-	public WidgetContainer getCanvas() {
+	public DraggableWidgetAssembly getCanvas() {
 		return canvas;
 	}
 
-	public void setCanvas(WidgetContainer canvas) {
+	public void setCanvas(DraggableWidgetAssembly canvas) {
 		this.canvas = canvas;
 	}
 
