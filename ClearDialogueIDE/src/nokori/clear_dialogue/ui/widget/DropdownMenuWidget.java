@@ -56,17 +56,22 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			optionHighlight.setInputEnabled(false);
 			
 			optionHighlight.setOnMouseButtonEvent(e -> {
-				if (isMouseWithinThisWidget() && e.isPressed()) {
-					optionSelected(options[index], index);	
+				if (ClearStaticResources.canFocus(this)) {
+					if (optionHighlight.isMouseWithinThisWidget() && !e.isPressed()) {
+						optionSelected(options[index], index);	
+					}
 				}
 			});
 			
 			optionHighlight.setOnMouseEnteredEvent(e -> {
-				ClearStaticResources.getCursor(Cursor.Type.HAND).apply(e.getWindow());
+				if (ClearStaticResources.canFocus(this)) {
+					FillTransition fadeIn = new FillTransition(200, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0.25f));
+					fadeIn.setLinkedObject(optionHighlight);
+					fadeIn.play();
 					
-				FillTransition fadeIn = new FillTransition(200, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0.25f));
-				fadeIn.setLinkedObject(optionHighlight);
-				fadeIn.play();
+					ClearStaticResources.getCursor(Cursor.Type.HAND).apply(e.getWindow());
+					ClearStaticResources.setFocusedWidget(this);
+				}
 			});
 			
 			optionHighlight.setOnMouseExitedEvent(e -> {
@@ -74,8 +79,13 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 				fadeOut.setLinkedObject(optionHighlight);
 				fadeOut.play();
 				
+				//The event check is for instances where the exited event is manually fired.
 				if (e != null) {
 					resetCursor(e.getWindow());
+				}
+				
+				if (ClearStaticResources.isFocused(this)) {
+					ClearStaticResources.setFocusedWidget(null);
 				}
 			});
 			
@@ -102,11 +112,13 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 		 * Dropdown Expansion
 		 */
 		
-		setOnMouseEnteredEvent(e -> {
-			expand();
+		setOnInternalMouseEnteredEvent(e -> {
+			if (ClearStaticResources.canFocus(this)) {
+				expand();
+			}
 		});
 		
-		setOnMouseExitedEvent(e -> {
+		setOnInternalMouseExitedEvent(e -> {
 			collapse(e.getWindow());
 		});
 	}
@@ -122,7 +134,9 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			}
 		}
 		
-		ClearStaticResources.getCursor(Cursor.Type.ARROW).apply(window);
+		if (!ClearStaticResources.isHoveringWidget()) {
+			ClearStaticResources.getCursor(Cursor.Type.ARROW).apply(window);
+		}
 	}
 	
 	private void expand() {

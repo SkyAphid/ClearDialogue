@@ -38,10 +38,33 @@ public class DialogueResponse extends Dialogue {
 				s.append("\n");
 			}
 			
-			s.append(responses.get(i));
+			s.append(responses.get(i).getText());
 		}
 		
 		return s.toString();
+	}
+	
+	@Override
+	public void parseAndSetContent(String content) {
+		String[] s = content.split("\n");
+		
+		//Add the new content (overwriting text on existing responses in matching indices so that connections can be reused)
+		for (int i = 0; i < s.length; i++) {
+			if (responses.size() < i) {
+				responses.get(i).setText(s[i]);
+			} else {
+				addResponse(s[i]);
+			}
+		}
+		
+		//Remove responses outside the range of the new content
+		if (s.length < responses.size()) {
+			for (int i = s.length; i < responses.size(); i++) {
+				responses.get(i).getOutConnector().disconnectAll();
+				responses.remove(i);
+				i--;
+			}
+		}
 	}
 	
 	@Override
@@ -117,7 +140,7 @@ public class DialogueResponse extends Dialogue {
 
 	@Override
 	public Dialogue duplicate() {
-		DialogueResponse node = new DialogueResponse(getProject(), getName(), getTag(), getX(), getY());
+		DialogueResponse node = new DialogueResponse(getProject(), getTitle(), getTag(), getX(), getY());
 		node.responses.addAll(responses);
 		return node;
 	}

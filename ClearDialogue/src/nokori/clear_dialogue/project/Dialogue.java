@@ -20,7 +20,7 @@ public abstract class Dialogue implements Serializable {
 	private String uid = new UID().toString();
 	
 	//Basic user-settable information
-	private String name;
+	private String title;
 	private String tag;
 	private float x, y;
 	private boolean expanded = false;
@@ -32,10 +32,10 @@ public abstract class Dialogue implements Serializable {
 	 * This constructor allows you to input the UID as well, for in cases where you're trying to load a copy of a dialogue node from a file.
 	 * 
 	 */
-	public Dialogue(Project project, String uid, String name, String tag, float x, float y, boolean expanded) {
+	public Dialogue(Project project, String uid, String title, String tag, float x, float y, boolean expanded) {
 		this.project = project;
 		this.uid = uid;
-		this.name = name;
+		this.title = title;
 		this.tag = tag;
 		this.x = x;
 		this.y = y;
@@ -45,9 +45,9 @@ public abstract class Dialogue implements Serializable {
 	/**
 	 * This constructor is used for making a brand new dialogue node. A UID is generated automatically.
 	 */
-	public Dialogue(Project project, String name, String tag, float x, float y) {
+	public Dialogue(Project project, String title, String tag, float x, float y) {
 		this.project = project;
-		this.name = name;
+		this.title = title;
 		this.tag = tag;
 		this.x = x;
 		this.y = y;
@@ -62,6 +62,12 @@ public abstract class Dialogue implements Serializable {
 	 */
 	public abstract String getRenderableContent();
 	
+	/**
+	 * The given content will be parsed into assignable data for this specific Dialogue implementation.
+	 * @param content
+	 */
+	public abstract void parseAndSetContent(String content);
+	
 	public Project getProject() {
 		return project;
 	}
@@ -70,12 +76,12 @@ public abstract class Dialogue implements Serializable {
 		return uid;
 	}
 	
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getTag() {

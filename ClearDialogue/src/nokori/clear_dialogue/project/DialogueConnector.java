@@ -59,7 +59,7 @@ public class DialogueConnector implements Serializable {
 				project.addConnection(new Connection(this, connector));
 			}
 		}else {
-			throw new NullConnectorError(parent.getName());
+			throw new NullConnectorError(parent.getTitle());
 		}
 	}
 	

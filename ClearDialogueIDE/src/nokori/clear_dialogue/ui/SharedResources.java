@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.font.Font;
-import nokori.clear.vg.widget.assembly.DraggableWidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetContainer;
+import nokori.clear.windows.Window;
 import nokori.clear_dialogue.project.Project;
 
 /**
@@ -13,6 +13,7 @@ import nokori.clear_dialogue.project.Project;
  */
 public class SharedResources {
 
+	private Window window;
 	private NanoVGContext context;
 	
 	/*
@@ -27,9 +28,10 @@ public class SharedResources {
 	private Font notoSans, notoSerif;
 	private String contextHint;
 	private WidgetContainer toolbar;
-	private DraggableWidgetAssembly canvas;
+	private ClearDialogueCanvas canvas;
 	
-	public void init(NanoVGContext context) {
+	public void init(Window window, NanoVGContext context) {
+		this.window = window;
 		this.context = context;
 		
 		resetContextHint();
@@ -42,6 +44,10 @@ public class SharedResources {
 		}
 	}
 	
+	public Window getWindow() {
+		return window;
+	}
+
 	public NanoVGContext getNanoVGContext() {
 		return context;
 	}
@@ -54,11 +60,11 @@ public class SharedResources {
 		this.toolbar = toolbar;
 	}
 
-	public DraggableWidgetAssembly getCanvas() {
+	public ClearDialogueCanvas getCanvas() {
 		return canvas;
 	}
 
-	public void setCanvas(DraggableWidgetAssembly canvas) {
+	public void setCanvas(ClearDialogueCanvas canvas) {
 		this.canvas = canvas;
 	}
 
@@ -82,7 +88,7 @@ public class SharedResources {
 	 * Resets the context hint back to the general controls for navigating the canvas.
 	 */
 	public void resetContextHint() {
-		contextHint = "Drag LMB = Pan Canvas | RMB = Context Menu";
+		contextHint = "Drag LMB = Pan Canvas & Drag Nodes";
 	}
 
 	/**

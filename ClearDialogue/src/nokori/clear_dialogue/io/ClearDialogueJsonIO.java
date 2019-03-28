@@ -106,7 +106,7 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			
 			//Record basic data
 			nodeBuilder.add(JSON_UID, node.getUID());
-			nodeBuilder.add(JSON_NAME, node.getName());
+			nodeBuilder.add(JSON_NAME, node.getTitle());
 			nodeBuilder.add(JSON_TAG, node.getTag());
 			
 			nodeBuilder.add(JSON_NODE_X, node.getX());

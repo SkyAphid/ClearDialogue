@@ -32,6 +32,11 @@ public class DialogueText extends Dialogue {
 		return text;
 	}
 
+	@Override
+	public void parseAndSetContent(String content) {
+		text = content;
+	}
+	
 	public String getText() {
 		return text;
 	}
@@ -65,7 +70,7 @@ public class DialogueText extends Dialogue {
 
 	@Override
 	public Dialogue duplicate() {
-		DialogueText node = new DialogueText(getProject(), getName(), getTag(), getX(), getY());
+		DialogueText node = new DialogueText(getProject(), getTitle(), getTag(), getX(), getY());
 		node.text = text;
 		return node;
 	}

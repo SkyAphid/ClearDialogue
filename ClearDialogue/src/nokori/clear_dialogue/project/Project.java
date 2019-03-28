@@ -141,7 +141,7 @@ public class Project implements Serializable {
 
 			@Override
 			public boolean check(Dialogue node) {
-				String nodeName = node.getName();
+				String nodeName = node.getTitle();
 				
 				boolean hasName = (exactMatch ? nodeName.equals(name) : nodeName.contains(name));
 				

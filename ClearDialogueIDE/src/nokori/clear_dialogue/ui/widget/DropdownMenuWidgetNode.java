@@ -8,18 +8,31 @@ public class DropdownMenuWidgetNode extends DropdownMenuWidget {
 
 	private static final String LABEL = "+NODE";
 	
+	private static final String OPTION_DIALOGUE = "+DIALOGUE";
+	private static final String OPTION_RESPONSE = "+RESPONSE";
+	
 	private static final String[] OPTIONS = {
-		"DIALOGUE",
-		"RESPONSE",
+		OPTION_DIALOGUE,
+		OPTION_RESPONSE
 	};
+	
+	private SharedResources sharedResources;
 	
 	public DropdownMenuWidgetNode(SharedResources sharedResources) {
 		super(getToolbarAbsoluteX(2), WIDGET_PADDING, sharedResources.getNotoSans(), LABEL, OPTIONS);
+		this.sharedResources = sharedResources;
 	}
 
 	@Override
 	protected void optionSelected(String option, int index) {
-		System.out.println(option + " " + index);
+		switch(option) {
+		case OPTION_DIALOGUE:
+			sharedResources.getCanvas().addDialogueTextNode();
+			break;
+		case OPTION_RESPONSE:
+			sharedResources.getCanvas().addDialogueResponseNode();
+			break;
+		}
 	}
 
 }

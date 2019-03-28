@@ -35,7 +35,7 @@ public class ClearDialogueIDECore extends ClearApplication {
 		 */
 		
 		SharedResources sharedResources = new SharedResources();
-		sharedResources.init(context);
+		sharedResources.init(window, context);
 		
 		/*
 		 * Initialize JDialogueWidgetAssembly (the user-interface)
