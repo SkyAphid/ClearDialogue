@@ -21,19 +21,19 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		Project project = sharedResources.getProject();
 
 		DialogueText dialogue = new DialogueText(project, "New Dialogue " + project.getNumDialogue(), "", getNewDialogueX(), getNewDialogueY());
+		project.addDialogue(dialogue);
 		
 		DraggableDialogueTextWidget widget = new DraggableDialogueTextWidget(sharedResources, dialogue);
-		
 		addChild(widget);
 	}
 	
 	public void addDialogueResponseNode() {
 		Project project = sharedResources.getProject();
 		
-		DialogueResponse dialogue = new DialogueResponse(project, "New Response " + project.getNumDialogue(), "", getNewDialogueX(), getNewDialogueY());
+		DialogueResponse response = new DialogueResponse(project, "New Response " + project.getNumDialogue(), "", getNewDialogueX(), getNewDialogueY());
+		project.addDialogue(response);
 		
-		DraggableDialogueResponseWidget widget = new DraggableDialogueResponseWidget(sharedResources, dialogue);
-		
+		DraggableDialogueResponseWidget widget = new DraggableDialogueResponseWidget(sharedResources, response);
 		addChild(widget);
 	}
 	
