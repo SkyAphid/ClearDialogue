@@ -25,7 +25,7 @@ public class ButtonWidget extends WidgetAssembly {
 	}
 	
 	protected void addJDButtonWidgetClip(Widget widget) {
-		widget.addChild(new WidgetClip(WidgetClip.Alignment.UPPER_LEFT, WIDGET_CLIP_X_PADDING, WIDGET_CLIP_Y_PADDING));
+		widget.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, WIDGET_CLIP_X_PADDING, WIDGET_CLIP_Y_PADDING));
 	}
 
 	@Override

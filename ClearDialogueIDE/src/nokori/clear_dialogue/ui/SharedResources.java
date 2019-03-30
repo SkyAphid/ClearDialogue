@@ -7,6 +7,7 @@ import nokori.clear.vg.font.Font;
 import nokori.clear.vg.widget.assembly.WidgetContainer;
 import nokori.clear.windows.Window;
 import nokori.clear_dialogue.project.Project;
+import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 
 /**
  * This is a pass-around class that allows JDialogue to communicate data around the program, such as the current project, context hints, etc.
@@ -29,6 +30,7 @@ public class SharedResources {
 	private String contextHint;
 	private WidgetContainer toolbar;
 	private ClearDialogueCanvas canvas;
+	private ConnectionRendererWidget connectionRenderer;
 	
 	public void init(Window window, NanoVGContext context) {
 		this.window = window;
@@ -66,6 +68,14 @@ public class SharedResources {
 
 	public void setCanvas(ClearDialogueCanvas canvas) {
 		this.canvas = canvas;
+	}
+
+	public ConnectionRendererWidget getConnectionRenderer() {
+		return connectionRenderer;
+	}
+
+	public void setConnectionRenderer(ConnectionRendererWidget connectionRenderer) {
+		this.connectionRenderer = connectionRenderer;
 	}
 
 	/**

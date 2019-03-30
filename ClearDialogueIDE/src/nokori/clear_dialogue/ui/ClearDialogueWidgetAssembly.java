@@ -3,6 +3,7 @@ package nokori.clear_dialogue.ui;
 import nokori.clear.vg.ClearColor;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetContainer;
+import nokori.clear.vg.widget.assembly.WidgetSynch;
 import nokori.clear_dialogue.ui.widget.ContextHintsWidget;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidget;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetFile;
@@ -10,6 +11,7 @@ import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetNode;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetTool;
 import nokori.clear_dialogue.ui.widget.GitRepoLinkWidget;
 import nokori.clear_dialogue.ui.widget.ProjectNameTextFieldWidget;
+import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 
 public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	
@@ -25,12 +27,19 @@ public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	
 	
 	public ClearDialogueWidgetAssembly() {
-		super(true);
+		super(new WidgetSynch());
 	}
 	
 	public void init(SharedResources sharedResources) {
+		initConnectionRenderer(sharedResources);
 		initCanvas(sharedResources);
 		initToolbar(sharedResources);
+	}
+	
+	private void initConnectionRenderer(SharedResources sharedResources) {
+		ConnectionRendererWidget connectionRenderer = new ConnectionRendererWidget(sharedResources);
+		addChild(connectionRenderer);
+		sharedResources.setConnectionRenderer(connectionRenderer);
 	}
 	
 	private void initCanvas(SharedResources sharedResources) {

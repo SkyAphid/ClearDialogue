@@ -18,6 +18,7 @@ import nokori.clear.windows.Window;
 import nokori.clear.windows.event.MouseButtonEvent;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear_dialogue.project.Dialogue;
+import nokori.clear_dialogue.project.DialogueConnector;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.widget.node.ConnectorWidget.ConnectorType;
 
@@ -96,6 +97,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	protected ConnectorWidget inConnector;
 	
+	private static final long CLICK_TIME = 250;
 	private long lastLeftClickTime = -1L;
 	private long lastRightClickTime = -1L;
 	
@@ -129,8 +131,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		float textWidth = mode.getWidth() - (xPadding * 2f);
 		
 		//Title
-		title = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTitle(), sharedResources.getNotoSans(), 22);
-		title.addChild(new WidgetClip(WidgetClip.Alignment.UPPER_LEFT, xPadding, yPadding));
+		title = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTitle(), sharedResources.getNotoSans(), 24);
+		title.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, yPadding));
 		title.addChild(new TextFieldSynch(false, xPadding, yPadding));
 		
 		title.setOnKeyEvent(e -> {
@@ -138,8 +140,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		});
 		
 		//Tags
-		tags = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTitle(), sharedResources.getNotoSans(), 18);
-		tags.addChild(new WidgetClip(WidgetClip.Alignment.UPPER_LEFT, xPadding, title.getHeight() + yPadding + widgetPadding));
+		tags = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTitle(), sharedResources.getNotoSans(), 20);
+		tags.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, title.getHeight() + yPadding + widgetPadding));
 		tags.addChild(new TextFieldSynch(false, xPadding, yPadding));
 		
 		tags.setOnKeyEvent(e -> {
@@ -149,27 +151,27 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		//Content
 		float contentY = title.getHeight() + tags.getHeight() + yPadding + (widgetPadding * 2f);
 
-		content = new TextAreaWidget(xPadding, contentY, textWidth, 0f, TEXT_COLOR, dialogue.getRenderableContent(), sharedResources.getNotoSerif(), 18);
+		content = new TextAreaWidget(xPadding, contentY, textWidth, 0f, TEXT_COLOR, dialogue.getRenderableContent(), sharedResources.getNotoSerif(), 22);
 		content.setLineNumbersEnabled(false);
 		content.setLineSplitOverrideEnabled(true);
 		content.setLineSplitOverrideWidth(Mode.EDITING.getWidth());
 		content.addChild(new TextFieldSynch(true, xPadding, yPadding));
 		
 		content.setOnKeyEvent(e -> {
-			dialogue.parseAndSetContent(content.getTextBuilder().toString());
+			keyEventCallback();
 		});
 		
 		/*
 		 * In-Connector
 		 */
 		
-		inConnector = new ConnectorWidget(this, ConnectorType.IN);
+		inConnector = new ConnectorWidget(dialogue.getInConnector(), ConnectorType.IN);
 		
 		/*
 		 * Finalize
 		 */
 		
-		addChild(dropShadow, background, highlight, title, tags, content, inConnector);
+		addChild(dropShadow, inConnector, background, highlight, title, tags, content);
 		
 		/*
 		 * Input callbacks
@@ -215,19 +217,37 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		return dialogue;
 	}
 	
+	public ConnectorWidget findConnectorWidget(DialogueConnector connector) {
+		for (int i = 0; i < getNumChildren(); i++) {
+			if (getChild(i) instanceof ConnectorWidget) {
+				ConnectorWidget w = (ConnectorWidget) getChild(i);
+				
+				if (w.getConnector() == connector) {
+					return w;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	protected float getMinWidth() {
-		return Mode.COLLAPSED.getWidth();
+		return (mode != Mode.DELETION ? Mode.COLLAPSED.getWidth() : 0f);
 	}
 	
 	protected float getMinHeight() {
-		return Mode.COLLAPSED.getHeight();
+		return (mode != Mode.DELETION ? Mode.COLLAPSED.getHeight() : 0f);
 	}
-
+	
+	protected void keyEventCallback() {
+		dialogue.parseAndSetContent(content.getTextBuilder().toString());
+	}
+	
 	public void leftClickCommands(MouseButtonEvent e) {
 		long clickTime = e.getTimestamp();
 
 		if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			if (lastLeftClickTime != -1 && TimeUnit.NANOSECONDS.toMillis(clickTime - lastLeftClickTime) < 500) {
+			if (lastLeftClickTime != -1 && TimeUnit.NANOSECONDS.toMillis(clickTime - lastLeftClickTime) <= CLICK_TIME) {
 				
 				//Switch between expanded and collapsed mode
 				if (mode == Mode.COLLAPSED) {
@@ -248,14 +268,15 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		long clickTime = e.getTimestamp();
 
 		if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-			if (lastRightClickTime != -1 && TimeUnit.NANOSECONDS.toMillis(clickTime - lastRightClickTime) < 500) {
+			if (lastRightClickTime != -1 && TimeUnit.NANOSECONDS.toMillis(clickTime - lastRightClickTime) <= CLICK_TIME) {
 				
 				if (sharedResources.getWindow().isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-					//Delete this node
-					if (TinyFileDialog.showConfirmDialog("Delete Dialogue", "Are you sure you want to delete " + dialogue.getTitle() + "?\nThis cannot be undone.",
+					if (TinyFileDialog.showConfirmDialog("Delete Dialogue", 
+							"Are you sure you want to delete " + dialogue.getTitle() + "?\nThis cannot be undone.",
 							TinyFileDialog.InputType.YES_NO, TinyFileDialog.Icon.QUESTION, false)) {
 						
-						transitionMode(Mode.DELETION);
+						delete();
+						
 					}
 				} else {
 					//Switch between editing and the last selected mode
@@ -269,6 +290,15 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			
 			lastRightClickTime = clickTime;
 		}
+	}
+	
+	public void delete() {
+		transitionMode(Mode.DELETION);
+		fadeOutConnector(inConnector);
+	}
+	
+	protected void fadeOutConnector(ConnectorWidget connector) {
+		new FillTransition(200, connector.getFill(), connector.getFill().copy().alpha(0f)).play();
 	}
 
 	/**
@@ -308,7 +338,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		}
 		
 		@Override
-		protected void synch(Window window) {
+		public void synch(Window window) {
 			setXOffset(xPadding);
 			setWOffset(-(xPadding * 2f));
 			super.synch(window);
