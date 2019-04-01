@@ -1,6 +1,7 @@
 package nokori.clear_dialogue.ui.widget;
 
-import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueTheme.*;
 
 import java.io.IOException;
 
@@ -25,12 +26,12 @@ public class GitRepoLinkWidget extends LabelWidget {
 		addChild(new WidgetClip(WidgetClip.Alignment.BOTTOM_LEFT, WIDGET_PADDING, -WIDGET_PADDING));
 		
 		setOnMouseEnteredEvent(e -> {
-			new FillTransition(200, getFill(), ClearColor.CORAL).play();
+			new FillTransition(TRANSITION_DURATION, getFill(), ClearColor.CORAL).play();
 			ClearStaticResources.getCursor(Type.HAND).apply(e.getWindow());
 		});
 		
 		setOnMouseExitedEvent(e -> {
-			new FillTransition(200, getFill(), CONTEXT_HINTS_TEXT_FILL).play();
+			new FillTransition(TRANSITION_DURATION, getFill(), CONTEXT_HINTS_TEXT_FILL).play();
 			ClearStaticResources.getCursor(Type.ARROW).apply(e.getWindow());
 		});
 		

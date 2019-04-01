@@ -13,7 +13,6 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	private SharedResources sharedResources;
 	
 	public ClearDialogueCanvas(SharedResources sharedResources) {
-		super();
 		this.sharedResources = sharedResources;
 	}
 	
@@ -43,6 +42,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	}
 	
 	private float getNewDialogueX() {
+		System.err.println(parent + " " + parent.getWidth());
 		return parent.getWidth()/2 - DraggableDialogueWidget.DEFAULT_MODE.getWidth()/2;
 	}
 	

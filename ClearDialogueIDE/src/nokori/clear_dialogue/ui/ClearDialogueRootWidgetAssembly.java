@@ -1,8 +1,8 @@
 package nokori.clear_dialogue.ui;
 
 import nokori.clear.vg.ClearColor;
+import nokori.clear.vg.widget.assembly.RootWidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
-import nokori.clear.vg.widget.assembly.WidgetContainer;
 import nokori.clear.vg.widget.assembly.WidgetSynch;
 import nokori.clear_dialogue.ui.widget.ContextHintsWidget;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidget;
@@ -13,7 +13,10 @@ import nokori.clear_dialogue.ui.widget.GitRepoLinkWidget;
 import nokori.clear_dialogue.ui.widget.ProjectNameTextFieldWidget;
 import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 
-public class ClearDialogueWidgetAssembly extends WidgetAssembly {
+/**
+ * This class is the RootWidgetAssembly for the ClearDialogueIDE, acting as the center of all of the user-interface components.
+ */
+public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 	
 	public static final int WIDGET_PADDING = 10;
 	
@@ -24,12 +27,7 @@ public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	
 	public static final ClearColor CONTEXT_HINTS_TEXT_FILL = ClearColor.GRAY;
 	public static final int CONTEXT_HINTS_FONT_SIZE = 24;
-	
-	
-	public ClearDialogueWidgetAssembly() {
-		super(new WidgetSynch());
-	}
-	
+
 	public void init(SharedResources sharedResources) {
 		initConnectionRenderer(sharedResources);
 		initCanvas(sharedResources);
@@ -52,7 +50,8 @@ public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 	
 	private void initToolbar(SharedResources sharedResources) {
 		//We'll group the toolbar widgets together with this container.
-		WidgetContainer toolbar = new WidgetContainer();
+		WidgetAssembly toolbar = new WidgetAssembly();
+		toolbar.addChild(new WidgetSynch(WidgetSynch.Mode.WITH_PARENT));
 		
 		//Toolbar
 		toolbar.addChild(new DropdownMenuWidgetFile(sharedResources));
@@ -65,7 +64,7 @@ public class ClearDialogueWidgetAssembly extends WidgetAssembly {
 		toolbar.addChild(new ContextHintsWidget(sharedResources));
 		
 		//Finalize
-		addAllChildrenOfContainer(toolbar);
+		addChild(toolbar);
 		sharedResources.setToolbar(toolbar);
 	}
 	

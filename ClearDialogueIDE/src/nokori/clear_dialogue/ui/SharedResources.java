@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.font.Font;
-import nokori.clear.vg.widget.assembly.WidgetContainer;
+import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.windows.Window;
 import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
@@ -16,6 +16,7 @@ public class SharedResources {
 
 	private Window window;
 	private NanoVGContext context;
+	private WidgetAssembly rootWidgetAssembly;
 	
 	/*
 	 * Dialogue Data
@@ -28,13 +29,15 @@ public class SharedResources {
 	
 	private Font notoSans, notoSerif;
 	private String contextHint;
-	private WidgetContainer toolbar;
+
+	private WidgetAssembly toolbar;
 	private ClearDialogueCanvas canvas;
 	private ConnectionRendererWidget connectionRenderer;
 	
-	public void init(Window window, NanoVGContext context) {
+	public void init(Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
 		this.window = window;
 		this.context = context;
+		this.rootWidgetAssembly = rootWidgetAssembly;
 		
 		resetContextHint();
 		
@@ -53,12 +56,16 @@ public class SharedResources {
 	public NanoVGContext getNanoVGContext() {
 		return context;
 	}
+	
+	public WidgetAssembly getRootWidgetAssembly() {
+		return rootWidgetAssembly;
+	}
 
-	public WidgetContainer getToolbar() {
+	public WidgetAssembly getToolbar() {
 		return toolbar;
 	}
 
-	public void setToolbar(WidgetContainer toolbar) {
+	public void setToolbar(WidgetAssembly toolbar) {
 		this.toolbar = toolbar;
 	}
 
@@ -77,7 +84,7 @@ public class SharedResources {
 	public void setConnectionRenderer(ConnectionRendererWidget connectionRenderer) {
 		this.connectionRenderer = connectionRenderer;
 	}
-
+	
 	/**
 	 * Gets the current context hint visible at the bottom of the screen. Context hints give contextual information on how to use the IDE.
 	 * @return

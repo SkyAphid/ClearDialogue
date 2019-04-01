@@ -1,6 +1,6 @@
 package nokori.clear_dialogue.ui.widget;
 
-import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
 
 import nokori.clear.vg.ClearColor;
 import nokori.clear.vg.font.Font;

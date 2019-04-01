@@ -25,7 +25,7 @@ public class ClearDialogueIDECore extends ClearApplication {
 	}
 
 	public ClearDialogueIDECore() {
-		super(new ClearDialogueWidgetAssembly());
+		super(new ClearDialogueRootWidgetAssembly());
 	}
 	
 	@Override
@@ -35,13 +35,13 @@ public class ClearDialogueIDECore extends ClearApplication {
 		 */
 		
 		SharedResources sharedResources = new SharedResources();
-		sharedResources.init(window, context);
+		sharedResources.init(window, context, rootWidgetAssembly);
 		
 		/*
 		 * Initialize JDialogueWidgetAssembly (the user-interface)
 		 */
 		
-		ClearDialogueWidgetAssembly root = (ClearDialogueWidgetAssembly) rootWidgetAssembly;
+		ClearDialogueRootWidgetAssembly root = (ClearDialogueRootWidgetAssembly) rootWidgetAssembly;
 		root.init(sharedResources);
 	}
 

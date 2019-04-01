@@ -9,7 +9,10 @@ import nokori.clear.vg.widget.HalfCircleWidget;
 import nokori.clear.vg.widget.assembly.Widget;
 import nokori.clear.vg.widget.assembly.WidgetClip;
 import nokori.clear.windows.Window;
+import nokori.clear.windows.Cursor.Type;
 import nokori.clear_dialogue.project.DialogueConnector;
+
+import static nokori.clear_dialogue.ui.ClearDialogueTheme.*;
 
 public class ConnectorWidget extends HalfCircleWidget {
 	public static final int CONNECTOR_RADIUS = 20;
@@ -62,11 +65,21 @@ public class ConnectorWidget extends HalfCircleWidget {
 		}
 		
 		setOnMouseEnteredEvent(e -> {
-			new FillTransition(200, getFill(), connectorType.color.multiply(1.2f)).play();
+			new FillTransition(TRANSITION_DURATION, getFill(), connectorType.color.multiply(1.2f)).play();
+			
+			if (!ClearStaticResources.isHoveringWidget()) {
+				ClearStaticResources.getCursor(Type.HAND).apply(e.getWindow());
+				ClearStaticResources.setHoveringWidget(ConnectorWidget.this);
+			}
 		});
 		
 		setOnMouseExitedEvent(e -> {
-			new FillTransition(200, getFill(), connectorType.color).play();
+			new FillTransition(TRANSITION_DURATION, getFill(), connectorType.color).play();
+			
+			if (ClearStaticResources.getHoveringWidget() == ConnectorWidget.this) {
+				ClearStaticResources.getCursor(Type.ARROW).apply(e.getWindow());
+				ClearStaticResources.setHoveringWidget(null);
+			}
 		});
 		
 		setOnMouseButtonEvent(e -> {

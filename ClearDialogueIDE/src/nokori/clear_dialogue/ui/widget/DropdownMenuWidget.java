@@ -1,12 +1,13 @@
 package nokori.clear_dialogue.ui.widget;
 
-import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueTheme.*;
 
 import nokori.clear.vg.ClearStaticResources;
 import nokori.clear.vg.font.Font;
 import nokori.clear.vg.font.FontStyle;
 import nokori.clear.vg.transition.FillTransition;
-import nokori.clear.vg.transition.SizeTransition;
+import nokori.clear.vg.transition.WidgetSizeTransition;
 import nokori.clear.vg.widget.LabelWidget;
 import nokori.clear.vg.widget.RectangleWidget;
 import nokori.clear.windows.Cursor;
@@ -20,7 +21,6 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	 * Options
 	 */
 	
-	private static final int OPTION_FADE_TIME = 200;
 	private LabelWidget[] optionLabels;
 	private RectangleWidget[] optionHighlights;
 
@@ -58,6 +58,9 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			optionHighlight.setOnMouseButtonEvent(e -> {
 				if (ClearStaticResources.canFocus(this)) {
 					if (optionHighlight.isMouseWithinThisWidget() && !e.isPressed()) {
+						ClearStaticResources.clearFocusIfApplicable(this);
+						resetCursor(e.getWindow());
+						collapse(e.getWindow());
 						optionSelected(options[index], index);	
 					}
 				}
@@ -65,7 +68,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			
 			optionHighlight.setOnMouseEnteredEvent(e -> {
 				if (ClearStaticResources.canFocus(this)) {
-					FillTransition fadeIn = new FillTransition(200, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0.25f));
+					FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0.25f));
 					fadeIn.setLinkedObject(optionHighlight);
 					fadeIn.play();
 					
@@ -75,7 +78,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			});
 			
 			optionHighlight.setOnMouseExitedEvent(e -> {
-				FillTransition fadeOut = new FillTransition(200, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0f));
+				FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0f));
 				fadeOut.setLinkedObject(optionHighlight);
 				fadeOut.play();
 				
@@ -84,9 +87,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 					resetCursor(e.getWindow());
 				}
 				
-				if (ClearStaticResources.isFocused(this)) {
-					ClearStaticResources.setFocusedWidget(null);
-				}
+				ClearStaticResources.clearFocusIfApplicable(this);
 			});
 			
 			optionHighlights[i] = optionHighlight;
@@ -142,12 +143,12 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	private void expand() {
 		//Expand the dropdown
 		float expandedHeight = HEIGHT + (HEIGHT * optionLabels.length);
-		new DropdownSizeTransition(200, WIDTH, expandedHeight).play();
+		new WidgetSizeTransition(this, TRANSITION_DURATION, WIDTH, expandedHeight).play();
 		
 		for (int i = 0; i < optionLabels.length; i++) {
 			int index = i;
 			
-			FillTransition expand = new FillTransition(OPTION_FADE_TIME, optionLabels[i].getFill(), TOOLBAR_TEXT_FILL);
+			FillTransition expand = new FillTransition(TRANSITION_DURATION, optionLabels[i].getFill(), TOOLBAR_TEXT_FILL);
 			expand.setLinkedObject(optionLabels[i]);
 			
 			expand.setOnCompleted(c -> {
@@ -160,7 +161,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	
 	private void collapse(Window window) {
 		//Collapse the dropdown
-		new DropdownSizeTransition(200, WIDTH, HEIGHT).play();
+		new WidgetSizeTransition(this, TRANSITION_DURATION, WIDTH, HEIGHT).play();
 		
 		//Fade out the options
 		for (int i = 0; i < optionLabels.length; i++) {
@@ -174,35 +175,9 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			
 			resetCursor(window);
 			
-			FillTransition collapse = new FillTransition(OPTION_FADE_TIME, optionLabels[i].getFill(), TOOLBAR_TEXT_FILL.copy().alpha(0f));
+			FillTransition collapse = new FillTransition(TRANSITION_DURATION, optionLabels[i].getFill(), TOOLBAR_TEXT_FILL.copy().alpha(0f));
 			collapse.setLinkedObject(optionLabels[i]);
 			collapse.play();
-		}
-	}
-	
-	private class DropdownSizeTransition extends SizeTransition {
-		public DropdownSizeTransition(long durationInMillis, float targetWidth, float targetHeight) {
-			super(durationInMillis, targetWidth, targetHeight);
-		}
-		
-		@Override
-		protected float getCurrentWidth() {
-			return getWidth();
-		}
-
-		@Override
-		protected float getCurrentHeight() {
-			return getHeight();
-		}
-
-		@Override
-		protected void setWidth(float width) {
-			DropdownMenuWidget.this.setWidth(width);
-		}
-
-		@Override
-		protected void setHeight(float height) {
-			DropdownMenuWidget.this.setHeight(height);
 		}
 	}
 }

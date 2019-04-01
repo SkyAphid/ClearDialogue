@@ -1,6 +1,7 @@
 package nokori.clear_dialogue.ui.widget;
 
-import static nokori.clear_dialogue.ui.ClearDialogueWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
+import static nokori.clear_dialogue.ui.ClearDialogueTheme.*;
 
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.font.FontStyle;
@@ -34,7 +35,7 @@ public class ContextHintsWidget extends LabelWidget {
 			getFill().alpha(0f);
 			setText(sharedResources.getContextHint());
 			
-			FillTransition t = new FillTransition(200, getFill(), CONTEXT_HINTS_TEXT_FILL);
+			FillTransition t = new FillTransition(TRANSITION_DURATION, getFill(), CONTEXT_HINTS_TEXT_FILL);
 			t.setLinkedObject(this);
 			t.play();
 		}

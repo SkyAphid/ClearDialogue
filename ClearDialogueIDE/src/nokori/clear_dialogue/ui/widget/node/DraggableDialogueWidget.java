@@ -22,6 +22,8 @@ import nokori.clear_dialogue.project.DialogueConnector;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.widget.node.ConnectorWidget.ConnectorType;
 
+import static nokori.clear_dialogue.ui.ClearDialogueTheme.*;
+
 import java.util.concurrent.TimeUnit;
 
 public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
@@ -34,9 +36,6 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	public static final int EDITING_WIDTH = EXPANDED_WIDTH * 6;
 	public static final int EDITING_HEIGHT = EXPANDED_HEIGHT * 3;
-	
-	public static final ClearColor TEXT_COLOR = ClearColor.LIGHT_BLACK;
-	public static final ClearColor UNDERLINE_COLOR = ClearColor.GRAY;
 	
 	public static final float CORNER_RADIUS = 1.0f;
 
@@ -114,7 +113,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		dropShadow = new DropShadowWidget(CORNER_RADIUS);
 		dropShadow.setInputEnabled(false);
 		
-		background = new RectangleWidget(CORNER_RADIUS, ClearColor.WHITE_SMOKE.multiply(0.95f), ClearColor.LIGHT_GRAY);
+		background = new RectangleWidget(CORNER_RADIUS, BACKGROUND_COLOR, BACKGROUND_STROKE_COLOR);
 		background.setInputEnabled(false);
 		
 		highlight = new RectangleWidget(CORNER_RADIUS, null, ClearColor.CORAL.alpha(0f));
@@ -135,7 +134,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		title = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTitle(), sharedResources.getNotoSans(), 24);
 		title.setUnderlineFill(UNDERLINE_COLOR);
 		title.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, yPadding));
-		title.addChild(new TextFieldSynch(false, xPadding, yPadding));
+		title.addChild(new TextFieldSynch(this, false, xPadding, yPadding));
 		
 		title.setOnKeyEvent(e -> {
 			dialogue.setTitle(title.getTextBuilder().toString());
@@ -151,7 +150,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		tags = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTag(), sharedResources.getNotoSans(), 20);
 		tags.setUnderlineFill(UNDERLINE_COLOR);
 		tags.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, title.getHeight() + yPadding + widgetPadding));
-		tags.addChild(new TextFieldSynch(false, xPadding, yPadding));
+		tags.addChild(new TextFieldSynch(this, false, xPadding, yPadding));
 		
 		tags.setOnKeyEvent(e -> {
 			dialogue.setTag(tags.getTextBuilder().toString());
@@ -170,7 +169,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		content.setLineNumbersEnabled(false);
 		content.setLineSplitOverrideEnabled(true);
 		content.setLineSplitOverrideWidth(Mode.EDITING.getWidth());
-		content.addChild(new TextFieldSynch(true, xPadding, yPadding));
+		content.addChild(new TextFieldSynch(this, true, xPadding, yPadding));
 		
 		content.setOnKeyEvent(e -> {
 			keyEventCallback();
@@ -200,24 +199,20 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		setOnMouseEnteredEvent(e -> {
 			if (ClearStaticResources.canFocus(this)) {
-				FillTransition fadeIn = new FillTransition(200, highlight.getStrokeFill(), ClearColor.CORAL);
+				FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
 				fadeIn.setLinkedObject(DraggableDialogueWidget.this);
 				fadeIn.play();
 					
-				ClearStaticResources.setHoveringWidget(DraggableDialogueWidget.this);
 				sharedResources.setContextHint(CONTEXT_HINT);
 			}
 		});
 		
 		setOnMouseExitedEvent(e -> {
-			FillTransition fadeOut = new FillTransition(200, highlight.getStrokeFill(), ClearColor.CORAL.alpha(0f));
+			FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL.alpha(0f));
 			fadeOut.setLinkedObject(DraggableDialogueWidget.this);
 			fadeOut.play();
 				
-			if (ClearStaticResources.getHoveringWidget() == DraggableDialogueWidget.this) {
-				ClearStaticResources.setHoveringWidget(null);
-				sharedResources.resetContextHint();
-			}
+			sharedResources.resetContextHint();
 		});
 		
 		setOnMouseButtonEvent(e -> {
@@ -325,7 +320,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	}
 	
 	protected void fadeOutConnector(ConnectorWidget connector) {
-		new FillTransition(200, connector.getFill(), connector.getFill().copy().alpha(0f)).play();
+		new FillTransition(TRANSITION_DURATION, connector.getFill(), connector.getFill().copy().alpha(0f)).play();
 	}
 
 	/**
@@ -358,8 +353,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		private float xPadding, yPadding;
 		
-		public TextFieldSynch(boolean synchHeight, float xPadding, float yPadding) {
-			super(false, false, true, synchHeight);
+		public TextFieldSynch(DraggableDialogueWidget parent, boolean synchHeight, float xPadding, float yPadding) {
+			super(parent, false, false, true, synchHeight);
 			this.xPadding = xPadding;
 			this.yPadding = yPadding;
 		}
@@ -372,7 +367,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		}
 		
 		@Override
-		protected void synchHeight(Window window) {
+		protected void synchHeight(Window window, Mode mode) {
 			TextAreaWidget textArea = (TextAreaWidget) parent;
 			textArea.setHeight(DraggableDialogueWidget.this.getHeight() - textArea.getY() - yPadding);
 		}
@@ -381,7 +376,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	private class DialogueWidgetSizeTransition extends SizeTransition {
 
 		public DialogueWidgetSizeTransition() {
-			super(200, Math.max(mode.getWidth(), getMinWidth()), Math.max(mode.getHeight(), getMinHeight()));
+			super(TRANSITION_DURATION, Math.max(mode.getWidth(), getMinWidth()), Math.max(mode.getHeight(), getMinHeight()));
 			
 			setLinkedObject(DraggableDialogueWidget.this);
 			
