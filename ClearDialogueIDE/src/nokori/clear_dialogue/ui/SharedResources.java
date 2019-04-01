@@ -21,6 +21,8 @@ public class SharedResources {
 	/*
 	 * Dialogue Data
 	 */
+	public static final String SYNTAX_FILE_LOCATION = "syntax_directory.ini";
+	
 	private Project project = new Project();
 	
 	/*

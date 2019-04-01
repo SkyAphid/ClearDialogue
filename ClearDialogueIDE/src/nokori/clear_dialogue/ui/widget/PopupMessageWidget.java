@@ -18,12 +18,15 @@ public class PopupMessageWidget extends WidgetAssembly {
 	private static final float SIZE_OFFSET = 100;
 	private static final int FADE_IN_DURATION = 200;
 	private static final ClearColor OVERLAY_COLOR = ClearColor.LIGHT_BLACK.alpha(0.5f).immutable(true);
+	private static final ClearColor BACKGROUND_STROKE_COLOR = ClearColor.LIGHT_BLACK;
 	
 	private SharedResources sharedResources;
 	private Stopwatch openInputDelay = new Stopwatch();
 	
+	private RectangleWidget overlay, background;
+	private TextAreaWidget content;
 	
-	public PopupMessageWidget(SharedResources sharedResources, String message) {
+	public PopupMessageWidget(SharedResources sharedResources, String message, boolean editingEnabled) {
 		this.sharedResources = sharedResources;
 		
 		/*
@@ -47,22 +50,30 @@ public class PopupMessageWidget extends WidgetAssembly {
 		 * Background
 		 */
 		
-		RectangleWidget overlay = new RectangleWidget(OVERLAY_COLOR.alpha(0.0f));
+		overlay = new RectangleWidget(OVERLAY_COLOR.alpha(0.0f));
 		overlay.addChild(new WidgetSynch(WidgetSynch.Mode.WITH_WINDOW));
 		new FillTransition(FADE_IN_DURATION, overlay.getFill(), OVERLAY_COLOR).play();
 		addChild(overlay);
 		
-		RectangleWidget background = new RectangleWidget(4f, BACKGROUND_COLOR.alpha(0.0f), ClearColor.LIGHT_BLACK);
+		background = new RectangleWidget(4f, BACKGROUND_COLOR.alpha(0.0f), BACKGROUND_STROKE_COLOR.alpha(0.0f));
 		background.addChild(new WidgetSynch(this));
-		new FillTransition(FADE_IN_DURATION * 2, background.getFill(), BACKGROUND_COLOR).play();
+		new FillTransition(FADE_IN_DURATION * 2, background.getFill(), BACKGROUND_COLOR) {
+			@Override
+			public void tick(float progress) {
+				super.tick(progress);
+				blend(background.getStrokeFill(), BACKGROUND_STROKE_COLOR, background.getStrokeFill(), progress);
+			}
+		}.play();
 		addChild(background);
 		
 		/*
 		 * Content
 		 */
 		
-		TextAreaWidget content = new TextAreaWidget(TEXT_COLOR.alpha(0.0f), message, sharedResources.getNotoSerif(), 20);
+		content = new TextAreaWidget(TEXT_COLOR.alpha(0.0f), message, sharedResources.getNotoSerif(), 20);
 		content.setWordWrappingEnabled(false);
+		content.setLineNumberBackgroundFill(null);
+		content.getInputSettings().setEditingEnabled(editingEnabled);
 		content.addChild(new WidgetSynch(this, 2f, 2f, -4f, -4f));
 		new FillTransition(FADE_IN_DURATION * 2, content.getDefaultTextFill(), TEXT_COLOR).play();
 		addChild(content);
@@ -93,8 +104,37 @@ public class PopupMessageWidget extends WidgetAssembly {
 	
 	public void close() {
 		setInputEnabled(false);
-		sharedResources.getCanvas().setInputEnabled(true);
-		sharedResources.getToolbar().setInputEnabled(true);
-		sharedResources.getRootWidgetAssembly().removeChild(this);
+		removeChild(content);
+		
+		FillTransition endTransition = new FillTransition(FADE_IN_DURATION, overlay.getFill(), OVERLAY_COLOR.alpha(0f)) {
+			@Override
+			public void tick(float progress) {
+				super.tick(progress);
+				blend(background.getFill(), BACKGROUND_COLOR.alpha(0f), background.getFill(), progress);
+				blend(background.getStrokeFill(), BACKGROUND_STROKE_COLOR.alpha(0f), background.getStrokeFill(), progress);
+			}
+		};
+		
+		endTransition.setOnCompleted(c -> {
+			sharedResources.getCanvas().setInputEnabled(true);
+			sharedResources.getToolbar().setInputEnabled(true);
+			sharedResources.getRootWidgetAssembly().removeChild(this);
+			onClose(content.getTextBuilder().toString());
+		});
+		
+		endTransition.play();
+	}
+	
+	/**
+	 * Called when this Widget is closed and removed from the parent root assembly.
+	 * 
+	 * @param content - the final edited String content of the TextAreaWidget in this Widget.
+	 */
+	protected void onClose(String content) {
+		
+	}
+	
+	public TextAreaWidget getTextAreaWidget() {
+		return content;
 	}
 }
