@@ -8,7 +8,7 @@ import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.Project;
 
 /**
- * This is just a small utility that can be used to recursively edit a large amount of Projects automatically. Only really useful for situations where Projects need to be re-exported
+ * This is just a small programmer utility that can be used to recursively edit a large amount of Projects automatically. Only really useful for situations where Projects need to be re-exported
  * into a newer version.
  * 
  */

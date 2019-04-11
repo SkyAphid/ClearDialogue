@@ -8,21 +8,20 @@ import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear.windows.util.TinyFileDialog.Icon;
 import nokori.clear.windows.util.TinyFileDialog.InputType;
 import nokori.clear_dialogue.ui.SharedResources;
-import nokori.clear_dialogue.ui.util.ClearDialogueIDEUtil;
+import nokori.clear_dialogue.ui.util.DialogueUtils;
+import nokori.clear_dialogue.ui.util.ReplaceUtils;
 
 public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 
 	private static final String LABEL = "TOOL";
 	
 	private static final String OPTION_REPLACE = "REPLACE...";
-	private static final String OPTION_MULTI_REPLACE = "MULTI-REPLACE...";
 	private static final String OPTION_VIEW_SYNTAX = "VIEW SYNTAX";
 	private static final String OPTION_REFRESH_SYNTAX = "REFRESH SYNTAX";
 	private static final String OPTION_SET_SYNTAX = "SET SYNTAX...";
 	
 	private static final String[] OPTIONS = {
 		OPTION_REPLACE,
-		OPTION_MULTI_REPLACE,
 		OPTION_VIEW_SYNTAX,
 		OPTION_REFRESH_SYNTAX,
 		OPTION_SET_SYNTAX
@@ -38,6 +37,9 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 	@Override
 	protected void optionSelected(String option, int index) {
 		switch(option) {
+		case OPTION_REPLACE:
+			ReplaceUtils.runReplaceTool(sharedResources);
+			break;
 		case OPTION_VIEW_SYNTAX:
 			showSyntaxPopup();
 			break;
@@ -45,14 +47,14 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 			sharedResources.loadAndProcessSyntax();
 			break;
 		case OPTION_SET_SYNTAX:
-			ClearDialogueIDEUtil.showSyntaxFileSelectDialog();
+			DialogueUtils.showSyntaxFileSelectDialog();
 			sharedResources.loadAndProcessSyntax();
 			break;
 		}
 	}
 	
 	private void showSyntaxPopup() {
-		String syntaxContent = ClearDialogueIDEUtil.loadSyntax();
+		String syntaxContent = DialogueUtils.loadSyntax();
 		boolean syntaxLoaded = (syntaxContent != null);
 		
 		PopupMessageWidget message = new PopupMessageWidget(sharedResources, syntaxLoaded ? syntaxContent : "//No syntax loaded.", syntaxLoaded) {
@@ -60,7 +62,7 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 			public void onClose(String content, boolean contentEdited) {
 				if (syntaxLoaded && contentEdited) {
 					if (TinyFileDialog.showConfirmDialog("Save Changes", "Would you like to save your edits to the syntax file?", InputType.YES_NO, Icon.QUESTION, false)) {
-						ClearDialogueIDEUtil.saveSyntax(content);
+						DialogueUtils.saveSyntax(content);
 					}
 				}
 			}

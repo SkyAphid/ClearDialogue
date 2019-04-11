@@ -14,7 +14,10 @@ import nokori.clear_dialogue.io.ClearDialogueIO;
 import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.SharedResources;
 
-public class ClearDialogueIDEUtil {
+/**
+ * General utilities for Dialogue project management.
+ */
+public class DialogueUtils {
 	
 	/**
 	 * Opens a project import dialogue using the given JDialogue I/O system and returns the loaded project. If the project fails to load, null will be returned instead.

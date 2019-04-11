@@ -12,7 +12,7 @@ import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget;
 import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget.Syntax;
 import nokori.clear.windows.Window;
 import nokori.clear_dialogue.project.Project;
-import nokori.clear_dialogue.ui.util.ClearDialogueIDEUtil;
+import nokori.clear_dialogue.ui.util.DialogueUtils;
 import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 
 /**
@@ -151,7 +151,7 @@ public class SharedResources {
 	 */
 	public void loadAndProcessSyntax() {
 		syntaxWidget.clearAllSyntax();
-		String[] split = ClearDialogueIDEUtil.loadSyntax().split("\n");
+		String[] split = DialogueUtils.loadSyntax().split("\n");
 		
 		for (int i = 0; i < split.length; i++) {
 			String s = split[i].replaceAll("\n", "").trim();
