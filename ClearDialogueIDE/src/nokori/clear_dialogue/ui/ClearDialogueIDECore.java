@@ -30,19 +30,8 @@ public class ClearDialogueIDECore extends ClearApplication {
 	
 	@Override
 	public void init(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly, String[] args) {
-		/*
-		 * Initialize SharedResources
-		 */
-		
 		SharedResources sharedResources = new SharedResources();
-		sharedResources.init(window, context, rootWidgetAssembly);
-		
-		/*
-		 * Initialize JDialogueWidgetAssembly (the user-interface)
-		 */
-		
-		ClearDialogueRootWidgetAssembly root = (ClearDialogueRootWidgetAssembly) rootWidgetAssembly;
-		root.init(sharedResources);
+		sharedResources.init(window, context, (ClearDialogueRootWidgetAssembly) rootWidgetAssembly);
 	}
 
 	@Override

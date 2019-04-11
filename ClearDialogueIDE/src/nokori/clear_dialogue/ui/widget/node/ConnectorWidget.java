@@ -67,18 +67,16 @@ public class ConnectorWidget extends HalfCircleWidget {
 		setOnMouseEnteredEvent(e -> {
 			new FillTransition(TRANSITION_DURATION, getFill(), connectorType.color.multiply(1.2f)).play();
 			
-			if (!ClearStaticResources.isHoveringWidget()) {
+			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
 				ClearStaticResources.getCursor(Type.HAND).apply(e.getWindow());
-				ClearStaticResources.setHoveringWidget(ConnectorWidget.this);
 			}
 		});
 		
 		setOnMouseExitedEvent(e -> {
 			new FillTransition(TRANSITION_DURATION, getFill(), connectorType.color).play();
 			
-			if (ClearStaticResources.getHoveringWidget() == ConnectorWidget.this) {
+			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
 				ClearStaticResources.getCursor(Type.ARROW).apply(e.getWindow());
-				ClearStaticResources.setHoveringWidget(null);
 			}
 		});
 		

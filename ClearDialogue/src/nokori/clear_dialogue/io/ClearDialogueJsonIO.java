@@ -224,8 +224,8 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 		
 		String projectName = projectObject.getString(JSON_PROJECT_NAME);
 
-		double viewportX = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_X).doubleValue();
-		double viewportY = projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_Y).doubleValue();
+		float viewportX = (float) projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_X).doubleValue();
+		float viewportY = (float) projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_Y).doubleValue();
 
 		Project project = new Project(projectVersion, projectName, viewportX, viewportY);
 

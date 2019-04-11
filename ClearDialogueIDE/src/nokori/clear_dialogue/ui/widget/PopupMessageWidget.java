@@ -16,6 +16,10 @@ import static nokori.clear_dialogue.ui.ClearDialogueTheme.*;
 public class PopupMessageWidget extends WidgetAssembly {
 	
 	private static final float SIZE_OFFSET = 100;
+	
+	private static final float START_Y_OFFSET = SIZE_OFFSET/1.35f;
+	private static final float END_Y_OFFSET = SIZE_OFFSET;
+	
 	private static final int FADE_IN_DURATION = 200;
 	private static final ClearColor OVERLAY_COLOR = ClearColor.LIGHT_BLACK.alpha(0.5f).immutable(true);
 	private static final ClearColor BACKGROUND_STROKE_COLOR = ClearColor.LIGHT_BLACK;
@@ -24,7 +28,9 @@ public class PopupMessageWidget extends WidgetAssembly {
 	private Stopwatch openInputDelay = new Stopwatch();
 	
 	private RectangleWidget overlay, background;
+	
 	private TextAreaWidget content;
+	private boolean contentEdited = false;
 	
 	public PopupMessageWidget(SharedResources sharedResources, String message, boolean editingEnabled) {
 		this.sharedResources = sharedResources;
@@ -41,9 +47,10 @@ public class PopupMessageWidget extends WidgetAssembly {
 		TemplateTransition transition = new TemplateTransition(FADE_IN_DURATION, 0f, 1f, new TemplateTransition.ProgressCallback() {
 			@Override
 			public void callback(float value) {
-				synch.setYOffset(SIZE_OFFSET * value);
+				synch.setYOffset(START_Y_OFFSET + ((END_Y_OFFSET - START_Y_OFFSET) * value));
 			}
 		});
+
 		transition.play();
 		
 		/*
@@ -76,6 +83,11 @@ public class PopupMessageWidget extends WidgetAssembly {
 		content.getInputSettings().setEditingEnabled(editingEnabled);
 		content.addChild(new WidgetSynch(this, 2f, 2f, -4f, -4f));
 		new FillTransition(FADE_IN_DURATION * 2, content.getDefaultTextFill(), TEXT_COLOR).play();
+		
+		content.setOnCharEvent(e -> {
+			contentEdited = true;
+		});
+		
 		addChild(content);
 		
 		/*
@@ -119,7 +131,7 @@ public class PopupMessageWidget extends WidgetAssembly {
 			sharedResources.getCanvas().setInputEnabled(true);
 			sharedResources.getToolbar().setInputEnabled(true);
 			sharedResources.getRootWidgetAssembly().removeChild(this);
-			onClose(content.getTextBuilder().toString());
+			onClose(content.getTextBuilder().toString(), contentEdited);
 		});
 		
 		endTransition.play();
@@ -129,8 +141,9 @@ public class PopupMessageWidget extends WidgetAssembly {
 	 * Called when this Widget is closed and removed from the parent root assembly.
 	 * 
 	 * @param content - the final edited String content of the TextAreaWidget in this Widget.
+	 * @param contentEdited - true if the string content was edited at any point
 	 */
-	protected void onClose(String content) {
+	protected void onClose(String content, boolean contentEdited) {
 		
 	}
 	

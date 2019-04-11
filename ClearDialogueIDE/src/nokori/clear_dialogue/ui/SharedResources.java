@@ -1,12 +1,18 @@
 package nokori.clear_dialogue.ui;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import nokori.clear.vg.ClearColor;
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.font.Font;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
+import nokori.clear.vg.widget.text.ClearEscapeSequences;
+import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget;
+import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget.Syntax;
 import nokori.clear.windows.Window;
 import nokori.clear_dialogue.project.Project;
+import nokori.clear_dialogue.ui.util.ClearDialogueIDEUtil;
 import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 
 /**
@@ -16,7 +22,7 @@ public class SharedResources {
 
 	private Window window;
 	private NanoVGContext context;
-	private WidgetAssembly rootWidgetAssembly;
+	private ClearDialogueRootWidgetAssembly rootWidgetAssembly;
 	
 	/*
 	 * Dialogue Data
@@ -31,17 +37,16 @@ public class SharedResources {
 	
 	private Font notoSans, notoSerif;
 	private String contextHint;
+	private TextAreaAutoFormatterWidget syntaxWidget = new TextAreaAutoFormatterWidget();
 
 	private WidgetAssembly toolbar;
 	private ClearDialogueCanvas canvas;
 	private ConnectionRendererWidget connectionRenderer;
 	
-	public void init(Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+	public void init(Window window, NanoVGContext context, ClearDialogueRootWidgetAssembly rootWidgetAssembly) {
 		this.window = window;
 		this.context = context;
 		this.rootWidgetAssembly = rootWidgetAssembly;
-		
-		resetContextHint();
 		
 		try {
 			notoSans = new Font("res/fonts/NotoSans/", "NotoSans-Regular", "NotoSans-Bold", "NotoSans-Italic", "NotoSans-Light").load(context);
@@ -49,6 +54,11 @@ public class SharedResources {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		resetContextHint();
+		loadAndProcessSyntax();
+		
+		rootWidgetAssembly.init(this);
 	}
 	
 	public Window getWindow() {
@@ -124,6 +134,7 @@ public class SharedResources {
 	 */
 	public void setProject(Project project) {
 		this.project = project;
+		canvas.refresh(project);
 	}
 
 	public Font getNotoSans() {
@@ -132,5 +143,31 @@ public class SharedResources {
 
 	public Font getNotoSerif() {
 		return notoSerif;
+	}
+	
+	/**
+	 * This function will call ClearDialogueIDEUtil.loadSyntax() and then process that string into the TextAreaAutoFormatterWidget that's used with 
+	 * the TextAreaWidget's around the IDE.
+	 */
+	public void loadAndProcessSyntax() {
+		syntaxWidget.clearAllSyntax();
+		String[] split = ClearDialogueIDEUtil.loadSyntax().split("\n");
+		
+		for (int i = 0; i < split.length; i++) {
+			String s = split[i].replaceAll("\n", "").trim();
+
+			if (!s.isEmpty() && !s.startsWith("//")) {
+				@SuppressWarnings("unused")
+				Syntax syntax = syntaxWidget.addSyntax(s, ClearEscapeSequences.ESCAPE_SEQUENCE_COLOR, ClearColor.CORAL.toHEX());
+				//System.out.println("Registered Syntax: " + syntax.getKey() + " -> " + syntax.getEscapeSequence() + syntax.getInstructions() + " " + syntax.getResetMode().name());
+			}
+		}
+	}
+	
+	/**
+	 * Gets the syntax settings that can be passed into TextAreaAutoFormatterWidgets. This allows the widgets to stay up to date on the latest syntax settings.
+	 */
+	public ArrayList<Syntax> getSyntaxSettings() {
+		return syntaxWidget.getSyntaxSettings();
 	}
 }

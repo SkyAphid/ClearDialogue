@@ -28,10 +28,11 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 	public static final ClearColor CONTEXT_HINTS_TEXT_FILL = ClearColor.GRAY;
 	public static final int CONTEXT_HINTS_FONT_SIZE = 24;
 
-	public void init(SharedResources sharedResources) {
+	public ClearDialogueRootWidgetAssembly init(SharedResources sharedResources) {
 		initConnectionRenderer(sharedResources);
 		initCanvas(sharedResources);
 		initToolbar(sharedResources);
+		return this;
 	}
 	
 	private void initConnectionRenderer(SharedResources sharedResources) {

@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear.windows.util.TinyFileDialog.Icon;
 import nokori.clear_dialogue.io.ClearDialogueIO;
 import nokori.clear_dialogue.project.Project;
+import nokori.clear_dialogue.ui.SharedResources;
 
 public class ClearDialogueIDEUtil {
 	
@@ -17,12 +20,26 @@ public class ClearDialogueIDEUtil {
 	 * Opens a project import dialogue using the given JDialogue I/O system and returns the loaded project. If the project fails to load, null will be returned instead.
 	 */
 	public static Project showImportProjectDialog(String title, ClearDialogueIO io) {
-		String filetype = io.getTypeName();
+		//Support multiple filetypes
+		String filetypes[] = io.getTypeName().split(",");
 		
-		String filterDescription = filetype + " Files";
+		//Add all filetypes to the description
+		String filterDescription = "";
+		
+		for (int i = 0; i < filetypes.length; i++) {
+			if (i > 0) {
+				filterDescription += ", ";
+			}
+			
+			filterDescription += filetypes[i];
+		}
+		
+		filterDescription += " Files";
 
-		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(), filterDescription, filetype, "");
+		//Finally open the TinyFileDialog for the support files
+		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(), filterDescription, filetypes[0], filetypes);
 		
+		//Import the file as a Project
 		if (f != null) {
 			try {
 				return io.importProject(f);
@@ -30,7 +47,9 @@ public class ClearDialogueIDEUtil {
 				e.printStackTrace();
 				TinyFileDialog.showMessageDialog("Caught " + e.getClass().getName(), e.getMessage(), Icon.ERROR);
 			}
-		} 
+		} else {
+			TinyFileDialog.showMessageDialog("ClearDialogue", "Project import cancelled.", Icon.INFORMATION);
+		}
 		
 		return null;
 	}
@@ -43,12 +62,16 @@ public class ClearDialogueIDEUtil {
 		
 		File f = TinyFileDialog.showSaveFileDialog(title, getProjectDirectory(), filterDescription, filetype, false);
 		
-		try {
-			io.exportProject(project, f);
-			TinyFileDialog.showMessageDialog("Export Success", project.getName() + " was successfully exported.", Icon.INFORMATION);
-		} catch (Exception e) {
-			e.printStackTrace();
-			TinyFileDialog.showMessageDialog(e.getClass().getName() + " Caught", e.getMessage(), Icon.ERROR);
+		if (f != null) {
+			try {
+				io.exportProject(project, f);
+				TinyFileDialog.showMessageDialog("Export Success", project.getName() + " was successfully exported.", Icon.INFORMATION);
+			} catch (Exception e) {
+				e.printStackTrace();
+				TinyFileDialog.showMessageDialog(e.getClass().getName() + " Caught", e.getMessage(), Icon.ERROR);
+			}
+		} else {
+			TinyFileDialog.showMessageDialog("ClearDialogue", "Project export cancelled.", Icon.INFORMATION);
 		}
 	}
 	
@@ -127,8 +150,7 @@ public class ClearDialogueIDEUtil {
 	}
 	
 	/**
-	 * Set the location of the syntax file to load at startup
-	 * @param stage
+	 * Set the location of the syntax file to load at startup and subsequent refreshes
 	 */
 	public static void showSyntaxFileSelectDialog() {
 		//Try to get the current directory first so that the filechooser will open in that location
@@ -173,9 +195,76 @@ public class ClearDialogueIDEUtil {
 			}catch(Exception ex){
 				ex.printStackTrace();
 			}
+		}
+	}
+	
+	/**
+	 * @return the syntax file configured in the syntax file directory settings
+	 */
+	private static File getSyntaxFile() {
+		/*
+		 * Get user-set syntax location (if it exists)
+		 */
+		
+		File f = new File(SharedResources.SYNTAX_FILE_LOCATION);
+
+		Properties props = new Properties();
+		
+		if(f.exists()){
+			try {
+				props.load(new FileReader(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String projectDirectory = props.getProperty("syntaxFile");
+		
+		return (projectDirectory != null ? new File(projectDirectory) : null);
+	}
+
+	/**
+	 * @return the syntax file using the current syntax directory settings.
+	 */
+	public static String loadSyntax() {
+		
+		File syntaxFile = getSyntaxFile();
+		
+		if (syntaxFile == null) {
+			syntaxFile = new File("example_syntax.txt");
+		}
+		
+		if (syntaxFile != null && syntaxFile.exists()) {
+			try {
+				
+				//Read the syntax file
+				return new String(Files.readAllBytes(syntaxFile.toPath()));
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else {
+			System.err.println("loadSyntax() failed: Syntax file not found.");
+		}
+		
+		return null;
+	}
+	
+	public static void saveSyntax(String content) {
+		File syntaxFile = getSyntaxFile();
+		
+		if (syntaxFile != null) {
 			
-			//Reload the current syntax
-			//TODO: loadSyntax();
+			try (PrintWriter out = new PrintWriter(syntaxFile)){
+				
+				out.println(content);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			System.err.println("saveSyntax() failed: Syntax file not found.");
 		}
 	}
 }

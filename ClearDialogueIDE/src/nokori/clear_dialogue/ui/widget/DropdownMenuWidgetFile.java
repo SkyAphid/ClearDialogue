@@ -2,7 +2,12 @@ package nokori.clear_dialogue.ui.widget;
 
 import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
 
+import nokori.clear_dialogue.io.ClearDialogueAutoIO;
+import nokori.clear_dialogue.io.ClearDialogueJsonIO;
+import nokori.clear_dialogue.project.Project;
+import nokori.clear_dialogue.ui.ClearDialogueCanvas;
 import nokori.clear_dialogue.ui.SharedResources;
+import nokori.clear_dialogue.ui.util.ClearDialogueIDEUtil;
 
 public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 
@@ -22,14 +27,44 @@ public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 		OPTION_IMPORT_JSON
 	};
 	
+	private SharedResources sharedResources;
+	
 	public DropdownMenuWidgetFile(SharedResources sharedResources) {
 		super(getToolbarAbsoluteX(0), WIDGET_PADDING, sharedResources.getNotoSans(), LABEL, OPTIONS);
+		this.sharedResources = sharedResources;
 	}
 
 	@Override
 	protected void optionSelected(String option, int index) {
-		switch(option) {
+		Project project = sharedResources.getProject();
+		ClearDialogueCanvas canvas = sharedResources.getCanvas();
 		
+		switch(option) {
+		case OPTION_NEW_PROJECT:
+			canvas.refresh(new Project());
+			break;
+		case OPTION_PROJECT_DIR:
+			ClearDialogueIDEUtil.showProjectDirectorySelectDialog();
+			break;
+		case OPTION_MERGE_PROJECT:
+			Project merge = ClearDialogueIDEUtil.showImportProjectDialog("Merge Project", new ClearDialogueAutoIO());
+			
+			if (merge != null) {
+				project.mergeProject(merge);
+			}
+
+			break;
+		case OPTION_EXPORT_JSON:
+			ClearDialogueIDEUtil.showExportProjectDialog(project, new ClearDialogueJsonIO());
+			break;
+		case OPTION_IMPORT_JSON:
+			Project loaded = ClearDialogueIDEUtil.showImportProjectDialog("Import JSON Dialogue", new ClearDialogueJsonIO());
+			
+			if (loaded != null) {
+				sharedResources.setProject(loaded);
+			}
+			
+			break;
 		}
 	}
 

@@ -20,7 +20,7 @@ public class Project implements Serializable {
 	private String name;
 
 	//Remember viewport data for next use
-	private double viewportX, viewportY;
+	private float viewportX, viewportY;
 	
 	//All nodes contained by this project
 	private ArrayList<Dialogue> dialogueList = new ArrayList<Dialogue>();
@@ -28,7 +28,7 @@ public class Project implements Serializable {
 	//All connections between the various nodes are stored here
 	private ArrayList<Connection> connections = new ArrayList<Connection>();
 	
-	public Project(int version, String name, double viewportX, double viewportY) {
+	public Project(int version, String name, float viewportX, float viewportY) {
 		this.version = version;
 		this.name = name;
 		this.viewportX = viewportX;
@@ -36,7 +36,7 @@ public class Project implements Serializable {
 	}
 	
 	public Project() {
-		this(CURRENT_VERSION, "Default Project", 0.0, 0.0);
+		this(CURRENT_VERSION, "Default Project", 0.0f, 0.0f);
 	}
 	
 	public int getVersion() {
@@ -51,24 +51,24 @@ public class Project implements Serializable {
 		this.name = name;
 	}
 	
-	public void setViewportPosition(double viewportX, double viewportY) {
+	public void setViewportPosition(float viewportX, float viewportY) {
 		setViewportX(viewportX);
 		setViewportY(viewportY);
 	}
 
-	public double getViewportX() {
+	public float getViewportX() {
 		return viewportX;
 	}
 
-	public void setViewportX(double viewportX) {
+	public void setViewportX(float viewportX) {
 		this.viewportX = viewportX;
 	}
 
-	public double getViewportY() {
+	public float getViewportY() {
 		return viewportY;
 	}
 
-	public void setViewportY(double viewportY) {
+	public void setViewportY(float viewportY) {
 		this.viewportY = viewportY;
 	}
 	

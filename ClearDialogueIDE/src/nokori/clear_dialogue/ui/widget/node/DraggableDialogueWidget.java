@@ -12,6 +12,7 @@ import nokori.clear.vg.widget.RectangleWidget;
 import nokori.clear.vg.widget.assembly.DraggableWidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetClip;
 import nokori.clear.vg.widget.assembly.WidgetSynch;
+import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget;
 import nokori.clear.vg.widget.text.TextAreaWidget;
 import nokori.clear.vg.widget.text.TextFieldWidget;
 import nokori.clear.windows.Window;
@@ -161,6 +162,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				sharedResources.setContextHint("LMB = Edit tags");
 			}
 		});
+		
+		//tags.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 
 		//Content
 		float contentY = title.getHeight() + tags.getHeight() + yPadding + (widgetPadding * 2f);
@@ -170,6 +173,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		content.setLineSplitOverrideEnabled(true);
 		content.setLineSplitOverrideWidth(Mode.EDITING.getWidth());
 		content.addChild(new TextFieldSynch(this, true, xPadding, yPadding));
+		content.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		content.setOnKeyEvent(e -> {
 			keyEventCallback();
@@ -198,7 +202,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		 */
 		
 		setOnMouseEnteredEvent(e -> {
-			if (ClearStaticResources.canFocus(this)) {
+			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
 				FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
 				fadeIn.setLinkedObject(DraggableDialogueWidget.this);
 				fadeIn.play();
@@ -233,6 +237,12 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		return dialogue;
 	}
 	
+	/**
+	 * Gets the ConnectorWidget attached to the DraggableDialogueWidget (if applicable) for the given connector
+	 * 
+	 * @param connector
+	 * @return
+	 */
 	public ConnectorWidget findConnectorWidget(DialogueConnector connector) {
 		for (int i = 0; i < getNumChildren(); i++) {
 			if (getChild(i) instanceof ConnectorWidget) {
@@ -293,7 +303,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 							"Are you sure you want to delete " + dialogue.getTitle() + "?\nThis cannot be undone.",
 							TinyFileDialog.InputType.YES_NO, TinyFileDialog.Icon.QUESTION, false)) {
 						
-						delete();
+						requestRemoval();
 						
 					}
 				} else {
@@ -310,11 +320,17 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		}
 	}
 	
+	/**
+	 * Ends editing mode and transforms the Widget back into it's non-editable form.
+	 */
 	private void endEditing() {
 		transitionMode(bMode);
 	}
 	
-	public void delete() {
+	/**
+	 * Requests this DraggableDialogueWidget to close and remove itself from the canvas. This is essentially an animated version of removing the widget.
+	 */
+	public void requestRemoval() {
 		transitionMode(Mode.DELETION);
 		fadeOutConnector(inConnector);
 	}

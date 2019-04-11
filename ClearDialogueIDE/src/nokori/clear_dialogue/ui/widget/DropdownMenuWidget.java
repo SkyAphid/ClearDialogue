@@ -23,6 +23,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	
 	private LabelWidget[] optionLabels;
 	private RectangleWidget[] optionHighlights;
+	private boolean[] optionPressed;
 
 	public DropdownMenuWidget(float x, float y, Font font, String label, String options[]) {
 		super(x, y, WIDTH);
@@ -41,6 +42,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 		
 		optionLabels = new LabelWidget[options.length];
 		optionHighlights = new RectangleWidget[options.length];
+		optionPressed = new boolean[options.length];
 		
 		for (int i = 0; i < optionLabels.length; i++) {
 			int index = i;
@@ -56,35 +58,37 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			optionHighlight.setInputEnabled(false);
 			
 			optionHighlight.setOnMouseButtonEvent(e -> {
-				if (ClearStaticResources.canFocus(this)) {
-					if (optionHighlight.isMouseWithinThisWidget() && !e.isPressed()) {
-						ClearStaticResources.clearFocusIfApplicable(this);
-						resetCursor(e.getWindow());
-						collapse(e.getWindow());
+				if (ClearStaticResources.isFocusedOrCanFocus(this)) {
+					boolean mouseWithin = optionHighlight.isMouseWithinThisWidget();
+					
+					setOptionPressedHighlight(index, mouseWithin && e.isPressed());
+					
+					if (mouseWithin && !e.isPressed()) {
 						optionSelected(options[index], index);	
 					}
 				}
 			});
 			
 			optionHighlight.setOnMouseEnteredEvent(e -> {
-				if (ClearStaticResources.canFocus(this)) {
-					FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0.25f));
-					fadeIn.setLinkedObject(optionHighlight);
-					fadeIn.play();
-					
+				//On enter, focus on the widget if possible. This notifies the system to highlight it and change the cursor.
+				if (ClearStaticResources.isFocusedOrCanFocus(this)) {
+					fadeHighlight(optionHighlight, 0.25f);
 					ClearStaticResources.getCursor(Cursor.Type.HAND).apply(e.getWindow());
 					ClearStaticResources.setFocusedWidget(this);
 				}
 			});
 			
 			optionHighlight.setOnMouseExitedEvent(e -> {
-				FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(0f));
-				fadeOut.setLinkedObject(optionHighlight);
-				fadeOut.play();
+				fadeHighlight(optionHighlight, 0.0f);
 				
 				//The event check is for instances where the exited event is manually fired.
 				if (e != null) {
 					resetCursor(e.getWindow());
+				}
+				
+				//Set option pressed to false on all options
+				for (int j = 0; j < optionPressed.length; j++) {
+					optionPressed[j] = false;
 				}
 				
 				ClearStaticResources.clearFocusIfApplicable(this);
@@ -114,7 +118,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 		 */
 		
 		setOnInternalMouseEnteredEvent(e -> {
-			if (ClearStaticResources.canFocus(this)) {
+			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
 				expand();
 			}
 		});
@@ -124,6 +128,38 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 		});
 	}
 	
+	private void setOptionPressedHighlight(int index, boolean pressed) {
+		boolean bPressed = optionPressed[index];
+		optionPressed[index] = pressed;
+		
+		if (pressed) {
+			//Select
+			fadeHighlight(optionHighlights[index], 1.0f);
+		} else if (bPressed && !pressed){
+			if (optionHighlights[index].isMouseWithinThisWidget()) {
+				//Fade into highlight
+				fadeHighlight(optionHighlights[index], 0.25f);
+			} else {
+				//Fade out
+				fadeHighlight(optionHighlights[index], 0.0f);
+			}
+		}
+	}
+	
+	/**
+	 * Fades the given widget's alpha to the "highlighted" parameter, which is 0.25
+	 */
+	private void fadeHighlight(RectangleWidget optionHighlight, float value) {
+		FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, optionHighlight.getFill(), HIGHLIGHT_COLOR.alpha(value));
+		fadeIn.setLinkedObject(optionHighlight);
+		fadeIn.play();
+	}
+	/**
+	 * This is the callback for when an option is selected from the dropdown menu
+	 * 
+	 * @param option - the name of the option selected
+	 * @param index - the index of the option
+	 */
 	protected abstract void optionSelected(String option, int index);
 	
 	private void resetCursor(Window window) {
@@ -135,11 +171,14 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			}
 		}
 		
-		if (!ClearStaticResources.isHoveringWidget()) {
+		if (ClearStaticResources.isFocusedOrCanFocus(this)) {
 			ClearStaticResources.getCursor(Cursor.Type.ARROW).apply(window);
 		}
 	}
 	
+	/**
+	 * This activates the animation for expanding the dropdown menu and enables all of the option inputs
+	 */
 	private void expand() {
 		//Expand the dropdown
 		float expandedHeight = HEIGHT + (HEIGHT * optionLabels.length);
@@ -159,6 +198,11 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 		}
 	}
 	
+	/**
+	 * This activates the animation for collapsing the dropdown and disables all of the option inputs
+	 * 
+	 * @param window
+	 */
 	private void collapse(Window window) {
 		//Collapse the dropdown
 		new WidgetSizeTransition(this, TRANSITION_DURATION, WIDTH, HEIGHT).play();
