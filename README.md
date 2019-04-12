@@ -1,7 +1,7 @@
 # ClearDialogue
 ClearDialogue is a branching dialogue editor for video games designed to be extremely flexible and work with any type of game engine. It was built with the [Clear LWJGL3 API.](https://github.com/SkyAphid/Clear)
 
-![jdialogue](https://user-images.githubusercontent.com/6147299/52175570-5aced880-276b-11e9-8879-924d437652af.png)
+![ClearDialogue](https://user-images.githubusercontent.com/6147299/56028879-c6d73b00-5cde-11e9-9a56-8cea701cdc5a.png)
 
 [This program was written by NOKORI•WARE. If you're satisfied with ClearDialogue, please visit our website and consider buying some of our products to help support the development of free software like this!](https://www.nokoriware.com/)
 
@@ -20,8 +20,9 @@ ClearDialogue is a branching dialogue editor for video games designed to be extr
 
 #### Tools
 - Supports quickly merging projects together into single files in the case of dialogue restructuring
-- Has basic replace/find tools that support refactoring within the current project as well as multiple projects spanning multiple files
+- Has basic replace/find tools that support refactoring within the current project
 - Edit/Move multiple nodes at once
+- Use grid snapping to keep nodes aligned neatly in the project
 - Add/Remove tags from multiple nodes at once
 - Supports implementing custom syntax highlighting (I.E. highlighting text commands from your particular engine)
 
@@ -31,7 +32,7 @@ ClearDialogue is a branching dialogue editor for video games designed to be extr
 - Code-base has extremely detailed documentation that walks you through adding new functionality
 
 ## Dependencies
-ClearDialogue is configured to use Maven, so most of the required APIs will be downloaded automatically. The only other dependency you need to make sure you have is [Clear.](https://github.com/SkyAphid/Clear)
+ClearDialogue is configured to use Maven, so most of the required APIs will be downloaded automatically. ClearDialogue [also has support for THJSON, and a JAR for that is included in the repository.](https://github.com/Puppygames/thjson) The only other dependency you need to make sure you have is [Clear.](https://github.com/SkyAphid/Clear)
 
 ## Download
 [Get a runnable version of ClearDialogue on the releases page.](https://github.com/SkyAphid/ClearDialogue/releases)
