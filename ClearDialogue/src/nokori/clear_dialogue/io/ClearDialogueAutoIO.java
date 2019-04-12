@@ -16,6 +16,11 @@ public class ClearDialogueAutoIO implements ClearDialogueIO {
 		if (isJSONFile(f)) {
 			new ClearDialogueJsonIO().exportProject(project, f);
 		}
+		
+		//THJSON Export
+		if (isTHJSONFile(f)) {
+			new ClearDialogueThjsonIO().exportProject(project, f);
+		}
 	}
 
 	@Override
@@ -25,16 +30,29 @@ public class ClearDialogueAutoIO implements ClearDialogueIO {
 			return new ClearDialogueJsonIO().importProject(f);
 		}
 		
+		//THJSON Import
+		if (isTHJSONFile(f)) {
+			return new ClearDialogueThjsonIO().importProject(f);
+		}
+		
 		return null;
 	}
 	
-	private boolean isJSONFile(File f) {
-		return f.getName().toLowerCase(Locale.ENGLISH).endsWith(".json");
+	private static boolean isTHJSONFile(File f) {
+		return isFile(f, ".thjson");
+	}
+	
+	private static boolean isJSONFile(File f) {
+		return isFile(f, ".json");
+	}
+	
+	private static boolean isFile(File f, String extension) {
+		return f.getName().toLowerCase(Locale.ENGLISH).endsWith(extension);
 	}
 
 	@Override
 	public String getTypeName() {
-		return "JSON";
+		return "JSON, THJSON";
 	}
 
 }

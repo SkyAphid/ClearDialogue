@@ -13,6 +13,7 @@ import nokori.clear_dialogue.project.DialogueConnector;
 import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.ClearDialogueCanvas;
 import nokori.clear_dialogue.ui.SharedResources;
+import nokori.clear_dialogue.ui.widget.node.ConnectorWidget.ConnectorType;
 
 public class ConnectionRendererWidget extends Widget {
 	
@@ -49,7 +50,7 @@ public class ConnectionRendererWidget extends Widget {
 		float ex = (float) window.getMouseX();
 		float ey = (float) window.getMouseY();
 		
-		renderLine(context, sx, sy, ex, ey);
+		renderLine(context, connector, sx, sy, null, ex, ey);
 	}
 	
 	private void renderConnection(NanoVGContext context, Connection connection) {
@@ -65,10 +66,10 @@ public class ConnectionRendererWidget extends Widget {
 		float ex = connector2Widget.getClippedX() + connector2Widget.getWidth()/2;
 		float ey = connector2Widget.getClippedY() + connector2Widget.getHeight()/2;
 
-		renderLine(context, sx, sy, ex, ey);
+		renderLine(context, connector1Widget, sx, sy, connector2Widget, ex, ey);
 	}
 	
-	private void renderLine(NanoVGContext context, float sx, float sy, float ex, float ey) {
+	private void renderLine(NanoVGContext context, ConnectorWidget startWidget, float sx, float sy, ConnectorWidget endWidget, float ex, float ey) {
 		float lineDX = (ex - sx);
 		
 		float lineSControlX = (lineDX > 0 ? 50 : -50);
@@ -76,6 +77,24 @@ public class ConnectionRendererWidget extends Widget {
 		
 		float lineEControlX = (ex - sx) + (lineDX < 0 ? 50 : -50);
 		float lineEControlY = (ey - sy);
+		
+		boolean looping = (startWidget != null && endWidget != null) && 
+				(  lineDX > 0 && startWidget.getConnectorType() == ConnectorType.IN && endWidget.getConnectorType() == ConnectorType.OUT 
+				|| lineDX < 0 && startWidget.getConnectorType() == ConnectorType.OUT && endWidget.getConnectorType() == ConnectorType.IN);
+		
+		//Curve the connector so that it doesn't end up behind nodes in cases where nodes loop back to the start
+		if (looping) {
+			//System.out.println("Start: " + startWidget.getConnectorType() + " End: " + endWidget.getConnectorType() + " " + lineDX);
+			float offset = 200;
+			
+			lineSControlX = (lineDX < 0 ? lineSControlX + offset : lineSControlX - offset);
+			lineEControlX = (lineDX < 0 ? lineEControlX - offset : lineEControlX + offset);
+			
+			float mult = 1.5f;
+			
+			lineSControlY += (startWidget.getParent().getHeight() * mult);
+			lineEControlY += (endWidget.getParent().getHeight() * mult);
+		}
 		
 		bezierLine.setStartAndControl1Position(sx, sy, lineSControlX, lineSControlY);
 		bezierLine.setEndAndControl2Position(ex, ey, lineEControlX, lineEControlY);

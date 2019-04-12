@@ -24,6 +24,12 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		addChild(synch);
 	}
 	
+	@Override
+	protected void move(float newX, float newY) {
+		super.move(newX, newY);
+		sharedResources.getProject().setViewportPosition(newX, newY);
+	}
+	
 	/**
 	 * This function will refresh the canvas and synchronize it with the given Project.
 	 */
@@ -31,6 +37,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		/*
 		 * Remove existing children
 		 */
+		
 		for (int i = 0; i < getNumChildren(); i++) {
 			Widget w = getChild(i);
 			
@@ -80,7 +87,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	public void addDialogueTextNode() {
 		Project project = sharedResources.getProject();
 
-		DialogueText dialogue = new DialogueText(project, "New Dialogue " + project.getNumDialogue(), "", getNewDialogueX(), getNewDialogueY());
+		DialogueText dialogue = new DialogueText(project, "Dialogue " + project.getNumDialogue(), "", getNewDialogueX(), getNewDialogueY());
 		project.addDialogue(dialogue);
 		
 		addDialogueTextNode(dialogue);
@@ -111,7 +118,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	public void addDialogueResponseNode() {
 		Project project = sharedResources.getProject();
 		
-		DialogueResponse response = new DialogueResponse(project, "New Response " + project.getNumDialogue(), "", getNewDialogueX(), getNewDialogueY());
+		DialogueResponse response = new DialogueResponse(project, "Response " + project.getNumDialogue(), "", getNewDialogueX(), getNewDialogueY());
 		project.addDialogue(response);
 		
 		addDialogueResponseNode(response);

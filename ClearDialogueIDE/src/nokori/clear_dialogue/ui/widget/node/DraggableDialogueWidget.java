@@ -102,6 +102,9 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	private long lastLeftClickTime = -1L;
 	private long lastRightClickTime = -1L;
 	
+	private boolean highlighted = false;
+	private boolean gridSnappingEnabled = false;
+	
 	public DraggableDialogueWidget(SharedResources sharedResources, Dialogue dialogue) {
 		super(dialogue.getX(), dialogue.getY(), 0f, 0f);
 		this.sharedResources = sharedResources;
@@ -126,8 +129,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		NanoVGContext context = sharedResources.getNanoVGContext();
 		
-		float xPadding = 15f;
-		float yPadding = 15f;
+		float xPadding = 10f;
+		float yPadding = 10f;
 		float widgetPadding = (yPadding/2f);
 		float textWidth = mode.getWidth() - (xPadding * 2f);
 		
@@ -201,28 +204,23 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		 * Input callbacks
 		 */
 		
-		setOnMouseEnteredEvent(e -> {
-			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
-				FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
-				fadeIn.setLinkedObject(DraggableDialogueWidget.this);
-				fadeIn.play();
-					
-				sharedResources.setContextHint(CONTEXT_HINT);
-			}
-		});
-		
-		setOnMouseExitedEvent(e -> {
-			FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL.alpha(0f));
-			fadeOut.setLinkedObject(DraggableDialogueWidget.this);
-			fadeOut.play();
-				
-			sharedResources.resetContextHint();
+		setOnMouseMotionEvent(e -> {
+			highlightingControls();
 		});
 		
 		setOnMouseButtonEvent(e -> {
 			if (isMouseWithinThisWidget() && !e.isPressed()) {
 				leftClickCommands(e);
 				rightClickCommands(e);
+			}
+			
+			highlightingControls();
+		});
+		
+		setOnKeyEvent(e -> {
+			//Snap the node to the grid when dragging if left shift is held down
+			if (e.getKey() == GLFW.GLFW_KEY_LEFT_SHIFT) {
+				gridSnappingEnabled = e.isPressed();
 			}
 		});
 		
@@ -231,6 +229,48 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		 */
 		
 		transitionMode(mode);
+	}
+	
+	//We handle fading in/out this way instead of using entered/exited callbacks because we want the highlight to persist if we're dragging the node
+	private void highlightingControls() {
+		boolean bHighlighted = highlighted;
+		highlighted = (isMouseWithinThisWidget() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
+		
+		//Fade in
+		if (!bHighlighted && highlighted) {
+			FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
+			fadeIn.setLinkedObject(DraggableDialogueWidget.this);
+			fadeIn.play();
+			
+			sharedResources.setContextHint(CONTEXT_HINT);
+		}
+		
+		//Fade out
+		if (bHighlighted && !highlighted) {
+			FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL.alpha(0f));
+			fadeOut.setLinkedObject(DraggableDialogueWidget.this);
+			fadeOut.play();
+				
+			sharedResources.resetContextHint();
+		}
+	}
+	
+	private static final float SNAP_SIZE_MULTIPLIER = 1.5f;
+	
+	@Override
+	protected void move(float newX, float newY) {
+		float snapWidth = getWidth() * SNAP_SIZE_MULTIPLIER;
+		float snapHeight = getHeight() * SNAP_SIZE_MULTIPLIER;
+		
+		float gridX = (snapWidth * (int) ((newX + getDraggingAnchor().x()) / snapWidth)) + snapWidth/2 - getWidth()/2;
+		float gridY = (snapHeight * (int) ((newY + getDraggingAnchor().y()) / snapHeight)) + snapHeight/2 - getHeight()/2;
+		
+		//System.out.println("Called " + gridSnappingEnabled + " " + gridX + "/" + gridY + " " + newX + " " + newY + " " + (int) (newX / SNAP_WIDTH) + " " + (int) (newY / SNAP_HEIGHT));
+		
+		super.move((gridSnappingEnabled ? gridX : newX), (gridSnappingEnabled ? gridY : newY));
+		
+		dialogue.setX(getX());
+		dialogue.setY(getY());
 	}
 
 	public Dialogue getDialogue() {

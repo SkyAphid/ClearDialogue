@@ -67,7 +67,7 @@ public class ConnectorWidget extends HalfCircleWidget {
 		setOnMouseEnteredEvent(e -> {
 			new FillTransition(TRANSITION_DURATION, getFill(), connectorType.color.multiply(1.2f)).play();
 			
-			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
+			if (ClearStaticResources.isFocusedOrCanFocus(this) || ClearStaticResources.getFocusedWidget() instanceof ConnectorWidget) {
 				ClearStaticResources.getCursor(Type.HAND).apply(e.getWindow());
 			}
 		});
@@ -153,5 +153,9 @@ public class ConnectorWidget extends HalfCircleWidget {
 
 	public DialogueConnector getConnector() {
 		return connector;
+	}
+
+	public ConnectorType getConnectorType() {
+		return connectorType;
 	}
 }

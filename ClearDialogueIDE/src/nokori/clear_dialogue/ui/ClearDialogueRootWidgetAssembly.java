@@ -27,6 +27,8 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 	
 	public static final ClearColor CONTEXT_HINTS_TEXT_FILL = ClearColor.GRAY;
 	public static final int CONTEXT_HINTS_FONT_SIZE = 24;
+	
+	private ProjectNameTextFieldWidget projectNameField;
 
 	public ClearDialogueRootWidgetAssembly init(SharedResources sharedResources) {
 		initConnectionRenderer(sharedResources);
@@ -58,7 +60,9 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 		toolbar.addChild(new DropdownMenuWidgetFile(sharedResources));
 		toolbar.addChild(new DropdownMenuWidgetTool(sharedResources));
 		toolbar.addChild(new DropdownMenuWidgetNode(sharedResources));
-		toolbar.addChild(new ProjectNameTextFieldWidget(sharedResources));
+		
+		projectNameField = new ProjectNameTextFieldWidget(sharedResources);
+		toolbar.addChild(projectNameField);
 		
 		//Program information and context hints
 		toolbar.addChild(new GitRepoLinkWidget(sharedResources));
@@ -71,5 +75,9 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 	
 	public static int getToolbarAbsoluteX(int index) {
 		return WIDGET_PADDING + (DropdownMenuWidget.WIDTH + WIDGET_PADDING) * index;
+	}
+
+	public ProjectNameTextFieldWidget getProjectNameField() {
+		return projectNameField;
 	}
 }

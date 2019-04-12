@@ -24,7 +24,7 @@ public class DialogueUtils {
 	 */
 	public static Project showImportProjectDialog(String title, ClearDialogueIO io) {
 		//Support multiple filetypes
-		String filetypes[] = io.getTypeName().split(",");
+		String filetypes[] = io.getTypeName().split(", ");
 		
 		//Add all filetypes to the description
 		String filterDescription = "";
@@ -68,10 +68,9 @@ public class DialogueUtils {
 		if (f != null) {
 			try {
 				io.exportProject(project, f);
-				TinyFileDialog.showMessageDialog("Export Success", project.getName() + " was successfully exported.", Icon.INFORMATION);
 			} catch (Exception e) {
 				e.printStackTrace();
-				TinyFileDialog.showMessageDialog(e.getClass().getName() + " Caught", e.getMessage(), Icon.ERROR);
+				TinyFileDialog.showMessageDialog("Caught " + e.getClass().getName(), e.getMessage(), Icon.ERROR);
 			}
 		} else {
 			TinyFileDialog.showMessageDialog("ClearDialogue", "Project export cancelled.", Icon.INFORMATION);

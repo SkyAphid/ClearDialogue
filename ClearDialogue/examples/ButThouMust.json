@@ -9,8 +9,8 @@
             "uid": "4d11dfb7:16444438fe5:-7ffb",
             "name": "Response",
             "tag": "No Tag",
-            "nodeX": 0.0,
-            "nodeY": 0.0,
+            "nodeX": 526.0,
+            "nodeY": 321.0,
             "expanded": false,
             "inConnectorUID": "4d11dfb7:16444438fe5:-7ffa",
             "type": "typeResponse",
@@ -27,10 +27,10 @@
         },
         {
             "uid": "4d11dfb7:16444438fe5:-7ff2",
-            "name": "Dialogue",
+            "name": "End",
             "tag": "No Tag",
-            "nodeX": 0.0,
-            "nodeY": 0.0,
+            "nodeX": 764.0,
+            "nodeY": 228.0,
             "expanded": false,
             "inConnectorUID": "4d11dfb7:16444438fe5:-7ff1",
             "type": "typeDialogue",
@@ -39,10 +39,10 @@
         },
         {
             "uid": "45ec64fe:16444451c2b:-7fff",
-            "name": "Dialogue",
+            "name": "Start",
             "tag": "$DIALOGUE_START",
-            "nodeX": 0.0,
-            "nodeY": 0.0,
+            "nodeX": 221.0,
+            "nodeY": 231.0,
             "expanded": false,
             "inConnectorUID": "45ec64fe:16444451c2b:-7ffe",
             "type": "typeDialogue",
@@ -64,7 +64,9 @@
             "connector2UID": "45ec64fe:16444451c2b:-7ffe"
         }
     ]
-}UID": "4d11dfb7:16444438fe5:-7ff0",
+}
+    ]
+}fb7:16444438fe5:-7ff0",
             "connector2UID": "45ec64fe:16444451c2b:-7ffe"
         }
     ]

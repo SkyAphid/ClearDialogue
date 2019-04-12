@@ -11,14 +11,18 @@ import nokori.clear_dialogue.ui.SharedResources;
 public class ProjectNameTextFieldWidget extends ButtonWidget {
 
 	public static final int WIDTH = 500;
+
+	private SharedResources sharedResources;
+	private TextFieldWidget field;
 	
 	public ProjectNameTextFieldWidget(SharedResources sharedResources) {
 		super(getToolbarAbsoluteX(3), WIDGET_PADDING, WIDTH);
+		this.sharedResources = sharedResources;
 		
 		Project project = sharedResources.getProject();
 		Font font = sharedResources.getNotoSans();
 
-		TextFieldWidget field = new TextFieldWidget(getWidth() - (WIDGET_CLIP_X_PADDING * 3), TOOLBAR_TEXT_FILL, project.getName(), font, TOOLBAR_FONT_SIZE);
+		field = new TextFieldWidget(getWidth() - (WIDGET_CLIP_X_PADDING * 3), TOOLBAR_TEXT_FILL, project.getName(), font, TOOLBAR_FONT_SIZE);
 		field.setHighlightFill(HIGHLIGHT_COLOR);
 		field.setUnderlineFill(ClearColor.WHITE_SMOKE);
 		
@@ -28,5 +32,12 @@ public class ProjectNameTextFieldWidget extends ButtonWidget {
 		field.setOnKeyEvent(e -> {
 			project.setName(field.getTextBuilder().toString());
 		});
+	}
+	
+	/**
+	 * Resets this text field to the project name. Called this if the Project is changed during runtime.
+	 */
+	public void refresh() {
+		field.setText(sharedResources.getProject().getName());
 	}
 }

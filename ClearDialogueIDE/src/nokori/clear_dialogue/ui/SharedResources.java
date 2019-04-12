@@ -135,6 +135,7 @@ public class SharedResources {
 	public void setProject(Project project) {
 		this.project = project;
 		canvas.refresh(project);
+		rootWidgetAssembly.getProjectNameField().refresh();
 	}
 
 	public Font getNotoSans() {
@@ -157,8 +158,7 @@ public class SharedResources {
 			String s = split[i].replaceAll("\n", "").trim();
 
 			if (!s.isEmpty() && !s.startsWith("//")) {
-				@SuppressWarnings("unused")
-				Syntax syntax = syntaxWidget.addSyntax(s, ClearEscapeSequences.ESCAPE_SEQUENCE_COLOR, ClearColor.CORAL.toHEX());
+				syntaxWidget.addSyntax(s, ClearEscapeSequences.ESCAPE_SEQUENCE_COLOR, ClearColor.CORAL.toHEX());
 				//System.out.println("Registered Syntax: " + syntax.getKey() + " -> " + syntax.getEscapeSequence() + syntax.getInstructions() + " " + syntax.getResetMode().name());
 			}
 		}
