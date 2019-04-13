@@ -17,7 +17,7 @@ ClearDialogue is a branching dialogue editor for video games designed to be extr
 
 #### IO
 - Supports JSON exporting/importing
-- Supports [THJSON](https://github.com/Puppygames/thjson) exporting/importing
+- Supports [THJSON](https://github.com/Puppygames/thjson) exporting/importing (THJSON allows for easier human editing of the saved files)
 - Is heavily documented with instructions on how to add support for your own filetypes (it's also extremely simple)
 
 #### Tools
