@@ -1,7 +1,7 @@
 # ClearDialogue
 ClearDialogue is a branching dialogue editor for video games designed to be extremely flexible and work with any type of game engine. It was built with the [Clear LWJGL3 API.](https://github.com/SkyAphid/Clear)
 
-![ClearDialogue](https://user-images.githubusercontent.com/6147299/56028879-c6d73b00-5cde-11e9-9a56-8cea701cdc5a.png)
+![ClearDialogue](https://user-images.githubusercontent.com/6147299/56083625-2ae82500-5ded-11e9-8363-d6cc44f202e2.png)
 
 [This program was written by NOKORI•WARE. If you're satisfied with ClearDialogue, please visit our website and consider buying some of our products to help support the development of free software like this!](https://www.nokoriware.com/)
 
