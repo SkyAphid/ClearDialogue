@@ -4,6 +4,7 @@ import static nokori.clear.vg.widget.text.ClearEscapeSequences.ESCAPE_SEQUENCE_C
 import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
 
 import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget;
+import nokori.clear.windows.Window;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear.windows.util.TinyFileDialog.Icon;
 import nokori.clear.windows.util.TinyFileDialog.InputType;
@@ -15,16 +16,20 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 
 	private static final String LABEL = "TOOL";
 	
-	private static final String OPTION_REPLACE = "REPLACE...";
 	private static final String OPTION_VIEW_SYNTAX = "VIEW SYNTAX";
 	private static final String OPTION_REFRESH_SYNTAX = "REFRESH SYNTAX";
 	private static final String OPTION_SET_SYNTAX = "SET SYNTAX...";
+	private static final String OPTION_REPLACE = "REPLACE...";
+	private static final String OPTION_MULTI_TITLE = "MULTI-TITLE...";
+	private static final String OPTION_MULTI_TAG = "MULTI-TAG...";
 	
 	private static final String[] OPTIONS = {
-		OPTION_REPLACE,
 		OPTION_VIEW_SYNTAX,
 		OPTION_REFRESH_SYNTAX,
-		OPTION_SET_SYNTAX
+		OPTION_SET_SYNTAX,
+		OPTION_REPLACE,
+		OPTION_MULTI_TITLE,
+		OPTION_MULTI_TAG,
 	};
 	
 	private SharedResources sharedResources;
@@ -35,7 +40,7 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 	}
 
 	@Override
-	protected void optionSelected(String option, int index) {
+	protected void optionSelected(Window window, String option, int index) {
 		switch(option) {
 		case OPTION_REPLACE:
 			ReplaceUtils.runReplaceTool(sharedResources);
@@ -44,11 +49,13 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 			showSyntaxPopup();
 			break;
 		case OPTION_REFRESH_SYNTAX:
-			sharedResources.loadAndProcessSyntax();
+			sharedResources.loadAndProcessSyntax(true);
+			collapse(window);
 			break;
 		case OPTION_SET_SYNTAX:
 			DialogueUtils.showSyntaxFileSelectDialog();
-			sharedResources.loadAndProcessSyntax();
+			sharedResources.loadAndProcessSyntax(true);
+			collapse(window);
 			break;
 		}
 	}

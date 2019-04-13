@@ -57,12 +57,12 @@ public class PopupMessageWidget extends WidgetAssembly {
 		 * Background
 		 */
 		
-		overlay = new RectangleWidget(OVERLAY_COLOR.alpha(0.0f));
+		overlay = new RectangleWidget(OVERLAY_COLOR.alpha(0.0f), true);
 		overlay.addChild(new WidgetSynch(WidgetSynch.Mode.WITH_WINDOW));
 		new FillTransition(FADE_IN_DURATION, overlay.getFill(), OVERLAY_COLOR).play();
 		addChild(overlay);
 		
-		background = new RectangleWidget(4f, BACKGROUND_COLOR.alpha(0.0f), BACKGROUND_STROKE_COLOR.alpha(0.0f));
+		background = new RectangleWidget(4f, BACKGROUND_COLOR.alpha(0.0f), BACKGROUND_STROKE_COLOR.alpha(0.0f), true);
 		background.addChild(new WidgetSynch(this));
 		new FillTransition(FADE_IN_DURATION * 2, background.getFill(), BACKGROUND_COLOR) {
 			@Override
@@ -101,7 +101,7 @@ public class PopupMessageWidget extends WidgetAssembly {
 				return;
 			}
 			
-			if (!e.isPressed() && !isMouseWithinThisWidget(e.getWindow())) {
+			if (!e.isPressed() && !isMouseIntersecting(e.getWindow())) {
 				close();
 			}
 		});

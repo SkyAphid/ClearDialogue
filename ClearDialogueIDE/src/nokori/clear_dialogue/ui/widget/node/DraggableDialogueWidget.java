@@ -20,6 +20,7 @@ import nokori.clear.windows.event.MouseButtonEvent;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.DialogueConnector;
+import nokori.clear_dialogue.ui.ClearDialogueCanvas;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.widget.node.ConnectorWidget.ConnectorType;
 
@@ -84,6 +85,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	public static final Mode DEFAULT_MODE = Mode.COLLAPSED;
 	
+	private boolean deleteFlag = false;
+	
 	protected SharedResources sharedResources;
 	protected Dialogue dialogue;
 	
@@ -103,12 +106,14 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	private long lastRightClickTime = -1L;
 	
 	private boolean highlighted = false;
+	private boolean hovering = false;
 	private boolean gridSnappingEnabled = false;
 	
 	public DraggableDialogueWidget(SharedResources sharedResources, Dialogue dialogue) {
 		super(dialogue.getX(), dialogue.getY(), 0f, 0f);
 		this.sharedResources = sharedResources;
 		this.dialogue = dialogue;
+		this.mode = dialogue.isExpanded() ? Mode.EXPANDED : Mode.COLLAPSED;
 		
 		/*
 		 * Widget Container
@@ -117,10 +122,10 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		dropShadow = new DropShadowWidget(CORNER_RADIUS);
 		dropShadow.setInputEnabled(false);
 		
-		background = new RectangleWidget(CORNER_RADIUS, BACKGROUND_COLOR, BACKGROUND_STROKE_COLOR);
+		background = new RectangleWidget(CORNER_RADIUS, BACKGROUND_COLOR, BACKGROUND_STROKE_COLOR, true);
 		background.setInputEnabled(false);
 		
-		highlight = new RectangleWidget(CORNER_RADIUS, null, ClearColor.CORAL.alpha(0f));
+		highlight = new RectangleWidget(CORNER_RADIUS, null, ClearColor.CORAL.alpha(0f), true);
 		highlight.setInputEnabled(false);
 		
 		/*
@@ -139,6 +144,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		title.setUnderlineFill(UNDERLINE_COLOR);
 		title.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, yPadding));
 		title.addChild(new TextFieldSynch(this, false, xPadding, yPadding));
+		title.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		title.setOnKeyEvent(e -> {
 			dialogue.setTitle(title.getTextBuilder().toString());
@@ -151,13 +157,14 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		});
 		
 		//Tags
-		tags = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTag(), sharedResources.getNotoSans(), 20);
+		tags = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTags(), sharedResources.getNotoSans(), 20);
 		tags.setUnderlineFill(UNDERLINE_COLOR);
 		tags.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, title.getHeight() + yPadding + widgetPadding));
 		tags.addChild(new TextFieldSynch(this, false, xPadding, yPadding));
+		tags.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		tags.setOnKeyEvent(e -> {
-			dialogue.setTag(tags.getTextBuilder().toString());
+			dialogue.setTags(tags.getTextBuilder().toString());
 		});
 		
 		tags.setOnMouseEnteredEvent(e -> {
@@ -205,16 +212,16 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		 */
 		
 		setOnMouseMotionEvent(e -> {
-			highlightingControls();
+			highlightingCommands(sharedResources.getCanvas().canMouseMotionUnhighlightDialogueNode(this));
 		});
 		
 		setOnMouseButtonEvent(e -> {
-			if (isMouseWithinThisWidget() && !e.isPressed()) {
+			if (isMouseWithin() && !e.isPressed()) {
 				leftClickCommands(e);
 				rightClickCommands(e);
 			}
 			
-			highlightingControls();
+			highlightingCommands(true);
 		});
 		
 		setOnKeyEvent(e -> {
@@ -231,29 +238,15 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		transitionMode(mode);
 	}
 	
-	//We handle fading in/out this way instead of using entered/exited callbacks because we want the highlight to persist if we're dragging the node
-	private void highlightingControls() {
-		boolean bHighlighted = highlighted;
-		highlighted = (isMouseWithinThisWidget() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
-		
-		//Fade in
-		if (!bHighlighted && highlighted) {
-			FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
-			fadeIn.setLinkedObject(DraggableDialogueWidget.this);
-			fadeIn.play();
-			
-			sharedResources.setContextHint(CONTEXT_HINT);
-		}
-		
-		//Fade out
-		if (bHighlighted && !highlighted) {
-			FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL.alpha(0f));
-			fadeOut.setLinkedObject(DraggableDialogueWidget.this);
-			fadeOut.play();
-				
-			sharedResources.resetContextHint();
-		}
-	}
+	/*
+	 * 
+	 * 
+	 * 
+	 * Input
+	 * 
+	 * 
+	 * 
+	 */
 	
 	private static final float SNAP_SIZE_MULTIPLIER = 1.5f;
 	
@@ -272,41 +265,15 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		dialogue.setX(getX());
 		dialogue.setY(getY());
 	}
-
-	public Dialogue getDialogue() {
-		return dialogue;
-	}
-	
-	/**
-	 * Gets the ConnectorWidget attached to the DraggableDialogueWidget (if applicable) for the given connector
-	 * 
-	 * @param connector
-	 * @return
-	 */
-	public ConnectorWidget findConnectorWidget(DialogueConnector connector) {
-		for (int i = 0; i < getNumChildren(); i++) {
-			if (getChild(i) instanceof ConnectorWidget) {
-				ConnectorWidget w = (ConnectorWidget) getChild(i);
-				
-				if (w.getConnector() == connector) {
-					return w;
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	protected float getMinWidth() {
-		return (mode != Mode.DELETION ? Mode.COLLAPSED.getWidth() : 0f);
-	}
-	
-	protected float getMinHeight() {
-		return (mode != Mode.DELETION ? Mode.COLLAPSED.getHeight() : 0f);
-	}
 	
 	protected void keyEventCallback() {
 		dialogue.parseAndSetContent(content.getTextBuilder().toString());
+	}
+	
+	private void highlightingCommands(boolean resetHighlighting) {
+		hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
+		
+		setHighlighted(highlighted && !resetHighlighting || hovering);
 	}
 	
 	public void leftClickCommands(MouseButtonEvent e) {
@@ -343,7 +310,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 							"Are you sure you want to delete " + dialogue.getTitle() + "?\nThis cannot be undone.",
 							TinyFileDialog.InputType.YES_NO, TinyFileDialog.Icon.QUESTION, false)) {
 						
-						requestRemoval();
+						requestRemoval(true);
 						
 					}
 				} else {
@@ -360,6 +327,89 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		}
 	}
 	
+	/*
+	 * 
+	 * 
+	 * 
+	 * Menu controls & animation
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public Dialogue getDialogue() {
+		return dialogue;
+	}
+	
+	/**
+	 * Gets the ConnectorWidget attached to the DraggableDialogueWidget (if applicable) for the given connector
+	 * 
+	 * @param connector
+	 * @return
+	 */
+	public ConnectorWidget findConnectorWidget(DialogueConnector connector) {
+		if (mode == Mode.DELETION) {
+			return null;
+		}
+		
+		for (int i = 0; i < getNumChildren(); i++) {
+			if (getChild(i) instanceof ConnectorWidget) {
+				ConnectorWidget w = (ConnectorWidget) getChild(i);
+				
+				if (w.getConnector() == connector) {
+					return w;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	protected float getMinWidth() {
+		return (mode != Mode.DELETION ? Mode.COLLAPSED.getWidth() : 0f);
+	}
+	
+	protected float getMinHeight() {
+		return (mode != Mode.DELETION ? Mode.COLLAPSED.getHeight() : 0f);
+	}
+	
+	/**
+	 * Sets the highlighted boolean and triggers animations if necessary.
+	 * 
+	 * @param highlighted
+	 */
+	public void setHighlighted(boolean highlighted) {
+		boolean bHighlighted = this.highlighted;
+		this.highlighted = highlighted;
+		
+		//Register as highlighted to canvas
+		ClearDialogueCanvas canvas = sharedResources.getCanvas();
+		
+		if (highlighted) {
+			canvas.notifyDialogueNodeHighlighted(this);
+		} else {
+			canvas.notifyDialogueNodeUnhighlighted(this);
+		}
+		
+		//Fade in
+		if (!bHighlighted && highlighted) {
+			FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
+			fadeIn.setLinkedObject(DraggableDialogueWidget.this);
+			fadeIn.play();
+			
+			sharedResources.setContextHint(CONTEXT_HINT);
+		}
+		
+		//Fade out
+		if (bHighlighted && !highlighted) {
+			FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL.alpha(0f));
+			fadeOut.setLinkedObject(DraggableDialogueWidget.this);
+			fadeOut.play();
+				
+			sharedResources.resetContextHint();
+		}
+	}
+	
 	/**
 	 * Ends editing mode and transforms the Widget back into it's non-editable form.
 	 */
@@ -369,10 +419,17 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	/**
 	 * Requests this DraggableDialogueWidget to close and remove itself from the canvas. This is essentially an animated version of removing the widget.
+	 * 
+	 * @param flagForDeletion - if true, the contents of this node will also be deleted from the project once the animation is complete.
 	 */
-	public void requestRemoval() {
+	public void requestRemoval(boolean flagForDeletion) {
+		deleteFlag = flagForDeletion;
 		transitionMode(Mode.DELETION);
 		fadeOutConnector(inConnector);
+	}
+	
+	public boolean isDataFlaggedForDeletion() {
+		return deleteFlag;
 	}
 	
 	protected void fadeOutConnector(ConnectorWidget connector) {
@@ -387,6 +444,10 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		this.mode = mode;
 
 		new DialogueWidgetSizeTransition().play();
+		
+		if (mode != Mode.EDITING) {
+			dialogue.setExpanded(mode == Mode.EXPANDED);
+		}
 		
 		/*
 		 * Set input settings based on mode
@@ -404,6 +465,16 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		tags.getInputSettings().setInputEnabled(mode == Mode.EDITING);
 		content.getInputSettings().setInputEnabled(mode == Mode.EDITING);
 	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 * Custom classes
+	 * 
+	 * 
+	 * 
+	 */
 
 	private class TextFieldSynch extends WidgetSynch {
 		
@@ -438,7 +509,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			
 			setOnCompleted(e -> {
 				if (mode == Mode.DELETION) {
-					sharedResources.getCanvas().deleteDialogueNode(DraggableDialogueWidget.this);
+					sharedResources.getCanvas().removeDialogueNode(DraggableDialogueWidget.this);
 				} else {
 					title.requestRefresh();
 					tags.requestRefresh();

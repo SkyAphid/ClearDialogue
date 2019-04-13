@@ -46,8 +46,8 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 	public static final String JSON_NODE_TYPE = "type";
 	
 	public static final String JSON_UID = "uid";
-	public static final String JSON_NAME = "name";
-	public static final String JSON_TAG = "tag";
+	public static final String JSON_TITLE = "title";
+	public static final String JSON_TAGS = "tags";
 	public static final String JSON_NODE_X = "nodeX";
 	public static final String JSON_NODE_Y = "nodeY";
 	public static final String JSON_EXPANDED = "expanded";
@@ -106,8 +106,8 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			
 			//Record basic data
 			nodeBuilder.add(JSON_UID, node.getUID());
-			nodeBuilder.add(JSON_NAME, node.getTitle());
-			nodeBuilder.add(JSON_TAG, node.getTag());
+			nodeBuilder.add(JSON_TITLE, node.getTitle());
+			nodeBuilder.add(JSON_TAGS, node.getTags());
 			
 			nodeBuilder.add(JSON_NODE_X, node.getX());
 			nodeBuilder.add(JSON_NODE_Y, node.getY());
@@ -206,7 +206,7 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 		jsonWriter.writeObject(export);
 		jsonWriter.close();
 
-		Files.write(f.toPath(), stringWriter.toString().getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
+		Files.write(new File(f.getAbsolutePath() + ".json").toPath(), stringWriter.toString().getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
 	}
 	
 	@Override
@@ -240,8 +240,8 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 
 			// Load basic shared data
 			String uid = nodeObject.getString(JSON_UID);
-			String name = nodeObject.getString(JSON_NAME);
-			String tag = nodeObject.getString(JSON_TAG);
+			String name = nodeObject.getString(JSON_TITLE);
+			String tag = nodeObject.getString(JSON_TAGS);
 
 			float nodeX = (float) nodeObject.getJsonNumber(JSON_NODE_X).doubleValue();
 			float nodeY = (float) nodeObject.getJsonNumber(JSON_NODE_Y).doubleValue();

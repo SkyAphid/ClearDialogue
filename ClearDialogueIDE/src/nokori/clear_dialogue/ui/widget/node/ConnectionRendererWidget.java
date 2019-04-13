@@ -59,7 +59,7 @@ public class ConnectionRendererWidget extends Widget {
 		
 		ConnectorWidget connector1Widget = findConnectorWidget(connector1);
 		ConnectorWidget connector2Widget = findConnectorWidget(connector2);
-			
+		
 		float sx = connector1Widget.getClippedX() + connector1Widget.getWidth()/2; 
 		float sy = connector1Widget.getClippedY() + connector1Widget.getHeight()/2;
 			
@@ -95,7 +95,7 @@ public class ConnectionRendererWidget extends Widget {
 			lineSControlY += (startWidget.getParent().getHeight() * mult);
 			lineEControlY += (endWidget.getParent().getHeight() * mult);
 		}
-		
+
 		bezierLine.setStartAndControl1Position(sx, sy, lineSControlX, lineSControlY);
 		bezierLine.setEndAndControl2Position(ex, ey, lineEControlX, lineEControlY);
 		
@@ -115,8 +115,8 @@ public class ConnectionRendererWidget extends Widget {
 			if (widget instanceof DraggableDialogueWidget) {
 				DraggableDialogueWidget w = (DraggableDialogueWidget) widget;
 				ConnectorWidget c = w.findConnectorWidget(connector);
-				
-				if (c != null) {
+
+				if (c != null) {	
 					return c;
 				}
 			}

@@ -16,8 +16,8 @@ public class DraggableDialogueTextWidget extends DraggableDialogueWidget {
 	}
 	
 	@Override
-	public void requestRemoval() {
-		super.requestRemoval();	
+	public void requestRemoval(boolean flagForDeletion) {
+		super.requestRemoval(flagForDeletion);	
 		fadeOutConnector(outConnector);
 	}
 }

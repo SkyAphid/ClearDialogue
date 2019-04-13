@@ -13,7 +13,7 @@ public class Project implements Serializable {
 	private static final long serialVersionUID = -8369866434879310100L;
 	
 	//Version information, this is to help bring old files up to date in the future if needed.
-	public static final int CURRENT_VERSION = 3;
+	public static final int CURRENT_VERSION = 1;
 	private int version;
 	
 	//The name of the project
@@ -116,7 +116,7 @@ public class Project implements Serializable {
 
 			@Override
 			public boolean check(Dialogue node) {
-				String nodeTag = node.getTag();
+				String nodeTag = node.getTags();
 				
 				boolean hasTag = (exactMatch ? nodeTag.equals(tag) : nodeTag.contains(tag));
 				

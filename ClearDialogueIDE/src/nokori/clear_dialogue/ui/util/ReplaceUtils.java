@@ -28,7 +28,7 @@ public class ReplaceUtils {
 			Dialogue dialogue = project.getDialogue(i);
 			
 			dialogue.setTitle(dialogue.getTitle().replace(find, replace));
-			dialogue.setTag(dialogue.getTag().replace(find, replace));
+			dialogue.setTags(dialogue.getTags().replace(find, replace));
 			
 			if (dialogue instanceof DialogueText) {
 				DialogueText dialogueText = (DialogueText) dialogue;

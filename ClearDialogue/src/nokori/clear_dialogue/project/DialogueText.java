@@ -16,13 +16,13 @@ public class DialogueText extends Dialogue {
 	//Out connector for connecting to other nodes
 	private DialogueConnector outConnector;
 	
-	public DialogueText(Project project, String uid, String name, String tag, float x, float y, boolean expanded, String text) {
-		super(project, uid, name, tag, x, y, expanded);
+	public DialogueText(Project project, String uid, String name, String tags, float x, float y, boolean expanded, String text) {
+		super(project, uid, name, tags, x, y, expanded);
 		this.text = text;
 	}
 	
-	public DialogueText(Project project, String name, String tag, float x, float y) {
-		super(project, name, tag, x, y);
+	public DialogueText(Project project, String name, String tags, float x, float y) {
+		super(project, name, tags, x, y);
 		text = "Default Text";
 		outConnector = new DialogueConnector(project, this);
 	}
@@ -70,7 +70,7 @@ public class DialogueText extends Dialogue {
 
 	@Override
 	public Dialogue duplicate() {
-		DialogueText node = new DialogueText(getProject(), getTitle(), getTag(), getX(), getY());
+		DialogueText node = new DialogueText(getProject(), getTitle(), getTags(), getX(), getY());
 		node.text = text;
 		return node;
 	}

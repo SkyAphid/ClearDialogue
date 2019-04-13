@@ -19,12 +19,12 @@ public class DialogueResponse extends Dialogue {
 	 */
 	private ArrayList<Response> responses = new ArrayList<Response>();
 	
-	public DialogueResponse(Project project, String uid, String name, String tag, float x, float y, boolean expanded) {
-		super(project, uid, name, tag, x, y, expanded);
+	public DialogueResponse(Project project, String uid, String name, String tags, float x, float y, boolean expanded) {
+		super(project, uid, name, tags, x, y, expanded);
 	}
 	
-	public DialogueResponse(Project project, String name, String tag, float x, float y) {
-		super(project, name, tag, x, y);
+	public DialogueResponse(Project project, String name, String tags, float x, float y) {
+		super(project, name, tags, x, y);
 
 		addResponse("Default Response");
 	}
@@ -140,7 +140,7 @@ public class DialogueResponse extends Dialogue {
 
 	@Override
 	public Dialogue duplicate() {
-		DialogueResponse node = new DialogueResponse(getProject(), getTitle(), getTag(), getX(), getY());
+		DialogueResponse node = new DialogueResponse(getProject(), getTitle(), getTags(), getX(), getY());
 		node.responses.addAll(responses);
 		return node;
 	}

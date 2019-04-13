@@ -27,6 +27,7 @@ public class SharedResources {
 	/*
 	 * Dialogue Data
 	 */
+	
 	public static final String SYNTAX_FILE_LOCATION = "syntax_directory.ini";
 	
 	private Project project = new Project();
@@ -56,7 +57,7 @@ public class SharedResources {
 		}
 
 		resetContextHint();
-		loadAndProcessSyntax();
+		loadAndProcessSyntax(false);
 		
 		rootWidgetAssembly.init(this);
 	}
@@ -89,6 +90,10 @@ public class SharedResources {
 		this.canvas = canvas;
 	}
 
+	public void refreshCanvas() {
+		canvas.refresh(project);
+	}
+	
 	public ConnectionRendererWidget getConnectionRenderer() {
 		return connectionRenderer;
 	}
@@ -117,7 +122,11 @@ public class SharedResources {
 	 * Resets the context hint back to the general controls for navigating the canvas.
 	 */
 	public void resetContextHint() {
-		contextHint = "Drag LMB = Pan Canvas & Drag Nodes";
+		contextHint = "Drag LMB = Pan Canvas & Drag Nodes | Drag RMB = Highlight";
+		
+		if (canvas != null && canvas.getNumHighlightedNodes() > 0) {
+			contextHint = canvas.getNumHighlightedNodes() + " Highlighted | T = Add Tags to All | R = Remove Tags from All | N = Rename All";
+		}
 	}
 
 	/**
@@ -150,17 +159,28 @@ public class SharedResources {
 	 * This function will call ClearDialogueIDEUtil.loadSyntax() and then process that string into the TextAreaAutoFormatterWidget that's used with 
 	 * the TextAreaWidget's around the IDE.
 	 */
-	public void loadAndProcessSyntax() {
-		syntaxWidget.clearAllSyntax();
-		String[] split = DialogueUtils.loadSyntax().split("\n");
+	public void loadAndProcessSyntax(boolean refreshCanvas) {
+		String syntax = DialogueUtils.loadSyntax();
 		
-		for (int i = 0; i < split.length; i++) {
-			String s = split[i].replaceAll("\n", "").trim();
+		if (syntax != null) {
+			syntaxWidget.clearAllSyntax();
+			
+			String[] split = DialogueUtils.loadSyntax().split("\n");
+			
+			for (int i = 0; i < split.length; i++) {
+				String s = split[i].replaceAll("\n", "").trim();
 
-			if (!s.isEmpty() && !s.startsWith("//")) {
-				syntaxWidget.addSyntax(s, ClearEscapeSequences.ESCAPE_SEQUENCE_COLOR, ClearColor.CORAL.toHEX());
-				//System.out.println("Registered Syntax: " + syntax.getKey() + " -> " + syntax.getEscapeSequence() + syntax.getInstructions() + " " + syntax.getResetMode().name());
+				if (!s.isEmpty() && !s.startsWith("//")) {
+					syntaxWidget.addSyntax(s, ClearEscapeSequences.ESCAPE_SEQUENCE_COLOR, ClearColor.CORAL.toHEX());
+					//System.out.println("Registered Syntax: " + syntax.getKey() + " -> " + syntax.getEscapeSequence() + syntax.getInstructions() + " " + syntax.getResetMode().name());
+				}
 			}
+			
+			if (refreshCanvas) {
+				canvas.refresh(project);
+			}
+		} else {
+			System.err.println("Syntax content was null. Processing aborted.");
 		}
 	}
 	

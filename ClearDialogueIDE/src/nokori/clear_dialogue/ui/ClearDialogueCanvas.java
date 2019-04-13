@@ -1,5 +1,9 @@
 package nokori.clear_dialogue.ui;
 
+import java.util.ArrayList;
+
+import org.lwjgl.glfw.GLFW;
+
 import nokori.clear.vg.widget.assembly.DraggableWidgetAssembly;
 import nokori.clear.vg.widget.assembly.Widget;
 import nokori.clear.vg.widget.assembly.WidgetSynch;
@@ -7,6 +11,8 @@ import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.DialogueResponse;
 import nokori.clear_dialogue.project.DialogueText;
 import nokori.clear_dialogue.project.Project;
+import nokori.clear_dialogue.ui.util.MultiEditUtils;
+import nokori.clear_dialogue.ui.widget.HighlightWidget;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueResponseWidget;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueTextWidget;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget;
@@ -14,6 +20,8 @@ import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget;
 public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	
 	private SharedResources sharedResources;
+
+	private ArrayList<DraggableDialogueWidget> highlightedNodes = new ArrayList<>();
 	
 	public ClearDialogueCanvas(SharedResources sharedResources) {
 		this.sharedResources = sharedResources;
@@ -22,6 +30,35 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		synch.setSynchXEnabled(false);
 		synch.setSynchYEnabled(false);
 		addChild(synch);
+		
+		setOnMouseButtonEvent(e -> {
+			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && e.isPressed()) {
+				HighlightWidget highlighter = new HighlightWidget(sharedResources, (float) e.getMouseX(), (float) e.getMouseY());
+				addChild(highlighter);
+			}
+		});
+		
+		setOnKeyEvent(e -> {
+			
+			if (!e.isPressed()) {
+				return;
+			}
+			
+			if (!highlightedNodes.isEmpty()) {
+				if (e.getKey() == GLFW.GLFW_KEY_T) {
+					MultiEditUtils.addTagsToAll(sharedResources, highlightedNodes);
+				}
+				
+				if (e.getKey() == GLFW.GLFW_KEY_R) {
+					MultiEditUtils.removeTagsFromAll(sharedResources, highlightedNodes);
+				}
+				
+				if (e.getKey() == GLFW.GLFW_KEY_N) {
+					MultiEditUtils.multiTitle(sharedResources, highlightedNodes);
+				}
+			}
+			
+		});
 	}
 	
 	@Override
@@ -42,7 +79,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 			Widget w = getChild(i);
 			
 			if (w instanceof DraggableDialogueWidget) {
-				((DraggableDialogueWidget) w).requestRemoval();
+				((DraggableDialogueWidget) w).requestRemoval(false);
 			} else {
 				removeChild(i);
 				i--;
@@ -138,13 +175,53 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	/*
 	 * 
 	 * 
+	 * Highlighting tools
+	 * 
+	 * 
+	 */
+	
+	/**
+	 * Notify this canvas that the dialogue node is no longer highlighted
+	 */
+	public void notifyDialogueNodeUnhighlighted(DraggableDialogueWidget node) {
+		highlightedNodes.remove(node);
+	}
+	
+	public void notifyDialogueNodeHighlighted(DraggableDialogueWidget node) {
+		if (!highlightedNodes.contains(node)) {
+			highlightedNodes.add(node);
+		}
+		
+		//This will change the context hint to include controls for multiple highlighted nodes
+		sharedResources.resetContextHint();
+	}
+	
+	/**
+	 * Checks whether or not the given node can unhighlight itself via the mouse leaving its bounding. 
+	 * This is only true if the given dialogue node is the only currently highlighted node. The purpose of this function is to prevent nodes from unhighlighting themselves after 
+	 * the multi-select is used.
+	 */
+	public boolean canMouseMotionUnhighlightDialogueNode(DraggableDialogueWidget node) {
+		return (highlightedNodes.contains(node) && highlightedNodes.size() == 1);
+	}
+	
+	public int getNumHighlightedNodes() {
+		return highlightedNodes.size();
+	}
+	
+	/*
+	 * 
+	 * 
 	 * Utilities
 	 * 
 	 * 
 	 */
 	
-	public void deleteDialogueNode(DraggableDialogueWidget widget) {
-		sharedResources.getProject().removeDialogue(widget.getDialogue());
+	public void removeDialogueNode(DraggableDialogueWidget widget) {
+		if (widget.isDataFlaggedForDeletion()) {
+			sharedResources.getProject().removeDialogue(widget.getDialogue());
+		}
+		
 		removeChild(widget);
 	}
 	

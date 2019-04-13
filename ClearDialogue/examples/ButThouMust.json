@@ -1,14 +1,14 @@
 
 {
     "projectName": "ButThouMust",
-    "projectVersion": 3,
+    "projectVersion": 1,
     "projectViewportX": 0.0,
     "projectViewportY": 0.0,
     "nodesArray": [
         {
             "uid": "4d11dfb7:16444438fe5:-7ffb",
-            "name": "Response",
-            "tag": "No Tag",
+            "title": "Response",
+            "tags": "No Tag",
             "nodeX": 526.0,
             "nodeY": 321.0,
             "expanded": false,
@@ -27,11 +27,11 @@
         },
         {
             "uid": "4d11dfb7:16444438fe5:-7ff2",
-            "name": "End",
-            "tag": "No Tag",
-            "nodeX": 764.0,
-            "nodeY": 228.0,
-            "expanded": false,
+            "title": "End",
+            "tags": "No Tag",
+            "nodeX": 738.0,
+            "nodeY": 213.0,
+            "expanded": true,
             "inConnectorUID": "4d11dfb7:16444438fe5:-7ff1",
             "type": "typeDialogue",
             "text": "But thou must.",
@@ -39,11 +39,11 @@
         },
         {
             "uid": "45ec64fe:16444451c2b:-7fff",
-            "name": "Start",
-            "tag": "$DIALOGUE_START",
-            "nodeX": 221.0,
-            "nodeY": 231.0,
-            "expanded": false,
+            "title": "Start",
+            "tags": "$DIALOGUE_START",
+            "nodeX": 202.0,
+            "nodeY": 208.0,
+            "expanded": true,
             "inConnectorUID": "45ec64fe:16444451c2b:-7ffe",
             "type": "typeDialogue",
             "text": "Dost thou love me $PLAYER_NAME?",
@@ -64,6 +64,7 @@
             "connector2UID": "45ec64fe:16444451c2b:-7ffe"
         }
     ]
+}
 }
     ]
 }fb7:16444438fe5:-7ff0",

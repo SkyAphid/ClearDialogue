@@ -2,6 +2,7 @@ package nokori.clear_dialogue.ui.widget;
 
 import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
 
+import nokori.clear.windows.Window;
 import nokori.clear_dialogue.io.ClearDialogueAutoIO;
 import nokori.clear_dialogue.io.ClearDialogueJsonIO;
 import nokori.clear_dialogue.project.Project;
@@ -35,7 +36,7 @@ public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 	}
 
 	@Override
-	protected void optionSelected(String option, int index) {
+	protected void optionSelected(Window window, String option, int index) {
 		Project project = sharedResources.getProject();
 		ClearDialogueCanvas canvas = sharedResources.getCanvas();
 		

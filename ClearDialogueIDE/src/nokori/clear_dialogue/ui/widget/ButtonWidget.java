@@ -21,7 +21,7 @@ public class ButtonWidget extends WidgetAssembly {
 
 		float cornerRadius = 3f;
 		addChild(new DropShadowWidget(cornerRadius, ClearColor.LIGHT_BLACK.alpha(0.5f)));
-		addChild(new RectangleWidget(cornerRadius, ClearColor.CORAL));
+		addChild(new RectangleWidget(cornerRadius, ClearColor.CORAL, true));
 	}
 	
 	protected void addJDButtonWidgetClip(Widget widget) {

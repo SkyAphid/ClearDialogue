@@ -59,12 +59,12 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			
 			optionHighlight.setOnMouseButtonEvent(e -> {
 				if (ClearStaticResources.isFocusedOrCanFocus(this)) {
-					boolean mouseWithin = optionHighlight.isMouseWithinThisWidget();
+					boolean mouseWithin = optionHighlight.isMouseWithin();
 					
 					setOptionPressedHighlight(index, mouseWithin && e.isPressed());
 					
 					if (mouseWithin && !e.isPressed()) {
-						optionSelected(options[index], index);	
+						optionSelected(e.getWindow(), options[index], index);	
 					}
 				}
 			});
@@ -136,7 +136,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			//Select
 			fadeHighlight(optionHighlights[index], 1.0f);
 		} else if (bPressed && !pressed){
-			if (optionHighlights[index].isMouseWithinThisWidget()) {
+			if (optionHighlights[index].isMouseWithin()) {
 				//Fade into highlight
 				fadeHighlight(optionHighlights[index], 0.25f);
 			} else {
@@ -156,17 +156,17 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	}
 	/**
 	 * This is the callback for when an option is selected from the dropdown menu
-	 * 
+	 * @param window TODO
 	 * @param option - the name of the option selected
 	 * @param index - the index of the option
 	 */
-	protected abstract void optionSelected(String option, int index);
+	protected abstract void optionSelected(Window window, String option, int index);
 	
 	private void resetCursor(Window window) {
 		//Reset the mouse cursor on exit, if none of the options are highlighted
 		
 		for (int j = 0; j < optionHighlights.length; j++) {
-			if (optionHighlights[j].isMouseWithinThisWidget()) {
+			if (optionHighlights[j].isMouseWithin()) {
 				return;
 			}
 		}
@@ -179,7 +179,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	/**
 	 * This activates the animation for expanding the dropdown menu and enables all of the option inputs
 	 */
-	private void expand() {
+	public void expand() {
 		//Expand the dropdown
 		float expandedHeight = HEIGHT + (HEIGHT * optionLabels.length);
 		new WidgetSizeTransition(this, TRANSITION_DURATION, WIDTH, expandedHeight).play();
@@ -203,7 +203,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	 * 
 	 * @param window
 	 */
-	private void collapse(Window window) {
+	public void collapse(Window window) {
 		//Collapse the dropdown
 		new WidgetSizeTransition(this, TRANSITION_DURATION, WIDTH, HEIGHT).play();
 		
@@ -212,9 +212,9 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			RectangleWidget h = optionHighlights[i];
 			h.setInputEnabled(false);
 			
-			if (h.isMouseWithinThisWidget()) {
+			if (h.isMouseWithin()) {
 				h.getMouseExitedEventListener().listen(null);
-				h.resetIsMouseWithin();
+				h.resetMouseWithin();
 			}
 			
 			resetCursor(window);

@@ -2,6 +2,7 @@ package nokori.clear_dialogue.ui.widget;
 
 import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
 
+import nokori.clear.windows.Window;
 import nokori.clear_dialogue.ui.SharedResources;
 
 public class DropdownMenuWidgetNode extends DropdownMenuWidget {
@@ -24,7 +25,7 @@ public class DropdownMenuWidgetNode extends DropdownMenuWidget {
 	}
 
 	@Override
-	protected void optionSelected(String option, int index) {
+	protected void optionSelected(Window window, String option, int index) {
 		switch(option) {
 		case OPTION_DIALOGUE:
 			sharedResources.getCanvas().addDialogueTextNode();

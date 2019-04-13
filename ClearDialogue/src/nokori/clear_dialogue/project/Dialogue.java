@@ -21,7 +21,7 @@ public abstract class Dialogue implements Serializable {
 	
 	//Basic user-settable information
 	private String title;
-	private String tag;
+	private String tags;
 	private float x, y;
 	private boolean expanded = false;
 	
@@ -32,11 +32,11 @@ public abstract class Dialogue implements Serializable {
 	 * This constructor allows you to input the UID as well, for in cases where you're trying to load a copy of a dialogue node from a file.
 	 * 
 	 */
-	public Dialogue(Project project, String uid, String title, String tag, float x, float y, boolean expanded) {
+	public Dialogue(Project project, String uid, String title, String tags, float x, float y, boolean expanded) {
 		this.project = project;
 		this.uid = uid;
 		this.title = title;
-		this.tag = tag;
+		this.tags = tags;
 		this.x = x;
 		this.y = y;
 		this.expanded = expanded;
@@ -45,10 +45,10 @@ public abstract class Dialogue implements Serializable {
 	/**
 	 * This constructor is used for making a brand new dialogue node. A UID is generated automatically.
 	 */
-	public Dialogue(Project project, String title, String tag, float x, float y) {
+	public Dialogue(Project project, String title, String tags, float x, float y) {
 		this.project = project;
 		this.title = title;
-		this.tag = tag;
+		this.tags = tags;
 		this.x = x;
 		this.y = y;
 		
@@ -84,12 +84,12 @@ public abstract class Dialogue implements Serializable {
 		this.title = title;
 	}
 
-	public String getTag() {
-		return tag;
+	public String getTags() {
+		return tags;
 	}
 
-	public void setTag(String tag) {
-		this.tag = tag;
+	public void setTags(String tags) {
+		this.tags = tags;
 	}
 	
 	public void setPosition(float x, float y) {

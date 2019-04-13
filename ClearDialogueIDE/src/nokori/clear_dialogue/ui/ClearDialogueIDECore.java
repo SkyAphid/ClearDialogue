@@ -2,16 +2,16 @@ package nokori.clear_dialogue.ui;
 
 import java.io.File;
 
-import nokori.clear.vg.ClearApplication;
+import nokori.clear.vg.ClearApp;
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.windows.GLFWException;
 import nokori.clear.windows.Window;
 import nokori.clear.windows.WindowManager;
 
-public class ClearDialogueIDECore extends ClearApplication {
+public class ClearDialogueIDECore extends ClearApp {
 	
-	public static final String PROGRAM_NAME = "ClearDialogue";
+	public static final String PROGRAM_NAME = "ClearDialogue IDE";
 	public static final String PROGRAM_VERSION = "Rev. 1";
 	public static final String PROGRAM_DEVELOPER = "NOKORI•WARE";
 	
