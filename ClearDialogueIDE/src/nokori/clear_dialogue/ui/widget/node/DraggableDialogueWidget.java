@@ -106,6 +106,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	private long lastRightClickTime = -1L;
 	
 	private boolean highlighted = false;
+	private boolean highlightedWithHighlighter = false;
 	private boolean hovering = false;
 	private boolean gridSnappingEnabled = false;
 	
@@ -212,7 +213,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		 */
 		
 		setOnMouseMotionEvent(e -> {
-			highlightingCommands(sharedResources.getCanvas().canMouseMotionUnhighlightDialogueNode(this));
+			highlightingCommands();
 		});
 		
 		setOnMouseButtonEvent(e -> {
@@ -221,7 +222,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				rightClickCommands(e);
 			}
 			
-			highlightingCommands(true);
+			highlightingCommands();
 		});
 		
 		setOnKeyEvent(e -> {
@@ -266,14 +267,47 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		dialogue.setY(getY());
 	}
 	
+	@Override
+	protected void draggingAnchorCallback(float mouseX, float mouseY) {
+		super.draggingAnchorCallback(mouseX, mouseY);
+		
+		/*
+		 * Multi-dragging anchor
+		 */
+		
+		ClearDialogueCanvas canvas = sharedResources.getCanvas();
+		
+		for (int i = 0; i < canvas.getNumHighlightedNodes(); i++) {
+			DraggableDialogueWidget w = canvas.getHighlightedNode(i);
+			w.clipDraggingAnchor(mouseX, mouseY);
+		}
+	}
+	
+	@Override
+	protected void draggingCallback(float mouseX, float mouseY) {
+		super.draggingCallback(mouseX, mouseY);
+		
+		/*
+		 * Multi-dragging
+		 */
+		
+		ClearDialogueCanvas canvas = sharedResources.getCanvas();
+		
+		for (int i = 0; i < canvas.getNumHighlightedNodes(); i++) {
+			DraggableDialogueWidget w = canvas.getHighlightedNode(i);
+			w.move(w.getDragX(mouseX), w.getDragY(mouseY));
+		}
+	}
+	
 	protected void keyEventCallback() {
 		dialogue.parseAndSetContent(content.getTextBuilder().toString());
 	}
 	
-	private void highlightingCommands(boolean resetHighlighting) {
-		hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
+	private void highlightingCommands() {
+		if (highlightedWithHighlighter) return;
 		
-		setHighlighted(highlighted && !resetHighlighting || hovering);
+		hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
+		setHighlighted(hovering, false);
 	}
 	
 	public void leftClickCommands(MouseButtonEvent e) {
@@ -378,9 +412,10 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	 * 
 	 * @param highlighted
 	 */
-	public void setHighlighted(boolean highlighted) {
+	public void setHighlighted(boolean highlighted, boolean highlightedWithHighlighter) {
 		boolean bHighlighted = this.highlighted;
 		this.highlighted = highlighted;
+		this.highlightedWithHighlighter = highlightedWithHighlighter;
 		
 		//Register as highlighted to canvas
 		ClearDialogueCanvas canvas = sharedResources.getCanvas();
@@ -445,7 +480,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 
 		new DialogueWidgetSizeTransition().play();
 		
-		if (mode != Mode.EDITING) {
+		if (mode == Mode.EXPANDED || mode == Mode.COLLAPSED) {
 			dialogue.setExpanded(mode == Mode.EXPANDED);
 		}
 		

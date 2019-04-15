@@ -71,6 +71,9 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	 * This function will refresh the canvas and synchronize it with the given Project.
 	 */
 	public void refresh(Project project) {
+		
+		resetHighlighted();
+		
 		/*
 		 * Remove existing children
 		 */
@@ -196,17 +199,19 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		sharedResources.resetContextHint();
 	}
 	
-	/**
-	 * Checks whether or not the given node can unhighlight itself via the mouse leaving its bounding. 
-	 * This is only true if the given dialogue node is the only currently highlighted node. The purpose of this function is to prevent nodes from unhighlighting themselves after 
-	 * the multi-select is used.
-	 */
-	public boolean canMouseMotionUnhighlightDialogueNode(DraggableDialogueWidget node) {
-		return (highlightedNodes.contains(node) && highlightedNodes.size() == 1);
+	public void resetHighlighted() {
+		for (int i = 0; i < highlightedNodes.size(); i++) {
+			highlightedNodes.get(i).setHighlighted(false, false);
+			i--;
+		}
 	}
 	
 	public int getNumHighlightedNodes() {
 		return highlightedNodes.size();
+	}
+	
+	public DraggableDialogueWidget getHighlightedNode(int index) {
+		return highlightedNodes.get(index);
 	}
 	
 	/*

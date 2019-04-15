@@ -20,7 +20,7 @@ public class ContextHintsWidget extends LabelWidget {
 	private SharedResources sharedResources;
 	
 	public ContextHintsWidget(SharedResources sharedResources) {
-		super(CONTEXT_HINTS_TEXT_FILL.copy(), sharedResources.getContextHint(), sharedResources.getNotoSans(), FontStyle.LIGHT, CONTEXT_HINTS_FONT_SIZE);
+		super(Float.MAX_VALUE, CONTEXT_HINTS_TEXT_FILL.copy(), sharedResources.getContextHint(), sharedResources.getNotoSans(), FontStyle.LIGHT, CONTEXT_HINTS_FONT_SIZE);
 		this.sharedResources = sharedResources;
 		addChild(new WidgetClip(WidgetClip.Alignment.BOTTOM_LEFT, WIDGET_PADDING + CONTEXT_HINT_X_OFFSET, -WIDGET_PADDING));
 	}

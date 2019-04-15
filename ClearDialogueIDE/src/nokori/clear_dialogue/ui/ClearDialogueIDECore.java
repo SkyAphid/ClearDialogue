@@ -31,7 +31,7 @@ public class ClearDialogueIDECore extends ClearApp {
 	@Override
 	public void init(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly, String[] args) {
 		SharedResources sharedResources = new SharedResources();
-		sharedResources.init(window, context, (ClearDialogueRootWidgetAssembly) rootWidgetAssembly);
+		sharedResources.init(this, window, context, (ClearDialogueRootWidgetAssembly) rootWidgetAssembly);
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class ClearDialogueIDECore extends ClearApp {
 	public Window createWindow(WindowManager windowManager) throws GLFWException {
 		Window window = windowManager.createWindow(PROGRAM_NAME, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, true, true);
 		window.setSizeLimits(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-		window.setIcon(".png", new File("res/icons/").listFiles());
+		window.setIcons(".png", new File("res/icons/").listFiles());
 		return window;
 	}
 	

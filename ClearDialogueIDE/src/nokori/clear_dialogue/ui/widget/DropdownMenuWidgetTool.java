@@ -20,16 +20,12 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 	private static final String OPTION_REFRESH_SYNTAX = "REFRESH SYNTAX";
 	private static final String OPTION_SET_SYNTAX = "SET SYNTAX...";
 	private static final String OPTION_REPLACE = "REPLACE...";
-	private static final String OPTION_MULTI_TITLE = "MULTI-TITLE...";
-	private static final String OPTION_MULTI_TAG = "MULTI-TAG...";
 	
 	private static final String[] OPTIONS = {
 		OPTION_VIEW_SYNTAX,
 		OPTION_REFRESH_SYNTAX,
 		OPTION_SET_SYNTAX,
-		OPTION_REPLACE,
-		OPTION_MULTI_TITLE,
-		OPTION_MULTI_TAG,
+		OPTION_REPLACE
 	};
 	
 	private SharedResources sharedResources;

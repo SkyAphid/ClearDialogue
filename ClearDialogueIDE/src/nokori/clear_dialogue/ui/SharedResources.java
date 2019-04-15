@@ -19,6 +19,8 @@ import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
  * This is a pass-around class that allows JDialogue to communicate data around the program, such as the current project, context hints, etc.
  */
 public class SharedResources {
+	
+	private ClearDialogueIDECore core;
 
 	private Window window;
 	private NanoVGContext context;
@@ -44,7 +46,8 @@ public class SharedResources {
 	private ClearDialogueCanvas canvas;
 	private ConnectionRendererWidget connectionRenderer;
 	
-	public void init(Window window, NanoVGContext context, ClearDialogueRootWidgetAssembly rootWidgetAssembly) {
+	public void init(ClearDialogueIDECore core, Window window, NanoVGContext context, ClearDialogueRootWidgetAssembly rootWidgetAssembly) {
+		this.core = core;
 		this.window = window;
 		this.context = context;
 		this.rootWidgetAssembly = rootWidgetAssembly;
@@ -62,6 +65,10 @@ public class SharedResources {
 		rootWidgetAssembly.init(this);
 	}
 	
+	public ClearDialogueIDECore getIDECore() {
+		return core;
+	}
+
 	public Window getWindow() {
 		return window;
 	}

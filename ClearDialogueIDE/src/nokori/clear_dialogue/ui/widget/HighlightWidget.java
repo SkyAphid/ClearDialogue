@@ -20,41 +20,49 @@ public class HighlightWidget extends RectangleWidget {
 	
 	private Stack<DraggableDialogueWidget> highlighting = new Stack<>();
 	
-	public HighlightWidget(SharedResources sharedResources, float clampX, float clampY) {
+	public HighlightWidget(SharedResources sharedResources, float mouseX, float mouseY) {
 		super(0.0f, ClearColor.CORAL.alpha(ALPHA), ClearColor.CORAL.multiply(1.2f).alpha(ALPHA), false);
+		
+		ClearDialogueCanvas canvas = sharedResources.getCanvas();
+		
+		float clampX = -canvas.getX() + mouseX;
+		float clampY = -canvas.getY() + mouseY;
+		
 		setPosition(clampX, clampY);
 		setWidth(0f);
 		setHeight(0f);
+		
+		canvas.resetHighlighted();
 
 		setOnInternalMouseMotionEvent(e -> {
-			float mX = (float) e.getMouseX();
-			float mY = (float) e.getMouseY();
+			float dragX = (float) (-canvas.getX() + e.getMouseX());
+			float dragY = (float) (-canvas.getY() + e.getMouseY());
 			
 			/*
 			 * If mouse coordinates < clamped coordinates
 			 */
-			if (mX < clampX) {
-				setX(mX);
-				setWidth(clampX - mX);
+			if (dragX < clampX) {
+				setX(dragX);
+				setWidth(clampX - dragX);
 			}
 			
-			if (mY < clampY) {
-				setY(mY);
-				setHeight(clampY - mY);
+			if (dragY < clampY) {
+				setY(dragY);
+				setHeight(clampY - dragY);
 			}
 			
 			/*
 			 * If mouse coordinates > clamped coordinates
 			 */
 			
-			if (mX > clampX) {
+			if (dragX > clampX) {
 				setX(clampX);
-				setWidth(mX - clampX);
+				setWidth(dragX - clampX);
 			}
 			
-			if (mY > clampY) {
+			if (dragY > clampY) {
 				setY(clampY);
-				setHeight(mY - clampY);
+				setHeight(dragY - clampY);
 			}
 			
 			/*
@@ -67,17 +75,17 @@ public class HighlightWidget extends RectangleWidget {
 		//Highlight all of the selected nodes and then delete the highlighting widget.
 		setOnInternalMouseButtonEvent(e -> {
 			if (!e.isPressed()) {
-				applyHighlighting(sharedResources.getCanvas());
+				applyHighlighting(canvas);
 				parent.removeChild(this);
 			}
 		});
 	}
-	
+
 	private void applyHighlighting(ClearDialogueCanvas canvas) {
 		Stack<DraggableDialogueWidget> highlighted = getHighlightedNodes();
 		
 		while(!highlighted.isEmpty()) {
-			highlighted.pop().setHighlighted(true);
+			highlighted.pop().setHighlighted(true, true);
 		}
 	}
 	
