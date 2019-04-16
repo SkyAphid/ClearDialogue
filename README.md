@@ -17,7 +17,6 @@ ClearDialogue is a branching dialogue editor for video games designed to be extr
 
 #### IO
 - Supports JSON exporting/importing
-- Supports [THJSON](https://github.com/Puppygames/thjson) exporting/importing (THJSON allows for easier human editing of the saved files)
 - Is heavily documented with instructions on how to add support for your own filetypes (it's also extremely simple)
 
 #### Tools
@@ -35,7 +34,7 @@ ClearDialogue is a branching dialogue editor for video games designed to be extr
 - Code-base is highly customizable and easy to modify
 
 ## Dependencies
-ClearDialogue is configured to use Maven, so most of the required APIs will be downloaded automatically. ClearDialogue [also has support for THJSON, and a JAR for that is included in the repository.](https://github.com/Puppygames/thjson) The only other dependency you need to make sure you have is [Clear.](https://github.com/SkyAphid/Clear)
+ClearDialogue is configured to use Maven, so most of the required APIs will be downloaded automatically.The only other dependency you need to make sure you have is [Clear.](https://github.com/SkyAphid/Clear)
 
 ## Download
 [Get a runnable version of ClearDialogue on the releases page.](https://github.com/SkyAphid/ClearDialogue/releases)
