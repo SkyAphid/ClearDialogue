@@ -29,53 +29,9 @@ import nokori.clear_dialogue.project.DialogueResponse.Response;
 import nokori.clear_dialogue.throwable.FailedToFindConnectorsException;
 import nokori.clear_dialogue.throwable.FailedToInstantiateNodeException;
 
-public class ClearDialogueJsonIO implements ClearDialogueIO{
+public class ClearDialogueJsonIO implements ClearDialogueIO {
 
-	/*
-	 * Project JSON tags
-	 */
-	public static final String JSON_PROJECT_VERSION = "projectVersion";
-	public static final String JSON_PROJECT_NAME = "projectName";
-	public static final String JSON_PROJECT_VIEWPORT_X = "projectViewportX";
-	public static final String JSON_PROJECT_VIEWPORT_Y = "projectViewportY";
-	
-	/*
-	 * Basic Node data JSON tags
-	 */
-	public static final String JSON_NODES_ARRAY = "nodesArray";
-	public static final String JSON_NODE_TYPE = "type";
-	
-	public static final String JSON_UID = "uid";
-	public static final String JSON_TITLE = "title";
-	public static final String JSON_TAGS = "tags";
-	public static final String JSON_NODE_X = "nodeX";
-	public static final String JSON_NODE_Y = "nodeY";
-	public static final String JSON_EXPANDED = "expanded";
-	
-	public static final String JSON_IN_CONNECTOR_UID = "inConnectorUID";
-	public static final String JSON_OUT_CONNECTOR_UID = "outConnectorUID";
-	
-	public static final String JSON_TEXT = "text";
-	
-	/*
-	 * Connection JSON tags
-	 */
-	public static final String JSON_CONNECTIONS_ARRAY = "connectionsArray";
-	public static final String JSON_CONNECTOR_1_UID = "connector1UID";
-	public static final String JSON_CONNECTOR_2_UID = "connector2UID";
-	
-	/*
-	 * Dialogue Node Type JSON tags
-	 */
-	
-	public static final String JSON_NODE_TYPE_DIALOGUE = "typeDialogue";
-	
-	/*
-	 * Response Node Type JSON tags
-	 */
-	
-	public static final String JSON_NODE_TYPE_RESPONSE = "typeResponse";
-	public static final String JSON_RESPONSES_ARRAY = "responsesArray";
+
 
 	
 	@Override
@@ -87,11 +43,11 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 		
 		JsonObjectBuilder projectBuilder = Json.createObjectBuilder();
 		
-		projectBuilder.add(JSON_PROJECT_NAME, project.getName());
-		projectBuilder.add(JSON_PROJECT_VERSION, Project.CURRENT_VERSION);
+		projectBuilder.add(IOKEY_PROJECT_NAME, project.getName());
+		projectBuilder.add(IOKEY_PROJECT_VERSION, Project.CURRENT_VERSION);
 		
-		projectBuilder.add(JSON_PROJECT_VIEWPORT_X, project.getViewportX());
-		projectBuilder.add(JSON_PROJECT_VIEWPORT_Y, project.getViewportY());
+		projectBuilder.add(IOKEY_PROJECT_VIEWPORT_X, project.getViewportX());
+		projectBuilder.add(IOKEY_PROJECT_VIEWPORT_Y, project.getViewportY());
 		
 		/*
 		 * Save Nodes
@@ -105,16 +61,16 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			JsonObjectBuilder nodeBuilder = Json.createObjectBuilder();
 			
 			//Record basic data
-			nodeBuilder.add(JSON_UID, node.getUID());
-			nodeBuilder.add(JSON_TITLE, node.getTitle());
-			nodeBuilder.add(JSON_TAGS, node.getTags());
+			nodeBuilder.add(IOKEY_UID, node.getUID());
+			nodeBuilder.add(IOKEY_TITLE, node.getTitle());
+			nodeBuilder.add(IOKEY_TAGS, node.getTags());
 			
-			nodeBuilder.add(JSON_NODE_X, node.getX());
-			nodeBuilder.add(JSON_NODE_Y, node.getY());
+			nodeBuilder.add(IOKEY_NODE_X, node.getX());
+			nodeBuilder.add(IOKEY_NODE_Y, node.getY());
 			
-			nodeBuilder.add(JSON_EXPANDED, node.isExpanded());
+			nodeBuilder.add(IOKEY_EXPANDED, node.isExpanded());
 			
-			nodeBuilder.add(JSON_IN_CONNECTOR_UID, node.getInConnector().getUID());
+			nodeBuilder.add(IOKEY_IN_CONNECTOR_UID, node.getInConnector().getUID());
 			
 			/*
 			 * Text Node Data
@@ -122,14 +78,14 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			
 			if (node instanceof DialogueText) {
 				//Store node-type for easy access in the importer
-				nodeBuilder.add(JSON_NODE_TYPE, JSON_NODE_TYPE_DIALOGUE);
+				nodeBuilder.add(IOKEY_NODE_TYPE, IOKEY_NODE_TYPE_DIALOGUE);
 				
 				//Store text of node
 				DialogueText textNode = (DialogueText) node;
-				nodeBuilder.add(JSON_TEXT, textNode.getText());
+				nodeBuilder.add(IOKEY_TEXT, textNode.getText());
 				
 				//Store the out-connector
-				nodeBuilder.add(JSON_OUT_CONNECTOR_UID, textNode.getOutConnector().getUID());
+				nodeBuilder.add(IOKEY_OUT_CONNECTOR_UID, textNode.getOutConnector().getUID());
 			}
 			
 			/*
@@ -138,7 +94,7 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			
 			if (node instanceof DialogueResponse) {
 				//Store node-type
-				nodeBuilder.add(JSON_NODE_TYPE, JSON_NODE_TYPE_RESPONSE);
+				nodeBuilder.add(IOKEY_NODE_TYPE, IOKEY_NODE_TYPE_RESPONSE);
 				
 				JsonArrayBuilder responsesBuilder = Json.createArrayBuilder();
 				
@@ -151,22 +107,22 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 					JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
 					
 					//Response text
-					responseBuilder.add(JSON_TEXT, response.getText());
+					responseBuilder.add(IOKEY_TEXT, response.getText());
 					
 					//Response out-connector
-					responseBuilder.add(JSON_OUT_CONNECTOR_UID, response.getOutConnector().getUID());
+					responseBuilder.add(IOKEY_OUT_CONNECTOR_UID, response.getOutConnector().getUID());
 					
 					//Store in responsesBuilder
 					responsesBuilder.add(responseBuilder);
 				}
 				
-				nodeBuilder.add(JSON_RESPONSES_ARRAY, responsesBuilder);
+				nodeBuilder.add(IOKEY_RESPONSES_ARRAY, responsesBuilder);
 			}
 			
 			nodes.add(nodeBuilder);
 		}
 		
-		projectBuilder.add(JSON_NODES_ARRAY, nodes);
+		projectBuilder.add(IOKEY_NODES_ARRAY, nodes);
 		
 		/*
 		 * 
@@ -182,13 +138,13 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			JsonObjectBuilder connectionBuilder = Json.createObjectBuilder();
 			
 			//Record basic data
-			connectionBuilder.add(JSON_CONNECTOR_1_UID, connection.getConnector1().getUID());
-			connectionBuilder.add(JSON_CONNECTOR_2_UID, connection.getConnector2().getUID());
+			connectionBuilder.add(IOKEY_CONNECTOR_1_UID, connection.getConnector1().getUID());
+			connectionBuilder.add(IOKEY_CONNECTOR_2_UID, connection.getConnector2().getUID());
 			
 			connections.add(connectionBuilder);
 		}
 		
-		projectBuilder.add(JSON_CONNECTIONS_ARRAY, connections);
+		projectBuilder.add(IOKEY_CONNECTIONS_ARRAY, connections);
 		
 		/*
 		 * Final Export / Write file
@@ -220,12 +176,12 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 		 */
 		JsonObject projectObject = jsonReader.readObject();
 
-		int projectVersion = projectObject.getInt(JSON_PROJECT_VERSION);
+		int projectVersion = projectObject.getInt(IOKEY_PROJECT_VERSION);
 		
-		String projectName = projectObject.getString(JSON_PROJECT_NAME);
+		String projectName = projectObject.getString(IOKEY_PROJECT_NAME);
 
-		float viewportX = (float) projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_X).doubleValue();
-		float viewportY = (float) projectObject.getJsonNumber(JSON_PROJECT_VIEWPORT_Y).doubleValue();
+		float viewportX = (float) projectObject.getJsonNumber(IOKEY_PROJECT_VIEWPORT_X).doubleValue();
+		float viewportY = (float) projectObject.getJsonNumber(IOKEY_PROJECT_VIEWPORT_Y).doubleValue();
 
 		Project project = new Project(projectVersion, projectName, viewportX, viewportY);
 
@@ -233,46 +189,46 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 		 * Node Data
 		 */
 
-		JsonArray nodeArray = projectObject.getJsonArray(JSON_NODES_ARRAY);
+		JsonArray nodeArray = projectObject.getJsonArray(IOKEY_NODES_ARRAY);
 
 		for (int i = 0; i < nodeArray.size(); i++) {
 			JsonObject nodeObject = nodeArray.getJsonObject(i);
 
 			// Load basic shared data
-			String uid = nodeObject.getString(JSON_UID);
-			String name = nodeObject.getString(JSON_TITLE);
-			String tag = nodeObject.getString(JSON_TAGS);
+			String uid = nodeObject.getString(IOKEY_UID);
+			String name = nodeObject.getString(IOKEY_TITLE);
+			String tag = nodeObject.getString(IOKEY_TAGS);
 
-			float nodeX = (float) nodeObject.getJsonNumber(JSON_NODE_X).doubleValue();
-			float nodeY = (float) nodeObject.getJsonNumber(JSON_NODE_Y).doubleValue();
+			float nodeX = (float) nodeObject.getJsonNumber(IOKEY_NODE_X).doubleValue();
+			float nodeY = (float) nodeObject.getJsonNumber(IOKEY_NODE_Y).doubleValue();
 			
-			boolean expanded = nodeObject.getBoolean(JSON_EXPANDED);
+			boolean expanded = nodeObject.getBoolean(IOKEY_EXPANDED);
 
 			Dialogue node = null;
 
 			// Load type-specific data
-			String type = nodeObject.getString(JSON_NODE_TYPE);
+			String type = nodeObject.getString(IOKEY_NODE_TYPE);
 
 			// Dialogue-type
-			if (type.equals(JSON_NODE_TYPE_DIALOGUE)) {
-				node = new DialogueText(project, uid, name, tag, nodeX, nodeY, expanded, nodeObject.getString(JSON_TEXT));
+			if (type.equals(IOKEY_NODE_TYPE_DIALOGUE)) {
+				node = new DialogueText(project, uid, name, tag, nodeX, nodeY, expanded, nodeObject.getString(IOKEY_TEXT));
 
-				String outConnectorUID = nodeObject.getString(JSON_OUT_CONNECTOR_UID);
+				String outConnectorUID = nodeObject.getString(IOKEY_OUT_CONNECTOR_UID);
 				((DialogueText) node).setOutConnector(new DialogueConnector(project, node, outConnectorUID));
 			}
 
 			// Response-type
-			if (type.equals(JSON_NODE_TYPE_RESPONSE)) {
+			if (type.equals(IOKEY_NODE_TYPE_RESPONSE)) {
 				node = new DialogueResponse(project, uid, name, tag, nodeX, nodeY, expanded);
 				DialogueResponse responseNode = (DialogueResponse) node;
 
-				JsonArray responseArray = nodeObject.getJsonArray(JSON_RESPONSES_ARRAY);
+				JsonArray responseArray = nodeObject.getJsonArray(IOKEY_RESPONSES_ARRAY);
 
 				for (int j = 0; j < responseArray.size(); j++) {
 					JsonObject responseObject = responseArray.getJsonObject(j);
 
-					String text = responseObject.getString(JSON_TEXT);
-					String outConnectorUID = responseObject.getString(JSON_OUT_CONNECTOR_UID);
+					String text = responseObject.getString(IOKEY_TEXT);
+					String outConnectorUID = responseObject.getString(IOKEY_OUT_CONNECTOR_UID);
 
 					responseNode.addResponse(text, outConnectorUID);
 				}
@@ -281,7 +237,7 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 			// Finalize
 			if (node != null) {
 				// Set in-connector now that node is instantiated
-				String inConnectorUID = nodeObject.getString(JSON_IN_CONNECTOR_UID);
+				String inConnectorUID = nodeObject.getString(IOKEY_IN_CONNECTOR_UID);
 				node.setInConnector(new DialogueConnector(project, node, inConnectorUID));
 
 				// Add node to project
@@ -295,14 +251,14 @@ public class ClearDialogueJsonIO implements ClearDialogueIO{
 		 * Connection data
 		 */
 
-		JsonArray connectionsArray = projectObject.getJsonArray(JSON_CONNECTIONS_ARRAY);
+		JsonArray connectionsArray = projectObject.getJsonArray(IOKEY_CONNECTIONS_ARRAY);
 
 		for (int i = 0; i < connectionsArray.size(); i++) {
 			JsonObject connectionObject = connectionsArray.getJsonObject(i);
 
 			// Get the connector UIDs of the Connection
-			String connector1UID = connectionObject.getString(JSON_CONNECTOR_1_UID);
-			String connector2UID = connectionObject.getString(JSON_CONNECTOR_2_UID);
+			String connector1UID = connectionObject.getString(IOKEY_CONNECTOR_1_UID);
+			String connector2UID = connectionObject.getString(IOKEY_CONNECTOR_2_UID);
 
 			// Build a Connection from the UIDs
 			DialogueConnector connector1 = project.getDialogueConnector(connector1UID);
