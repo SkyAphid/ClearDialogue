@@ -108,7 +108,7 @@ public class ConnectorWidget extends HalfCircleWidget {
 			//The mouse wasn't hovering over another connector, so we can go ahead and just cancel the selection
 			endSelecting();
 			
-		} else if (isMouseIntersecting(window)) {
+		} else if (isMouseIntersectingThisWidget(window)) {
 			
 			Widget w = ClearStaticResources.getFocusedWidget();
 			

@@ -30,11 +30,11 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
-	public static final int COLLAPSED_WIDTH = 100;
-	public static final int COLLAPSED_HEIGHT = 100;
+	public static final int COLLAPSED_WIDTH = 120;
+	public static final int COLLAPSED_HEIGHT = 120;
 	
-	public static final int EXPANDED_WIDTH = COLLAPSED_WIDTH * 2;
-	public static final int EXPANDED_HEIGHT = COLLAPSED_HEIGHT * 2;
+	public static final int EXPANDED_WIDTH = 200;
+	public static final int EXPANDED_HEIGHT = 200;
 	
 	public static final int EDITING_WIDTH = EXPANDED_WIDTH * 6;
 	public static final int EDITING_HEIGHT = EXPANDED_HEIGHT * 3;
@@ -256,8 +256,16 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		float snapWidth = getWidth() * SNAP_SIZE_MULTIPLIER;
 		float snapHeight = getHeight() * SNAP_SIZE_MULTIPLIER;
 		
-		float gridX = (snapWidth * (int) ((newX + getDraggingAnchor().x()) / snapWidth)) + snapWidth/2 - getWidth()/2;
-		float gridY = (snapHeight * (int) ((newY + getDraggingAnchor().y()) / snapHeight)) + snapHeight/2 - getHeight()/2;
+		ClearDialogueCanvas canvas = sharedResources.getCanvas();
+		
+		float snapX = (snapWidth * (int) ((newX + getDraggingAnchor().x()) / snapWidth)) + snapWidth/2 - getWidth()/2;
+		float snapY = (snapHeight * (int) ((newY + getDraggingAnchor().y()) / snapHeight)) + snapHeight/2 - getHeight()/2;
+		
+		float canvasSnapX = (snapWidth * (int) (-canvas.getX() / snapWidth));
+		float canvasSnapY = (snapHeight * (int) (-canvas.getY() / snapHeight));
+		
+		float gridX = canvasSnapX + snapX;
+		float gridY = canvasSnapY + snapY;
 		
 		//System.out.println("Called " + gridSnappingEnabled + " " + gridX + "/" + gridY + " " + newX + " " + newY + " " + (int) (newX / SNAP_WIDTH) + " " + (int) (newY / SNAP_HEIGHT));
 		
@@ -350,6 +358,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				} else {
 					//Switch between editing and the last selected mode
 					if (mode != Mode.EDITING) {
+						sharedResources.getCanvas().centerOn(getClippedX(), getClippedY(), EDITING_WIDTH, EDITING_HEIGHT);
 						transitionMode(Mode.EDITING);
 					} else {
 						endEditing();

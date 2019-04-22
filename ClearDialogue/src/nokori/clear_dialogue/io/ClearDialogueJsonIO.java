@@ -162,7 +162,7 @@ public class ClearDialogueJsonIO implements ClearDialogueIO {
 		jsonWriter.writeObject(export);
 		jsonWriter.close();
 
-		Files.write(new File(f.getAbsolutePath() + ".json").toPath(), stringWriter.toString().getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
+		Files.write(new File(f.getAbsolutePath()).toPath(), stringWriter.toString().getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
 	}
 	
 	@Override

@@ -50,8 +50,6 @@ public class DialogueUtils {
 				e.printStackTrace();
 				TinyFileDialog.showMessageDialog("Caught " + e.getClass().getName(), e.getMessage(), Icon.ERROR);
 			}
-		} else {
-			TinyFileDialog.showMessageDialog("ClearDialogue", "Project import cancelled.", Icon.INFORMATION);
 		}
 		
 		return null;
@@ -72,8 +70,6 @@ public class DialogueUtils {
 				e.printStackTrace();
 				TinyFileDialog.showMessageDialog("Caught " + e.getClass().getName(), e.getMessage(), Icon.ERROR);
 			}
-		} else {
-			TinyFileDialog.showMessageDialog("ClearDialogue", "Project export cancelled.", Icon.INFORMATION);
 		}
 	}
 	

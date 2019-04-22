@@ -101,7 +101,7 @@ public class PopupMessageWidget extends WidgetAssembly {
 				return;
 			}
 			
-			if (!e.isPressed() && !isMouseIntersecting(e.getWindow())) {
+			if (!e.isPressed() && !isMouseIntersectingThisWidget(e.getWindow())) {
 				close();
 			}
 		});

@@ -25,8 +25,9 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	
 	public ClearDialogueCanvas(SharedResources sharedResources) {
 		this.sharedResources = sharedResources;
+		setRequiresMouseToBeWithinWidgetToDrag(false);
 		
-		WidgetSynch synch = new WidgetSynch(WidgetSynch.Mode.WITH_PARENT);
+		WidgetSynch synch = new WidgetSynch(WidgetSynch.Mode.WITH_WINDOW);
 		synch.setSynchXEnabled(false);
 		synch.setSynchYEnabled(false);
 		addChild(synch);
@@ -221,6 +222,19 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	 * 
 	 * 
 	 */
+	
+	/**
+	 * Centers the canvas on the given coordinates. Make sure they're the clipped coordinates and not the parent relative ones.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	public void centerOn(float x, float y, float width, float height) {
+		setX((getX() - x));
+		setY((getY() - y));
+	}
 	
 	public void removeDialogueNode(DraggableDialogueWidget widget) {
 		if (widget.isDataFlaggedForDeletion()) {
