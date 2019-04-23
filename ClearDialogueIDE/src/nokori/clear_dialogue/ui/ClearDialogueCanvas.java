@@ -1,6 +1,7 @@
 package nokori.clear_dialogue.ui;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -26,6 +27,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	public ClearDialogueCanvas(SharedResources sharedResources) {
 		this.sharedResources = sharedResources;
 		setRequiresMouseToBeWithinWidgetToDrag(false);
+		setInvertInputOrder(true);
 		
 		WidgetSynch synch = new WidgetSynch(WidgetSynch.Mode.WITH_WINDOW);
 		synch.setSynchXEnabled(false);
@@ -112,6 +114,37 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		 */
 		
 		setPosition(project.getViewportX(), project.getViewportY());
+		
+		/*
+		 * Rendering order Sort
+		 */
+		
+		sortNodes();
+	}
+	
+	/**
+	 * Sort wrapper that should be called every time a change is applied to the canvas to keep the rendering order correct.
+	 */
+	public void sortNodes() {
+		sortChildren(new Comparator<Widget>() {
+			public int compare(Widget x1, Widget x2) {
+				int result = Float.compare(x1.getClippedX(), x2.getClippedX());
+				
+				if (result == 0) {
+					// both X are equal -> compare Y too
+					result = Float.compare(x1.getClippedY(), x2.getClippedY());
+				}
+				
+				return result;
+			}
+		});
+		
+		reverseChildren();
+	}
+	
+	private void addNode(DraggableDialogueWidget w) {
+		addChild(w);
+		sortNodes();
 	}
 	
 	/*
@@ -141,7 +174,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	 */
 	public void addDialogueTextNode(DialogueText dialogue) {
 		DraggableDialogueTextWidget widget = new DraggableDialogueTextWidget(sharedResources, dialogue);
-		addChild(widget);
+		addNode(widget);
 	}
 	
 	/*
@@ -173,7 +206,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	
 	public void addDialogueResponseNode(DialogueResponse response) {
 		DraggableDialogueResponseWidget widget = new DraggableDialogueResponseWidget(sharedResources, response);
-		addChild(widget);
+		addNode(widget);
 	}
 	
 	/*
@@ -232,8 +265,8 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	 * @param height
 	 */
 	public void centerOn(float x, float y, float width, float height) {
-		setX((getX() - x));
-		setY((getY() - y));
+		setX((getX() - x) + getWidth()/2 - width/2);
+		setY((getY() - y) + getHeight()/2 - height/2);
 	}
 	
 	public void removeDialogueNode(DraggableDialogueWidget widget) {

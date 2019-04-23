@@ -16,6 +16,7 @@ import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget;
 import nokori.clear.vg.widget.text.TextAreaWidget;
 import nokori.clear.vg.widget.text.TextFieldWidget;
 import nokori.clear.windows.Window;
+import nokori.clear.windows.event.Event;
 import nokori.clear.windows.event.MouseButtonEvent;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear_dialogue.project.Dialogue;
@@ -213,16 +214,20 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		 */
 		
 		setOnMouseMotionEvent(e -> {
-			highlightingCommands();
+			highlightingCommands(e);
 		});
 		
 		setOnMouseButtonEvent(e -> {
+			if (e.isConsumed()) {
+				return;
+			}
+			
 			if (isMouseWithin() && !e.isPressed()) {
 				leftClickCommands(e);
 				rightClickCommands(e);
 			}
 			
-			highlightingCommands();
+			highlightingCommands(e);
 		});
 		
 		setOnKeyEvent(e -> {
@@ -267,12 +272,14 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		float gridX = canvasSnapX + snapX;
 		float gridY = canvasSnapY + snapY;
 		
-		//System.out.println("Called " + gridSnappingEnabled + " " + gridX + "/" + gridY + " " + newX + " " + newY + " " + (int) (newX / SNAP_WIDTH) + " " + (int) (newY / SNAP_HEIGHT));
+		//System.out.println("Called " + gridSnappingEnabled + " " + gridX + "/" + gridY + " " + newX + " " + newY);
 		
 		super.move((gridSnappingEnabled ? gridX : newX), (gridSnappingEnabled ? gridY : newY));
 		
 		dialogue.setX(getX());
 		dialogue.setY(getY());
+		
+		canvas.sortNodes();
 	}
 	
 	@Override
@@ -311,11 +318,17 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		dialogue.parseAndSetContent(content.getTextBuilder().toString());
 	}
 	
-	private void highlightingCommands() {
-		if (highlightedWithHighlighter) return;
+	private void highlightingCommands(Event e) {
+		if (e.isConsumed() || highlightedWithHighlighter) {
+			return;
+		}
 		
 		hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
 		setHighlighted(hovering, false);
+		
+		if (hovering) {
+			e.setConsumed(true);
+		}
 	}
 	
 	public void leftClickCommands(MouseButtonEvent e) {
@@ -334,6 +347,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				}
 
 				lastLeftClickTime = -1L;
+				e.setConsumed(true);
+				
 				return;
 			}
 			
@@ -364,6 +379,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 						endEditing();
 					}
 				}
+				
+				e.setConsumed(true);
 			}
 			
 			lastRightClickTime = clickTime;
