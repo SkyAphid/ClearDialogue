@@ -18,6 +18,7 @@ import nokori.clear.vg.widget.text.TextFieldWidget;
 import nokori.clear.windows.Window;
 import nokori.clear.windows.event.Event;
 import nokori.clear.windows.event.MouseButtonEvent;
+import nokori.clear.windows.event.MouseMotionEvent;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.DialogueConnector;
@@ -283,8 +284,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	}
 	
 	@Override
-	protected void draggingAnchorCallback(float mouseX, float mouseY) {
-		super.draggingAnchorCallback(mouseX, mouseY);
+	protected void draggingAnchorCallback(MouseButtonEvent e) {
+		super.draggingAnchorCallback(e);
 		
 		/*
 		 * Multi-dragging anchor
@@ -294,13 +295,19 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		for (int i = 0; i < canvas.getNumHighlightedNodes(); i++) {
 			DraggableDialogueWidget w = canvas.getHighlightedNode(i);
-			w.clipDraggingAnchor(mouseX, mouseY);
+			w.clipDraggingAnchor((float) e.getMouseX(), (float) e.getMouseY());
 		}
+		
+		/*
+		 * Consume event
+		 */
+		
+		e.setConsumed(true);
 	}
 	
 	@Override
-	protected void draggingCallback(float mouseX, float mouseY) {
-		super.draggingCallback(mouseX, mouseY);
+	protected void draggingCallback(MouseMotionEvent e) {
+		super.draggingCallback(e);
 		
 		/*
 		 * Multi-dragging
@@ -310,8 +317,13 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		for (int i = 0; i < canvas.getNumHighlightedNodes(); i++) {
 			DraggableDialogueWidget w = canvas.getHighlightedNode(i);
-			w.move(w.getDragX(mouseX), w.getDragY(mouseY));
+			w.move(w.getDragX(e.getMouseX()), w.getDragY(e.getMouseY()));
 		}
+	}
+	
+	@Override
+	protected void draggingReleaseCallback(MouseButtonEvent e) {
+		e.setConsumed(true);
 	}
 	
 	protected void keyEventCallback() {

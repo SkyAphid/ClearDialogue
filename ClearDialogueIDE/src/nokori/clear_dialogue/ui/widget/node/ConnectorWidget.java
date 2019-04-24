@@ -81,7 +81,7 @@ public class ConnectorWidget extends HalfCircleWidget {
 		});
 		
 		setOnMouseButtonEvent(e -> {
-			if (!e.isPressed()) {
+			if (!e.isConsumed() && !e.isPressed()) {
 				select(e.getWindow());
 			}
 		});
