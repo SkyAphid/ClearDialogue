@@ -146,6 +146,7 @@ public class SharedResources {
 	public void setProject(Project project) {
 		this.project = project;
 		canvas.refresh(project);
+		scaler.setScale(project.getViewportScale());
 		rootWidgetAssembly.getProjectNameField().refresh();
 	}
 

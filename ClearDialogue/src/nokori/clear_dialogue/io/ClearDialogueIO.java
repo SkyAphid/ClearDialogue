@@ -17,6 +17,7 @@ public interface ClearDialogueIO {
 	public static final String IOKEY_PROJECT_NAME = "projectName";
 	public static final String IOKEY_PROJECT_VIEWPORT_X = "projectViewportX";
 	public static final String IOKEY_PROJECT_VIEWPORT_Y = "projectViewportY";
+	public static final String IOKEY_PROJECT_VIEWPORT_SCALE = "projectViewportScale";
 	
 	/*
 	 * Basic Node data keys

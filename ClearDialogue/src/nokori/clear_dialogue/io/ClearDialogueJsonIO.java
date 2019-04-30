@@ -48,6 +48,7 @@ public class ClearDialogueJsonIO implements ClearDialogueIO {
 		
 		projectBuilder.add(IOKEY_PROJECT_VIEWPORT_X, project.getViewportX());
 		projectBuilder.add(IOKEY_PROJECT_VIEWPORT_Y, project.getViewportY());
+		projectBuilder.add(IOKEY_PROJECT_VIEWPORT_SCALE, project.getViewportScale());
 		
 		/*
 		 * Save Nodes
@@ -182,8 +183,9 @@ public class ClearDialogueJsonIO implements ClearDialogueIO {
 
 		float viewportX = (float) projectObject.getJsonNumber(IOKEY_PROJECT_VIEWPORT_X).doubleValue();
 		float viewportY = (float) projectObject.getJsonNumber(IOKEY_PROJECT_VIEWPORT_Y).doubleValue();
+		float viewportScale = (float) projectObject.getJsonNumber(IOKEY_PROJECT_VIEWPORT_SCALE).doubleValue();
 
-		Project project = new Project(projectVersion, projectName, viewportX, viewportY);
+		Project project = new Project(projectVersion, projectName, viewportX, viewportY, viewportScale);
 
 		/*
 		 * Node Data

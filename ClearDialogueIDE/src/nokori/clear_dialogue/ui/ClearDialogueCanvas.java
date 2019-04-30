@@ -49,14 +49,17 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		//Canvas mouse inputs (node highlighting)
 		setOnMouseButtonEvent(e -> {
 			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && e.isPressed()) {
-				HighlightWidget highlighter = new HighlightWidget(sharedResources, (float) e.getMouseX(), (float) e.getMouseY());
+				HighlightWidget highlighter = new HighlightWidget(sharedResources, (float) e.getScaledMouseX(scaler.getScale()), (float) e.getScaledMouseY(scaler.getScale()));
 				addChild(highlighter);
 			}
 		});
 		
 		//Canvas zooming
 		setOnMouseScrollEvent(e -> {
-			sharedResources.getScaler().offsetScale((float) (e.getYOffset() * 0.10f));
+			NanoVGScaler scaler = sharedResources.getScaler();
+			
+			scaler.offsetScale((float) (e.getYOffset() * 0.10f));
+			sharedResources.getProject().setViewportScale(scaler.getScale());
 			sharedResources.refreshContextHint();
 		});
 		
