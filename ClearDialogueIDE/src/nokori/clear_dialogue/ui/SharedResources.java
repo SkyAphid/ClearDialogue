@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import nokori.clear.vg.ClearColor;
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.font.Font;
+import nokori.clear.vg.util.NanoVGScaler;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.text.ClearEscapeSequences;
 import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget;
@@ -13,7 +14,6 @@ import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget.Syntax;
 import nokori.clear.windows.Window;
 import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.util.DialogueUtils;
-import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 
 /**
  * This is a pass-around class that allows JDialogue to communicate data around the program, such as the current project, context hints, etc.
@@ -44,8 +44,9 @@ public class SharedResources {
 
 	private WidgetAssembly toolbar;
 	private ClearDialogueCanvas canvas;
-	private ConnectionRendererWidget connectionRenderer;
 	
+	private NanoVGScaler scaler = new NanoVGScaler();
+
 	public void init(ClearDialogueIDECore core, Window window, NanoVGContext context, ClearDialogueRootWidgetAssembly rootWidgetAssembly) {
 		this.core = core;
 		this.window = window;
@@ -59,7 +60,7 @@ public class SharedResources {
 			e.printStackTrace();
 		}
 
-		resetContextHint();
+		refreshContextHint();
 		loadAndProcessSyntax(false);
 		
 		rootWidgetAssembly.init(this);
@@ -97,16 +98,12 @@ public class SharedResources {
 		this.canvas = canvas;
 	}
 
-	public void refreshCanvas() {
-		canvas.refresh(project);
-	}
-	
-	public ConnectionRendererWidget getConnectionRenderer() {
-		return connectionRenderer;
+	public NanoVGScaler getScaler() {
+		return scaler;
 	}
 
-	public void setConnectionRenderer(ConnectionRendererWidget connectionRenderer) {
-		this.connectionRenderer = connectionRenderer;
+	public void refreshCanvas() {
+		canvas.refresh(project);
 	}
 	
 	/**
@@ -118,26 +115,24 @@ public class SharedResources {
 	}
 
 	/**
-	 * Sets the current context hint.
-	 * @param contextHint
-	 */
-	public void setContextHint(String contextHint) {
-		this.contextHint = contextHint;
-	}
-	
-	/**
 	 * Resets the context hint back to the general controls for navigating the canvas.
 	 */
-	public void resetContextHint() {
-		contextHint = "Drag LMB = Pan Canvas & Drag Nodes | Drag RMB = Highlight";
+	public void refreshContextHint() {
+		String scale = "Scale: " + (int) (scaler.getScale() * 10);
+		
+		contextHint = scale + " | Drag LMB = Pan Canvas & Drag Nodes | Drag RMB = Highlight";
 		
 		if (canvas != null && canvas.getNumHighlightedNodes() > 0) {
-			contextHint = canvas.getNumHighlightedNodes() + " Highlighted | T = Add Tags to All | R = Remove Tags from All | N = Rename All";
+			if (canvas.getNumHighlightedNodes() == 1) {
+				contextHint = scale + " | \"" + canvas.getHighlightedNode(0).getDialogue().getTitle() + "\" Highlighted | T = Add Tags | R = Remove Tags | N = Rename";
+			} else {
+				contextHint = scale + " | " + canvas.getNumHighlightedNodes() + " Highlighted | T = Add Tags to All | R = Remove Tags from All | N = Rename All";
+			}
 		}
 	}
 
 	/**
-	 * Gets the currently active JDialogue Project.
+	 * Gets the currently active ClearDialogue Project.
 	 * @return
 	 */
 	public Project getProject() {
@@ -145,7 +140,7 @@ public class SharedResources {
 	}
 	
 	/**
-	 * Sets a new JDialogue Project and refreshes the Canvas with its data.
+	 * Sets a new ClearDialogue Project and refreshes the Canvas with its data.
 	 * @param project
 	 */
 	public void setProject(Project project) {

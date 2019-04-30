@@ -35,14 +35,17 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	public static final int COLLAPSED_WIDTH = 120;
 	public static final int COLLAPSED_HEIGHT = 120;
 	
-	public static final int EXPANDED_WIDTH = 200;
+	public static final int EXPANDED_WIDTH = 400;
 	public static final int EXPANDED_HEIGHT = 200;
 	
-	public static final int EDITING_WIDTH = EXPANDED_WIDTH * 6;
-	public static final int EDITING_HEIGHT = EXPANDED_HEIGHT * 3;
+	public static final int EDITING_WIDTH = 1200;
+	public static final int EDITING_HEIGHT = 600;
 	
 	public static final float CORNER_RADIUS = 1.0f;
 
+	protected static final int X_PADDING = 10;
+	protected static final int Y_PADDING = 10;
+	
 	protected static final int TOP_PADDING = 20;
 	protected static final int LEFT_PADDING = 15;
 	
@@ -118,6 +121,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		this.dialogue = dialogue;
 		this.mode = dialogue.isExpanded() ? Mode.EXPANDED : Mode.COLLAPSED;
 		
+		setScaler(sharedResources.getScaler());
+		
 		/*
 		 * Widget Container
 		 */
@@ -137,72 +142,51 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		NanoVGContext context = sharedResources.getNanoVGContext();
 		
-		float xPadding = 10f;
-		float yPadding = 10f;
-		float widgetPadding = (yPadding/2f);
-		float textWidth = mode.getWidth() - (xPadding * 2f);
+		float widgetPadding = (Y_PADDING/2f);
+		float textWidth = mode.getWidth() - (X_PADDING * 2f);
 		
 		//Title
-		title = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTitle(), sharedResources.getNotoSans(), 24);
+		title = new TextFieldWidget(context, textWidth, sharedResources.getScaler(), TEXT_COLOR, dialogue.getTitle(), sharedResources.getNotoSans(), 24);
 		title.setUnderlineFill(UNDERLINE_COLOR);
-		title.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, yPadding));
-		title.addChild(new TextFieldSynch(this, false, xPadding, yPadding));
+		title.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, X_PADDING, Y_PADDING));
+		title.addChild(new TextFieldSynch(this, false, X_PADDING, Y_PADDING));
 		title.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		title.setOnKeyEvent(e -> {
 			dialogue.setTitle(title.getTextBuilder().toString());
 		});
 		
-		title.setOnMouseEnteredEvent(e -> {
-			if (mode == Mode.EDITING) {
-				sharedResources.setContextHint("LMB = Edit title");
-			}
-		});
-		
 		//Tags
-		tags = new TextFieldWidget(context, textWidth, TEXT_COLOR, dialogue.getTags(), sharedResources.getNotoSans(), 20);
+		tags = new TextFieldWidget(context, textWidth, sharedResources.getScaler(), TEXT_COLOR, dialogue.getTags(), sharedResources.getNotoSans(), 20);
 		tags.setUnderlineFill(UNDERLINE_COLOR);
-		tags.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, xPadding, title.getHeight() + yPadding + widgetPadding));
-		tags.addChild(new TextFieldSynch(this, false, xPadding, yPadding));
+		tags.addChild(new WidgetClip(WidgetClip.Alignment.TOP_LEFT, X_PADDING, title.getHeight() + Y_PADDING + widgetPadding));
+		tags.addChild(new TextFieldSynch(this, false, X_PADDING, Y_PADDING));
 		tags.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		tags.setOnKeyEvent(e -> {
 			dialogue.setTags(tags.getTextBuilder().toString());
 		});
 		
-		tags.setOnMouseEnteredEvent(e -> {
-			if (mode == Mode.EDITING) {
-				sharedResources.setContextHint("LMB = Edit tags");
-			}
-		});
-		
 		//tags.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 
 		//Content
-		float contentY = title.getHeight() + tags.getHeight() + yPadding + (widgetPadding * 2f);
+		float contentY = title.getHeight() + tags.getHeight() + Y_PADDING + (widgetPadding * 2f);
 
-		content = new TextAreaWidget(xPadding, contentY, textWidth, 0f, TEXT_COLOR, dialogue.getRenderableContent(), sharedResources.getNotoSerif(), 22);
+		content = new TextAreaWidget(X_PADDING, contentY, textWidth, 0f, sharedResources.getScaler(), TEXT_COLOR, dialogue.getRenderableContent(), sharedResources.getNotoSerif(), 22);
 		content.setLineNumbersEnabled(false);
 		content.setLineSplitOverrideEnabled(true);
-		content.setLineSplitOverrideWidth(Mode.EDITING.getWidth());
-		content.addChild(new TextFieldSynch(this, true, xPadding, yPadding));
+		content.addChild(new TextFieldSynch(this, true, X_PADDING, Y_PADDING));
 		content.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		content.setOnKeyEvent(e -> {
 			keyEventCallback();
 		});
 		
-		content.setOnMouseEnteredEvent(e -> {
-			if (mode == Mode.EDITING) {
-				sharedResources.setContextHint("LMB = Edit content");
-			}
-		});
-		
 		/*
 		 * In-Connector
 		 */
 		
-		inConnector = new ConnectorWidget(dialogue.getInConnector(), ConnectorType.IN);
+		inConnector = new ConnectorWidget(sharedResources.getScaler(), dialogue.getInConnector(), ConnectorType.IN);
 		
 		/*
 		 * Finalize
@@ -322,8 +306,13 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	}
 	
 	@Override
-	protected void draggingReleaseCallback(MouseButtonEvent e) {
-		e.setConsumed(true);
+	protected void draggingReleaseCallback(MouseButtonEvent e, boolean wasMoved) {
+		e.setConsumed(wasMoved);
+	}
+	
+	@Override
+	protected boolean canDrag(Window window, float scale) {
+		return super.canDrag(window, sharedResources.getScaler().getScale());
 	}
 	
 	protected void keyEventCallback() {
@@ -331,21 +320,26 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	}
 	
 	private void highlightingCommands(Event e) {
-		if (e.isConsumed() || highlightedWithHighlighter) {
+		if (highlightedWithHighlighter) {
 			return;
 		}
 		
-		hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
+		if (e.isConsumed()) {
+			hovering = false;
+		} else {
+			hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
+		}
+		
 		setHighlighted(hovering, false);
 		
-		if (hovering) {
+		if (hovering && e instanceof MouseMotionEvent) {
 			e.setConsumed(true);
 		}
 	}
 	
 	public void leftClickCommands(MouseButtonEvent e) {
 		long clickTime = e.getTimestamp();
-
+	
 		if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			if (lastLeftClickTime != -1 && TimeUnit.NANOSECONDS.toMillis(clickTime - lastLeftClickTime) <= CLICK_TIME) {
 				
@@ -359,8 +353,6 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				}
 
 				lastLeftClickTime = -1L;
-				e.setConsumed(true);
-				
 				return;
 			}
 			
@@ -469,8 +461,6 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
 			fadeIn.setLinkedObject(DraggableDialogueWidget.this);
 			fadeIn.play();
-			
-			sharedResources.setContextHint(CONTEXT_HINT);
 		}
 		
 		//Fade out
@@ -479,7 +469,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			fadeOut.setLinkedObject(DraggableDialogueWidget.this);
 			fadeOut.play();
 				
-			sharedResources.resetContextHint();
+			sharedResources.refreshContextHint();
 		}
 	}
 	
@@ -520,6 +510,12 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		if (mode == Mode.EXPANDED || mode == Mode.COLLAPSED) {
 			dialogue.setExpanded(mode == Mode.EXPANDED);
+		}
+		
+		if (mode == Mode.EXPANDED) {
+			content.setLineSplitOverrideWidth(EXPANDED_WIDTH - (X_PADDING * 2.25f));
+		} else {
+			content.setLineSplitOverrideWidth(EDITING_WIDTH - (X_PADDING * 2.25f));
 		}
 		
 		/*

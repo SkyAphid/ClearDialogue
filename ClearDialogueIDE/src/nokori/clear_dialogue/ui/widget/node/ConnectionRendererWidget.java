@@ -31,7 +31,7 @@ public class ConnectionRendererWidget extends Widget {
 	@Override
 	public void render(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
 		Project project = sharedResources.getProject();
-		
+
 		//Render all connections
 		for (int i = 0; i < project.getNumConnections(); i++) {
 			renderConnection(context, project.getConnection(i));
@@ -47,8 +47,10 @@ public class ConnectionRendererWidget extends Widget {
 		float sx = connector.getClippedX() + connector.getWidth()/2;
 		float sy = connector.getClippedY() + connector.getHeight()/2;
 		
-		float ex = (float) window.getMouseX();
-		float ey = (float) window.getMouseY();
+		float scale = sharedResources.getScaler().getScale();
+		
+		float ex = (float) window.getScaledMouseX(scale);
+		float ey = (float) window.getScaledMouseY(scale);
 		
 		renderLine(context, connector, sx, sy, null, ex, ey);
 	}
@@ -111,7 +113,7 @@ public class ConnectionRendererWidget extends Widget {
 		
 		for (int i = 0; i < canvas.getNumChildren(); i++) {
 			Widget widget = canvas.getChild(i);
-			
+
 			if (widget instanceof DraggableDialogueWidget) {
 				DraggableDialogueWidget w = (DraggableDialogueWidget) widget;
 				ConnectorWidget c = w.findConnectorWidget(connector);

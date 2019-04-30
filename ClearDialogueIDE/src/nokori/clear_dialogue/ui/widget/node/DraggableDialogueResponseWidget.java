@@ -41,7 +41,7 @@ public class DraggableDialogueResponseWidget extends DraggableDialogueWidget {
 				float connectorRadius = responseHeight/2;
 				float connectorOffsetY = content.getY() + (responseHeight * i);
 				
-				ConnectorWidget outConnector = new ConnectorWidget(responses.get(i).getOutConnector(), ConnectorType.OUT, connectorRadius, false);
+				ConnectorWidget outConnector = new ConnectorWidget(sharedResources.getScaler(), responses.get(i).getOutConnector(), ConnectorType.OUT, connectorRadius, false);
 				outConnector.addChild(new WidgetClip(WidgetClip.Alignment.TOP_RIGHT, 10f, connectorOffsetY));
 				
 				addChildInFrontOf(inConnector, outConnector);

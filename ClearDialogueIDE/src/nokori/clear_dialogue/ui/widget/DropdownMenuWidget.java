@@ -58,13 +58,18 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 			optionHighlight.setInputEnabled(false);
 			
 			optionHighlight.setOnMouseButtonEvent(e -> {
+				if (e.isConsumed()) {
+					return;
+				}
+				
 				if (ClearStaticResources.isFocusedOrCanFocus(this)) {
 					boolean mouseWithin = optionHighlight.isMouseWithin();
 					
 					setOptionPressedHighlight(index, mouseWithin && e.isPressed());
 					
 					if (mouseWithin && !e.isPressed()) {
-						optionSelected(e.getWindow(), options[index], index);	
+						e.setConsumed(true);
+						optionSelected(e.getWindow(), options[index], index);
 					}
 				}
 			});

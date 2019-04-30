@@ -265,10 +265,10 @@ public class ClearDialogueJsonIO implements ClearDialogueIO {
 			DialogueConnector connector2 = project.getDialogueConnector(connector2UID);
 
 			if (connector1 != null && connector2 != null) {
+				
 				Connection connection = new Connection(connector1, connector2);
-
 				project.addConnection(connection);
-
+				
 			} else {
 				String missingUIDs = "";
 

@@ -4,16 +4,23 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import org.lwjgl.glfw.GLFW;
-
+import nokori.clear.vg.NanoVGContext;
+import nokori.clear.vg.transition.Transition;
+import nokori.clear.vg.util.NanoVGScaler;
 import nokori.clear.vg.widget.assembly.DraggableWidgetAssembly;
 import nokori.clear.vg.widget.assembly.Widget;
+import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetSynch;
+import nokori.clear.vg.widget.assembly.WidgetUtils;
+import nokori.clear.windows.Window;
+import nokori.clear.windows.WindowManager;
 import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.DialogueResponse;
 import nokori.clear_dialogue.project.DialogueText;
 import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.util.MultiEditUtils;
 import nokori.clear_dialogue.ui.widget.HighlightWidget;
+import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueResponseWidget;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueTextWidget;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget;
@@ -26,14 +33,20 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	
 	public ClearDialogueCanvas(SharedResources sharedResources) {
 		this.sharedResources = sharedResources;
+		
+		setScaler(sharedResources.getScaler());
+		
+		//Settings unique to this canvas. Check the function descriptions for more information.
 		setRequiresMouseToBeWithinWidgetToDrag(false);
 		setInvertInputOrder(true);
 		
+		//Synchronize the canvas size with the window size
 		WidgetSynch synch = new WidgetSynch(WidgetSynch.Mode.WITH_WINDOW);
 		synch.setSynchXEnabled(false);
 		synch.setSynchYEnabled(false);
 		addChild(synch);
 		
+		//Canvas mouse inputs (node highlighting)
 		setOnMouseButtonEvent(e -> {
 			if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && e.isPressed()) {
 				HighlightWidget highlighter = new HighlightWidget(sharedResources, (float) e.getMouseX(), (float) e.getMouseY());
@@ -41,6 +54,13 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 			}
 		});
 		
+		//Canvas zooming
+		setOnMouseScrollEvent(e -> {
+			sharedResources.getScaler().offsetScale((float) (e.getYOffset() * 0.10f));
+			sharedResources.refreshContextHint();
+		});
+		
+		//Canvas shortcut keys (multi-node editing)
 		setOnKeyEvent(e -> {
 			
 			if (!e.isPressed()) {
@@ -60,8 +80,20 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 					MultiEditUtils.multiTitle(sharedResources, highlightedNodes);
 				}
 			}
-			
 		});
+		
+		//Render connections between nodes
+		ConnectionRendererWidget connectionRenderer = new ConnectionRendererWidget(sharedResources);
+		addChild(connectionRenderer);
+	}
+	
+	@Override
+	public void renderChildren(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+		NanoVGScaler scaler = sharedResources.getScaler();
+		
+		scaler.pushScale(context);
+		super.renderChildren(windowManager, window, context, rootWidgetAssembly);
+		scaler.popScale(context);
 	}
 	
 	@Override
@@ -78,7 +110,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		resetHighlighted();
 		
 		/*
-		 * Remove existing children
+		 * Remove existing nodes
 		 */
 		
 		for (int i = 0; i < getNumChildren(); i++) {
@@ -86,15 +118,13 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 			
 			if (w instanceof DraggableDialogueWidget) {
 				((DraggableDialogueWidget) w).requestRemoval(false);
-			} else {
-				removeChild(i);
-				i--;
 			}
 		}
 		
 		/*
 		 * Add children from given project
 		 */
+		
 		for (int i = 0; i < project.getNumDialogue(); i++) {
 			Dialogue d = project.getDialogue(i);
 			
@@ -130,7 +160,11 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 			public int compare(Widget x1, Widget x2) {
 				int result = Float.compare(x1.getClippedX(), x2.getClippedX());
 				
-				if (result == 0) {
+				if (x1 instanceof ConnectionRendererWidget) {
+					result = Float.compare(x2.getClippedX() + 1, x2.getClippedX());
+				} else if (x2 instanceof ConnectionRendererWidget) {
+					result = Float.compare(x1.getClippedX(), x1.getClippedX() + 1);
+				} else if (result == 0) {
 					// both X are equal -> compare Y too
 					result = Float.compare(x1.getClippedY(), x2.getClippedY());
 				}
@@ -230,7 +264,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		}
 		
 		//This will change the context hint to include controls for multiple highlighted nodes
-		sharedResources.resetContextHint();
+		sharedResources.refreshContextHint();
 	}
 	
 	public void resetHighlighted() {
@@ -265,8 +299,10 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	 * @param height
 	 */
 	public void centerOn(float x, float y, float width, float height) {
-		setX((getX() - x) + getWidth()/2 - width/2);
-		setY((getY() - y) + getHeight()/2 - height/2);
+		float targetX = (getX() - x) + scaler.applyScale(getWidth())/2 - width/2;
+		float targetY = (getY() - y) + scaler.applyScale(getHeight())/2 - height/2;
+
+		new CenterTransition(200, this, getX(), getY(), targetX, targetY).play();
 	}
 	
 	public void removeDialogueNode(DraggableDialogueWidget widget) {
@@ -278,10 +314,37 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	}
 	
 	private float getNewDialogueX() {
-		return parent.getWidth()/2 - DraggableDialogueWidget.DEFAULT_MODE.getWidth()/2;
+		return -getX() + parent.getWidth()/2 - DraggableDialogueWidget.DEFAULT_MODE.getWidth()/2;
 	}
 	
 	private float getNewDialogueY() {
-		return parent.getHeight()/2 - DraggableDialogueWidget.DEFAULT_MODE.getHeight()/2;
+		return -getY() + parent.getHeight()/2 - DraggableDialogueWidget.DEFAULT_MODE.getHeight()/2;
 	}
+	
+	private class CenterTransition extends Transition {
+
+		private ClearDialogueCanvas canvas;
+		private float startX, startY, targetX, targetY;
+		
+		public CenterTransition(long durationInMillis, ClearDialogueCanvas canvas, float startX, float startY, float targetX, float targetY) {
+			super(durationInMillis);
+			this.canvas = canvas;
+			this.startX = startX;
+			this.startY = startY;
+			this.targetX = targetX;
+			this.targetY = targetY;
+			
+			setLinkedObject(canvas);
+		}
+
+		@Override
+		public void tick(float progress) {
+			float x = WidgetUtils.smoothermix(startX, targetX, progress);
+			float y = WidgetUtils.smoothermix(startY, targetY, progress);
+			
+			canvas.setX(x);
+			canvas.setY(y);
+		}
+		
+	};
 }

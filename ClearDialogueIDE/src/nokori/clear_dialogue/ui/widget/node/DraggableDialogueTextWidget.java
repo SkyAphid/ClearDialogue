@@ -11,7 +11,7 @@ public class DraggableDialogueTextWidget extends DraggableDialogueWidget {
 	public DraggableDialogueTextWidget(SharedResources sharedResources, DialogueText dialogue) {
 		super(sharedResources, dialogue);
 		
-		outConnector = new ConnectorWidget(dialogue.getOutConnector(), ConnectorType.OUT);
+		outConnector = new ConnectorWidget(sharedResources.getScaler(), dialogue.getOutConnector(), ConnectorType.OUT);
 		addChildInFrontOf(inConnector, outConnector);
 	}
 	

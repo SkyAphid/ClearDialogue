@@ -2,7 +2,7 @@ package nokori.clear_dialogue.ui.widget;
 
 import nokori.clear.vg.ClearColor;
 import nokori.clear.vg.transition.FillTransition;
-import nokori.clear.vg.transition.TemplateTransition;
+import nokori.clear.vg.transition.TransitionImpl;
 import nokori.clear.vg.widget.RectangleWidget;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetClip;
@@ -44,7 +44,7 @@ public class PopupMessageWidget extends WidgetAssembly {
 		WidgetSynch synch = new WidgetSynch(Mode.WITH_PARENT, SIZE_OFFSET, 0f, -(SIZE_OFFSET * 2), -(SIZE_OFFSET * 2));
 		addChild(synch);
 		
-		TemplateTransition transition = new TemplateTransition(FADE_IN_DURATION, 0f, 1f, new TemplateTransition.ProgressCallback() {
+		TransitionImpl transition = new TransitionImpl(FADE_IN_DURATION, 0f, 1f, new TransitionImpl.ProgressCallback() {
 			@Override
 			public void callback(float value) {
 				synch.setYOffset(START_Y_OFFSET + ((END_Y_OFFSET - START_Y_OFFSET) * value));

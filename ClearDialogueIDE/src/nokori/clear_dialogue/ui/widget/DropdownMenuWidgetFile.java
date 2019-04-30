@@ -67,6 +67,8 @@ public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 			
 			break;
 		}
+		
+		collapse(window);
 	}
 
 }

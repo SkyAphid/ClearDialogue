@@ -5,6 +5,7 @@ import java.util.Stack;
 import nokori.clear.vg.ClearColor;
 import nokori.clear.vg.ClearStaticResources;
 import nokori.clear.vg.transition.FillTransition;
+import nokori.clear.vg.util.NanoVGScaler;
 import nokori.clear.vg.widget.HalfCircleWidget;
 import nokori.clear.vg.widget.assembly.Widget;
 import nokori.clear.vg.widget.assembly.WidgetClip;
@@ -43,14 +44,16 @@ public class ConnectorWidget extends HalfCircleWidget {
 
 	private boolean selected = false;
 	
-	public ConnectorWidget(DialogueConnector connector, ConnectorType connectorType) {
-		this(connector, connectorType, CONNECTOR_RADIUS, true);
+	public ConnectorWidget(NanoVGScaler scaler, DialogueConnector connector, ConnectorType connectorType) {
+		this(scaler, connector, connectorType, CONNECTOR_RADIUS, true);
 	}
 	
-	public ConnectorWidget(DialogueConnector connector, ConnectorType connectorType, float radius, boolean addWidgetClip) {
+	public ConnectorWidget(NanoVGScaler scaler, DialogueConnector connector, ConnectorType connectorType, float radius, boolean addWidgetClip) {
 		super(radius, connectorType.color.copy(), connectorType.getOrientation());
 		this.connector = connector;
 		this.connectorType = connectorType;
+		
+		setScaler(scaler);
 		
 		if (addWidgetClip) {
 			switch(connectorType) {

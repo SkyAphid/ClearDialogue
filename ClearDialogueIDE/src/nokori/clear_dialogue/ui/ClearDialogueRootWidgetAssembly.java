@@ -11,7 +11,6 @@ import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetNode;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetTool;
 import nokori.clear_dialogue.ui.widget.GitRepoLinkWidget;
 import nokori.clear_dialogue.ui.widget.ProjectNameTextFieldWidget;
-import nokori.clear_dialogue.ui.widget.node.ConnectionRendererWidget;
 
 /**
  * This class is the RootWidgetAssembly for the ClearDialogueIDE, acting as the center of all of the user-interface components.
@@ -31,21 +30,14 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 	private ProjectNameTextFieldWidget projectNameField;
 
 	public ClearDialogueRootWidgetAssembly init(SharedResources sharedResources) {
-		initConnectionRenderer(sharedResources);
 		initCanvas(sharedResources);
 		initToolbar(sharedResources);
 		return this;
 	}
 	
-	private void initConnectionRenderer(SharedResources sharedResources) {
-		ConnectionRendererWidget connectionRenderer = new ConnectionRendererWidget(sharedResources);
-		addChild(connectionRenderer);
-		sharedResources.setConnectionRenderer(connectionRenderer);
-	}
-	
 	private void initCanvas(SharedResources sharedResources) {
 		ClearDialogueCanvas canvas = new ClearDialogueCanvas(sharedResources);
-		
+
 		//Finalize
 		addChild(canvas);
 		sharedResources.setCanvas(canvas);
