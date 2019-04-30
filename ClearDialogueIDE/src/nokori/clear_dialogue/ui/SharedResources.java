@@ -120,7 +120,7 @@ public class SharedResources {
 	public void refreshContextHint() {
 		String scale = "Scale: " + (int) (scaler.getScale() * 10);
 		
-		contextHint = scale + " | Drag LMB = Pan Canvas & Drag Nodes | Drag RMB = Highlight";
+		contextHint = scale + " | Drag LMB = Pan Canvas & Drag Nodes | Drag RMB = Highlight | Scroll MMB = Viewport Zoom";
 		
 		if (canvas != null && canvas.getNumHighlightedNodes() > 0) {
 			if (canvas.getNumHighlightedNodes() == 1) {
