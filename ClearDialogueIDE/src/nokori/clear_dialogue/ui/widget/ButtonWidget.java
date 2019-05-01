@@ -7,8 +7,6 @@ import nokori.clear.vg.widget.RectangleWidget;
 import nokori.clear.vg.widget.assembly.Widget;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetClip;
-import nokori.clear.windows.Window;
-import nokori.clear.windows.WindowManager;
 
 public class ButtonWidget extends WidgetAssembly {
 
@@ -29,12 +27,12 @@ public class ButtonWidget extends WidgetAssembly {
 	}
 
 	@Override
-	public void tick(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+	public void tick(NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
 		
 	}
 
 	@Override
-	public void render(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+	public void render(NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
 		
 	}
 

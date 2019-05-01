@@ -58,7 +58,7 @@ public class PopupMessageWidget extends WidgetAssembly {
 		 */
 		
 		overlay = new RectangleWidget(OVERLAY_COLOR.alpha(0.0f), true);
-		overlay.addChild(new WidgetSynch(WidgetSynch.Mode.WITH_WINDOW));
+		overlay.addChild(new WidgetSynch(WidgetSynch.Mode.WITH_FRAMEBUFFER));
 		new FillTransition(FADE_IN_DURATION, overlay.getFill(), OVERLAY_COLOR).play();
 		addChild(overlay);
 		

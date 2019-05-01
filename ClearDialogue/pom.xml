@@ -2,8 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nokoriware.jdialogue</groupId>
-	<artifactId>jdialogue-api</artifactId>
+	<groupId>ClearDialogue</groupId>
+	<artifactId>ClearDialogueAPI</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -17,23 +17,17 @@
 			</plugin>
 		</plugins>
 	</build>
-	<name>JDialogue API</name>
-	<url>https://github.com/SkyAphid/JDialogue</url>
-	<description>An API for creating branching dialogue in video games.</description>
-	<organization>
-		<name>NOKORIWARE</name>
-		<url>https://www.nokoriware.com/</url>
-	</organization>
+	
 	<dependencies>
 		<dependency>
-    		<groupId>javax.json</groupId>
-    		<artifactId>javax.json-api</artifactId>
-    		<version>1.1.4</version>
+			<groupId>javax.json</groupId>
+			<artifactId>javax.json-api</artifactId>
+			<version>1.1.4</version>
 		</dependency>
 		<dependency>
-    		<groupId>org.glassfish</groupId>
-   			<artifactId>javax.json</artifactId>
-    		<version>1.1.4</version>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>1.1.4</version>
 		</dependency>
 	</dependencies>
 </project>

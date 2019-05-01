@@ -10,8 +10,6 @@ import nokori.clear.vg.widget.LabelWidget;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetClip;
 import nokori.clear_dialogue.ui.SharedResources;
-import nokori.clear.windows.Window;
-import nokori.clear.windows.WindowManager;
 
 public class ContextHintsWidget extends LabelWidget {
 	
@@ -26,14 +24,14 @@ public class ContextHintsWidget extends LabelWidget {
 	}
 
 	@Override
-	public void tick(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
-		super.tick(windowManager, window, context, rootWidgetAssembly);
+	public void tick(NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+		super.tick(context, rootWidgetAssembly);
 		
 		String contextHint = sharedResources.getContextHint();
 		
 		if (!getText().equals(contextHint)) {
 			getFill().alpha(0f);
-			setText(sharedResources.getContextHint());
+			setText(context, sharedResources.getContextHint());
 			
 			FillTransition t = new FillTransition(TRANSITION_DURATION, getFill(), CONTEXT_HINTS_TEXT_FILL);
 			t.setLinkedObject(this);

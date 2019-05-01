@@ -556,14 +556,14 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		}
 		
 		@Override
-		public void synch(Window window) {
+		public void synch(NanoVGContext context) {
 			setXOffset(xPadding);
 			setWOffset(-(xPadding * 2f));
-			super.synch(window);
+			super.synch(context);
 		}
 		
 		@Override
-		protected void synchHeight(Window window, Mode mode) {
+		protected void synchHeight(NanoVGContext context, Mode mode) {
 			TextAreaWidget textArea = (TextAreaWidget) parent;
 			textArea.setHeight(DraggableDialogueWidget.this.getHeight() - textArea.getY() - yPadding);
 		}

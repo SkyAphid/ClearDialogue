@@ -12,8 +12,6 @@ import nokori.clear.vg.widget.assembly.Widget;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.vg.widget.assembly.WidgetSynch;
 import nokori.clear.vg.widget.assembly.WidgetUtils;
-import nokori.clear.windows.Window;
-import nokori.clear.windows.WindowManager;
 import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.DialogueResponse;
 import nokori.clear_dialogue.project.DialogueText;
@@ -41,7 +39,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		setInvertInputOrder(true);
 		
 		//Synchronize the canvas size with the window size
-		WidgetSynch synch = new WidgetSynch(WidgetSynch.Mode.WITH_WINDOW);
+		WidgetSynch synch = new WidgetSynch(WidgetSynch.Mode.WITH_FRAMEBUFFER);
 		synch.setSynchXEnabled(false);
 		synch.setSynchYEnabled(false);
 		addChild(synch);
@@ -91,11 +89,11 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	}
 	
 	@Override
-	public void renderChildren(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+	public void renderChildren(NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
 		NanoVGScaler scaler = sharedResources.getScaler();
 		
 		scaler.pushScale(context);
-		super.renderChildren(windowManager, window, context, rootWidgetAssembly);
+		super.renderChildren(context, rootWidgetAssembly);
 		scaler.popScale(context);
 	}
 	

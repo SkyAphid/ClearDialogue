@@ -7,7 +7,6 @@ import nokori.clear.vg.util.BezierLineRenderer;
 import nokori.clear.vg.widget.assembly.Widget;
 import nokori.clear.vg.widget.assembly.WidgetAssembly;
 import nokori.clear.windows.Window;
-import nokori.clear.windows.WindowManager;
 import nokori.clear_dialogue.project.Connection;
 import nokori.clear_dialogue.project.DialogueConnector;
 import nokori.clear_dialogue.project.Project;
@@ -26,10 +25,10 @@ public class ConnectionRendererWidget extends Widget {
 	}
 
 	@Override
-	public void tick(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {}
+	public void tick(NanoVGContext context, WidgetAssembly rootWidgetAssembly) {}
 
 	@Override
-	public void render(WindowManager windowManager, Window window, NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
+	public void render(NanoVGContext context, WidgetAssembly rootWidgetAssembly) {
 		Project project = sharedResources.getProject();
 
 		//Render all connections
@@ -39,15 +38,17 @@ public class ConnectionRendererWidget extends Widget {
 		
 		//Render a line connected to the mouse when the user is connecting dialogue nodes
 		if (ClearStaticResources.getFocusedWidget() instanceof ConnectorWidget) {
-			renderConnectionInProgress(window, context, ((ConnectorWidget) ClearStaticResources.getFocusedWidget()));
+			renderConnectionInProgress(context, ((ConnectorWidget) ClearStaticResources.getFocusedWidget()));
 		}
 	}
 	
-	private void renderConnectionInProgress(Window window, NanoVGContext context, ConnectorWidget connector) {
+	private void renderConnectionInProgress(NanoVGContext context, ConnectorWidget connector) {
 		float sx = connector.getClippedX() + connector.getWidth()/2;
 		float sy = connector.getClippedY() + connector.getHeight()/2;
 		
 		float scale = sharedResources.getScaler().getScale();
+		
+		Window window = sharedResources.getWindow();
 		
 		float ex = (float) window.getScaledMouseX(scale);
 		float ey = (float) window.getScaledMouseY(scale);
