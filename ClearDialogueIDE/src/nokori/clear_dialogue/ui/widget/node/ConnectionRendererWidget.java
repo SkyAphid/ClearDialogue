@@ -37,7 +37,7 @@ public class ConnectionRendererWidget extends Widget {
 		}
 		
 		//Render a line connected to the mouse when the user is connecting dialogue nodes
-		if (ClearStaticResources.getFocusedWidget() instanceof ConnectorWidget) {
+		if (ClearStaticResources.getFocusedWidget() instanceof ConnectorWidget && ((ConnectorWidget) ClearStaticResources.getFocusedWidget()).isSelected()) {
 			renderConnectionInProgress(context, ((ConnectorWidget) ClearStaticResources.getFocusedWidget()));
 		}
 	}

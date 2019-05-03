@@ -9,7 +9,7 @@ import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear.windows.util.TinyFileDialog.Icon;
 import nokori.clear.windows.util.TinyFileDialog.InputType;
 import nokori.clear_dialogue.ui.SharedResources;
-import nokori.clear_dialogue.ui.util.DialogueUtils;
+import nokori.clear_dialogue.ui.util.FileUtils;
 import nokori.clear_dialogue.ui.util.ReplaceUtils;
 
 public class DropdownMenuWidgetTool extends DropdownMenuWidget {
@@ -49,7 +49,7 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 			collapse(window);
 			break;
 		case OPTION_SET_SYNTAX:
-			DialogueUtils.showSyntaxFileSelectDialog();
+			FileUtils.showSyntaxFileSelectDialog();
 			sharedResources.loadAndProcessSyntax(true);
 			collapse(window);
 			break;
@@ -57,7 +57,7 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 	}
 	
 	private void showSyntaxPopup() {
-		String syntaxContent = DialogueUtils.loadSyntax();
+		String syntaxContent = FileUtils.loadSyntax();
 		boolean syntaxLoaded = (syntaxContent != null);
 		
 		PopupMessageWidget message = new PopupMessageWidget(sharedResources, syntaxLoaded ? syntaxContent : "//No syntax loaded.", syntaxLoaded) {
@@ -65,7 +65,7 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 			public void onClose(String content, boolean contentEdited) {
 				if (syntaxLoaded && contentEdited) {
 					if (TinyFileDialog.showConfirmDialog("Save Changes", "Would you like to save your edits to the syntax file?", InputType.YES_NO, Icon.QUESTION, false)) {
-						DialogueUtils.saveSyntax(content);
+						FileUtils.saveSyntax(content);
 					}
 				}
 			}

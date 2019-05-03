@@ -80,6 +80,14 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 				if (e.getKey() == GLFW.GLFW_KEY_N) {
 					MultiEditUtils.multiTitle(sharedResources, highlightedNodes);
 				}
+				
+				if (e.getKey() == GLFW.GLFW_KEY_S) {
+					MultiEditUtils.autoSnap((float) e.getWindow().getScaledMouseX(scaler.getScale()), (float) e.getWindow().getScaledMouseY(scaler.getScale()), this, highlightedNodes);
+				}
+			}
+
+			if (e.getWindow().isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) && e.getKey() == GLFW.GLFW_KEY_A) {
+				highlightAll();
 			}
 		});
 		
@@ -98,7 +106,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	}
 	
 	@Override
-	protected void move(float newX, float newY) {
+	public void move(float newX, float newY) {
 		super.move(newX, newY);
 		sharedResources.getProject().setViewportPosition(newX, newY);
 	}
@@ -272,6 +280,16 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		for (int i = 0; i < highlightedNodes.size(); i++) {
 			highlightedNodes.get(i).setHighlighted(false, false);
 			i--;
+		}
+	}
+	
+	public void highlightAll() {
+		for (int i = 0; i < getNumChildren(); i++) {
+			if (getChild(i) instanceof DraggableDialogueWidget) {
+				DraggableDialogueWidget n = (DraggableDialogueWidget) getChild(i);
+				n.setHighlighted(true, true);
+				notifyDialogueNodeHighlighted(n);
+			}
 		}
 	}
 	

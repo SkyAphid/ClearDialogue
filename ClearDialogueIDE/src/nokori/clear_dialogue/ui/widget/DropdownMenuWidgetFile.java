@@ -2,13 +2,15 @@ package nokori.clear_dialogue.ui.widget;
 
 import static nokori.clear_dialogue.ui.ClearDialogueRootWidgetAssembly.*;
 
+import java.io.File;
+
 import nokori.clear.windows.Window;
 import nokori.clear_dialogue.io.ClearDialogueAutoIO;
 import nokori.clear_dialogue.io.ClearDialogueJsonIO;
 import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.ClearDialogueCanvas;
 import nokori.clear_dialogue.ui.SharedResources;
-import nokori.clear_dialogue.ui.util.DialogueUtils;
+import nokori.clear_dialogue.ui.util.FileUtils;
 
 public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 
@@ -38,37 +40,36 @@ public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 	@Override
 	protected void optionSelected(Window window, String option, int index) {
 		Project project = sharedResources.getProject();
+		File projectFileLocation = sharedResources.getProjectFileLocation();
+		
 		ClearDialogueCanvas canvas = sharedResources.getCanvas();
+
+		collapse(window);
 		
 		switch(option) {
 		case OPTION_NEW_PROJECT:
 			canvas.refresh(new Project());
 			break;
 		case OPTION_PROJECT_DIR:
-			DialogueUtils.showProjectDirectorySelectDialog();
+			FileUtils.showProjectDirectorySelectDialog();
 			break;
 		case OPTION_MERGE_PROJECT:
-			Project merge = DialogueUtils.showImportProjectDialog("Merge Project", new ClearDialogueAutoIO());
+			Project merge = FileUtils.showImportProjectDialog("Merge Project", new ClearDialogueAutoIO(), null);
 			
 			if (merge != null) {
 				project.mergeProject(merge);
 			}
 
+			sharedResources.getCanvas().refresh(project);
+			
 			break;
 		case OPTION_EXPORT_JSON:
-			DialogueUtils.showExportProjectDialog(project, new ClearDialogueJsonIO());
+			FileUtils.showExportProjectDialog(project, projectFileLocation, new ClearDialogueJsonIO());
 			break;
 		case OPTION_IMPORT_JSON:
-			Project loaded = DialogueUtils.showImportProjectDialog("Import JSON Dialogue", new ClearDialogueJsonIO());
-			
-			if (loaded != null) {
-				sharedResources.setProject(loaded);
-			}
-			
+			FileUtils.showImportProjectDialog("Import JSON Dialogue", new ClearDialogueJsonIO(), sharedResources);
 			break;
 		}
-		
-		collapse(window);
 	}
 
 }

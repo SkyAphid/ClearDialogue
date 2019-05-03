@@ -23,6 +23,8 @@ public class HighlightWidget extends RectangleWidget {
 	public HighlightWidget(SharedResources sharedResources, float mouseX, float mouseY) {
 		super(0.0f, ClearColor.CORAL.alpha(ALPHA), ClearColor.CORAL.multiply(1.2f).alpha(ALPHA), false);
 		
+		setScaler(sharedResources.getScaler());
+		
 		ClearDialogueCanvas canvas = sharedResources.getCanvas();
 		
 		float clampX = -canvas.getX() + mouseX;
@@ -35,8 +37,8 @@ public class HighlightWidget extends RectangleWidget {
 		canvas.resetHighlighted();
 
 		setOnInternalMouseMotionEvent(e -> {
-			float dragX = (float) (-canvas.getX() + e.getMouseX());
-			float dragY = (float) (-canvas.getY() + e.getMouseY());
+			float dragX = (float) (-canvas.getX() + e.getScaledMouseX(scaler.getScale()));
+			float dragY = (float) (-canvas.getY() + e.getScaledMouseY(scaler.getScale()));
 			
 			/*
 			 * If mouse coordinates < clamped coordinates
@@ -82,6 +84,8 @@ public class HighlightWidget extends RectangleWidget {
 	}
 
 	private void applyHighlighting(ClearDialogueCanvas canvas) {
+		canvas.resetHighlighted();
+		
 		Stack<DraggableDialogueWidget> highlighted = getHighlightedNodes();
 		
 		while(!highlighted.isEmpty()) {

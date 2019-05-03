@@ -109,6 +109,30 @@ public class Project implements Serializable {
 	 * Adds all nodes from the inputted project into this one.
 	 */
 	public void mergeProject(Project project) {
+		boolean init = false;
+		float minX = 0f, minY = 0f;
+		
+		for (Dialogue d : dialogueList) {
+			if (!init) {
+				minX = d.getX();
+				minY = d.getY();
+				init = true;
+			} else {
+				if (d.getX() < minX) {
+					minX = d.getX();
+				}
+				
+				if (d.getY() < minY) {
+					minY = d.getY();
+				}
+			}
+		}
+		
+		for (Dialogue d : project.dialogueList) {
+			d.setX(minX);
+			d.setY(minY);
+		}
+		
 		dialogueList.addAll(project.dialogueList);
 		connections.addAll(project.connections);
 	}
@@ -243,6 +267,40 @@ public class Project implements Serializable {
 			if (c.contains(connector)) {
 				connections.remove(i);
 				i--;
+			}
+		}
+	}
+	
+	/**
+	 * Returns an ArrayList of all the Connections containing the given connector.
+	 * 
+	 * @param connector
+	 */
+	public ArrayList<Connection> getAllConnections(DialogueConnector connector){
+		ArrayList<Connection> found = new ArrayList<>();
+		
+		for (int i = 0; i < connections.size(); i++) {
+			Connection c = connections.get(i);
+			
+			if (c.contains(connector)) {
+				found.add(c);
+			}
+		}
+		
+		return found;
+	}
+	
+	/**
+	 * Adds all of the connections to this Project's registry.
+	 * 
+	 * @param connections
+	 */
+	public void connectAll(ArrayList<Connection> connections) {
+		for (int i = 0; i < connections.size(); i++) {
+			Connection c = connections.get(i);
+			
+			if (!connectionExists(c.getConnector1(), c.getConnector2())) {
+				connections.add(c);
 			}
 		}
 	}

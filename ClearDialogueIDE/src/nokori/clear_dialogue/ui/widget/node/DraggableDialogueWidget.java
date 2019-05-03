@@ -32,11 +32,11 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
-	public static final int COLLAPSED_WIDTH = 120;
-	public static final int COLLAPSED_HEIGHT = 120;
+	public static final int COLLAPSED_WIDTH = 200;
+	public static final int COLLAPSED_HEIGHT = 200;
 	
-	public static final int EXPANDED_WIDTH = 400;
-	public static final int EXPANDED_HEIGHT = 200;
+	public static final int EXPANDED_WIDTH = 600;
+	public static final int EXPANDED_HEIGHT = 300;
 	
 	public static final int EDITING_WIDTH = 1200;
 	public static final int EDITING_HEIGHT = 600;
@@ -48,6 +48,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	protected static final int TOP_PADDING = 20;
 	protected static final int LEFT_PADDING = 15;
+	
+	public static final float SNAP_SIZE_MULTIPLIER = 1.5f;
 	
 	public static final String CONTEXT_HINT = "LMBx2 = Expand/Collapse | RMBx2 = Toggle Editing Mode | Shift + RMBx2 = Delete";
 	
@@ -203,7 +205,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		});
 		
 		setOnMouseButtonEvent(e -> {
-			if (e.isConsumed()) {
+			if (e.isConsumed() || !highlighted) {
 				return;
 			}
 			
@@ -212,7 +214,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				rightClickCommands(e);
 			}
 			
-			highlightingCommands(e);
+			//This seems to cause issues with highlighting
+			//highlightingCommands(e);
 		});
 		
 		setOnKeyEvent(e -> {
@@ -238,33 +241,24 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	 * 
 	 * 
 	 */
-	
-	private static final float SNAP_SIZE_MULTIPLIER = 1.5f;
-	
+
 	@Override
-	protected void move(float newX, float newY) {
-		float snapWidth = getWidth() * SNAP_SIZE_MULTIPLIER;
-		float snapHeight = getHeight() * SNAP_SIZE_MULTIPLIER;
-		
-		ClearDialogueCanvas canvas = sharedResources.getCanvas();
-		
-		float snapX = (snapWidth * (int) ((newX + getDraggingAnchor().x()) / snapWidth)) + snapWidth/2 - getWidth()/2;
-		float snapY = (snapHeight * (int) ((newY + getDraggingAnchor().y()) / snapHeight)) + snapHeight/2 - getHeight()/2;
-		
-		float canvasSnapX = (snapWidth * (int) (-canvas.getX() / snapWidth));
-		float canvasSnapY = (snapHeight * (int) (-canvas.getY() / snapHeight));
-		
-		float gridX = canvasSnapX + snapX;
-		float gridY = canvasSnapY + snapY;
-		
-		//System.out.println("Called " + gridSnappingEnabled + " " + gridX + "/" + gridY + " " + newX + " " + newY);
-		
-		super.move((gridSnappingEnabled ? gridX : newX), (gridSnappingEnabled ? gridY : newY));
+	public void move(float newX, float newY) {
+		super.move((gridSnappingEnabled ? snapValue(newX) : newX), (gridSnappingEnabled ? snapValue(newY) : newY));
 		
 		dialogue.setX(getX());
 		dialogue.setY(getY());
 		
-		canvas.sortNodes();
+		sharedResources.getCanvas().sortNodes();
+	}
+	
+	public float snapValue(float value) {
+		float snapSize = Math.max(getWidth(), getHeight()) * SNAP_SIZE_MULTIPLIER;
+		
+		int grid = (int) (value / snapSize);
+		float snap = grid  * snapSize;
+		
+		return snap;
 	}
 	
 	@Override
@@ -279,7 +273,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		for (int i = 0; i < canvas.getNumHighlightedNodes(); i++) {
 			DraggableDialogueWidget w = canvas.getHighlightedNode(i);
-			w.clipDraggingAnchor((float) e.getMouseX(), (float) e.getMouseY());
+			w.clipDraggingAnchor((float) e.getScaledMouseX(scaler.getScale()), (float) e.getScaledMouseY(scaler.getScale()));
 		}
 		
 		/*
@@ -301,7 +295,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		
 		for (int i = 0; i < canvas.getNumHighlightedNodes(); i++) {
 			DraggableDialogueWidget w = canvas.getHighlightedNode(i);
-			w.move(w.getDragX(e.getMouseX()), w.getDragY(e.getMouseY()));
+			w.move(w.getDragX(e.getScaledMouseX(scaler.getScale())), w.getDragY(e.getScaledMouseY(scaler.getScale())));
 		}
 	}
 	
@@ -312,7 +306,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	@Override
 	protected boolean canDrag(Window window, float scale) {
-		return super.canDrag(window, sharedResources.getScaler().getScale());
+		return (highlighted && super.canDrag(window, sharedResources.getScaler().getScale()));
 	}
 	
 	protected void keyEventCallback() {
@@ -324,7 +318,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			return;
 		}
 		
-		if (e.isConsumed()) {
+		if (e.isConsumed() || sharedResources.getToolbar().isMouseIntersectingChild(e.getWindow())) {
 			hovering = false;
 		} else {
 			hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
@@ -352,6 +346,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 					transitionMode(Mode.COLLAPSED);
 				}
 
+				e.setConsumed(true);
 				lastLeftClickTime = -1L;
 				return;
 			}
@@ -499,6 +494,17 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		new FillTransition(TRANSITION_DURATION, connector.getFill(), connector.getFill().copy().alpha(0f)).play();
 	}
 
+
+	public boolean isGridSnappingEnabled() {
+		return gridSnappingEnabled;
+	}
+	
+
+	public void setGridSnappingEnabled(boolean gridSnappingEnabled) {
+		this.gridSnappingEnabled = gridSnappingEnabled;
+	}
+	
+
 	/**
 	 * Applies the target dimensions for the current widget mode.
 	 */
@@ -512,11 +518,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			dialogue.setExpanded(mode == Mode.EXPANDED);
 		}
 		
-		if (mode == Mode.EXPANDED) {
-			content.setLineSplitOverrideWidth(EXPANDED_WIDTH - (X_PADDING * 2.25f));
-		} else {
-			content.setLineSplitOverrideWidth(EDITING_WIDTH - (X_PADDING * 2.25f));
-		}
+		content.setLineSplitOverrideWidth(mode.getWidth() - (X_PADDING * 2.25f));
 		
 		/*
 		 * Set input settings based on mode
@@ -533,6 +535,10 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		title.getInputSettings().setInputEnabled(mode == Mode.EDITING);
 		tags.getInputSettings().setInputEnabled(mode == Mode.EDITING);
 		content.getInputSettings().setInputEnabled(mode == Mode.EDITING);
+	}
+	
+	public Mode getMode() {
+		return mode;
 	}
 	
 	/*

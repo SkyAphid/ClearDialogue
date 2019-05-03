@@ -17,12 +17,14 @@ import nokori.clear_dialogue.ui.SharedResources;
 /**
  * General utilities for Dialogue project management.
  */
-public class DialogueUtils {
+public class FileUtils {
 	
 	/**
 	 * Opens a project import dialogue using the given JDialogue I/O system and returns the loaded project. If the project fails to load, null will be returned instead.
+	 * 
+	 * @param sharedResources - if a SharedResources object is inputted, then the project will be auto-loaded upon import
 	 */
-	public static Project showImportProjectDialog(String title, ClearDialogueIO io) {
+	public static Project showImportProjectDialog(String title, ClearDialogueIO io, SharedResources sharedResources) {
 		//Support multiple filetypes
 		String filetypes[] = io.getTypeName().split(", ");
 		
@@ -40,12 +42,18 @@ public class DialogueUtils {
 		filterDescription += " Files";
 
 		//Finally open the TinyFileDialog for the support files
-		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(), filterDescription, filetypes[0], filetypes);
+		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(null, null), filterDescription, filetypes[0], filetypes);
 		
 		//Import the file as a Project
 		if (f != null) {
 			try {
-				return io.importProject(f);
+				Project project = io.importProject(f);
+				
+				if (sharedResources != null) {
+					sharedResources.setProject(project, f);
+				}
+				
+				return project;
 			} catch(Exception e) {
 				e.printStackTrace();
 				TinyFileDialog.showMessageDialog("Caught " + e.getClass().getName(), e.getMessage(), Icon.ERROR);
@@ -55,13 +63,13 @@ public class DialogueUtils {
 		return null;
 	}
 	
-	public static void showExportProjectDialog(Project project, ClearDialogueIO io) {
+	public static void showExportProjectDialog(Project project, File projectFileLocation, ClearDialogueIO io) {
 		String filetype = io.getTypeName();
 		
 		String title = "Export " + io.getTypeName() + " Project";
 		String filterDescription = filetype + " Files";
 		
-		File f = TinyFileDialog.showSaveFileDialog(title, getProjectDirectory(), filterDescription, filetype, false);
+		File f = TinyFileDialog.showSaveFileDialog(title, getProjectDirectory(projectFileLocation, project.getName() + "." + io.getTypeName()), filterDescription, filetype, false);
 		
 		if (f != null) {
 			try {
@@ -121,7 +129,23 @@ public class DialogueUtils {
 	/**
 	 * Get the set directory for saving projects (convenience)
 	 */
-	public static File getProjectDirectory() {
+	public static File getProjectDirectory(File projectFileLocation, String newFileName) {
+		/*
+		 * Try to open the export dialog in the previous location of the project
+		 */
+		
+		if (projectFileLocation != null && newFileName != null) {
+			File dir = new File(projectFileLocation.getParentFile().getAbsolutePath() + "/" + newFileName);
+
+			if (dir.exists()) {
+				return dir;
+			}
+		}
+
+		/*
+		 * If this fails, just default to opening in the configured project directory
+		 */
+
 		File f = new File("project_directory.ini");
 		
 		Properties props = new Properties();
@@ -143,6 +167,10 @@ public class DialogueUtils {
 				return dir;
 			}
 		}
+		
+		/*
+		 * If that fails, just open the export dialog in the root folder since there's nothing else we can do
+		 */
 		
 		return new File(".");
 	}

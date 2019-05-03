@@ -1,5 +1,6 @@
 package nokori.clear_dialogue.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -13,7 +14,7 @@ import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget;
 import nokori.clear.vg.widget.text.TextAreaAutoFormatterWidget.Syntax;
 import nokori.clear.windows.Window;
 import nokori.clear_dialogue.project.Project;
-import nokori.clear_dialogue.ui.util.DialogueUtils;
+import nokori.clear_dialogue.ui.util.FileUtils;
 
 /**
  * This is a pass-around class that allows JDialogue to communicate data around the program, such as the current project, context hints, etc.
@@ -33,12 +34,13 @@ public class SharedResources {
 	public static final String SYNTAX_FILE_LOCATION = "syntax_directory.ini";
 	
 	private Project project = new Project();
+	private File projectFileLocation = null;
 	
 	/*
 	 * GUI Data
 	 */
 	
-	private Font notoSans, notoSerif;
+	private Font notoEmoji, notoSans, notoSerif;
 	private String contextHint;
 	private TextAreaAutoFormatterWidget syntaxWidget = new TextAreaAutoFormatterWidget();
 
@@ -54,8 +56,17 @@ public class SharedResources {
 		this.rootWidgetAssembly = rootWidgetAssembly;
 		
 		try {
+			//Create fallback font for emojis
+			Font.FallbackFontMode fallbackFontMode = Font.FallbackFontMode.REGULAR_TO_ALL;
+			notoEmoji = new Font("NotoEmoji", new File("res/fonts/NotoEmoji/NotoEmoji-Regular.ttf")).load(context);
+			
+			//Create fonts for use on UIs and set the emojis as a fallback font for missing special characters
 			notoSans = new Font("res/fonts/NotoSans/", "NotoSans-Regular", "NotoSans-Bold", "NotoSans-Italic", "NotoSans-Light").load(context);
+			notoSans.addFallbackFont(context, notoEmoji, fallbackFontMode);
+			
 			notoSerif = new Font("res/fonts/NotoSerif/", "NotoSerif-Regular", "NotoSerif-Bold", "NotoSerif-Italic", "NotoSerif-Light").load(context);
+			notoSerif.addFallbackFont(context, notoEmoji, fallbackFontMode);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -118,7 +129,7 @@ public class SharedResources {
 	 * Resets the context hint back to the general controls for navigating the canvas.
 	 */
 	public void refreshContextHint() {
-		String scale = "Scale: " + (int) (scaler.getScale() * 10);
+		String scale = "Scale: " + Math.round(scaler.getScale() * 10.0) / 10.0;
 		
 		contextHint = scale + " | Drag LMB = Pan Canvas & Drag Nodes | Drag RMB = Highlight | Scroll MMB = Viewport Zoom";
 		
@@ -126,25 +137,33 @@ public class SharedResources {
 			if (canvas.getNumHighlightedNodes() == 1) {
 				contextHint = scale + " | \"" + canvas.getHighlightedNode(0).getDialogue().getTitle() + "\" Highlighted | T = Add Tags | R = Remove Tags | N = Rename";
 			} else {
-				contextHint = scale + " | " + canvas.getNumHighlightedNodes() + " Highlighted | T = Add Tags to All | R = Remove Tags from All | N = Rename All";
+				contextHint = scale + " | " + canvas.getNumHighlightedNodes() + " Highlighted | T = Add Tags to All | R = Remove Tags from All | N = Rename All | S = Relative Mouse sAuto-Snap";
 			}
 		}
 	}
 
 	/**
 	 * Gets the currently active ClearDialogue Project.
-	 * @return
 	 */
 	public Project getProject() {
 		return project;
 	}
 	
 	/**
+	 * Gets the file location of the active ClearDialogue Project if it was loaded from a file.
+	 */
+	public File getProjectFileLocation() {
+		return projectFileLocation;
+	}
+
+	/**
 	 * Sets a new ClearDialogue Project and refreshes the Canvas with its data.
 	 * @param project
 	 */
-	public void setProject(Project project) {
+	public void setProject(Project project, File projectFileLocation) {
 		this.project = project;
+		this.projectFileLocation = projectFileLocation;
+		
 		canvas.refresh(project);
 		scaler.setScale(project.getViewportScale());
 		rootWidgetAssembly.getProjectNameField().refresh();
@@ -163,12 +182,12 @@ public class SharedResources {
 	 * the TextAreaWidget's around the IDE.
 	 */
 	public void loadAndProcessSyntax(boolean refreshCanvas) {
-		String syntax = DialogueUtils.loadSyntax();
+		String syntax = FileUtils.loadSyntax();
 		
 		if (syntax != null) {
 			syntaxWidget.clearAllSyntax();
 			
-			String[] split = DialogueUtils.loadSyntax().split("\n");
+			String[] split = FileUtils.loadSyntax().split("\n");
 			
 			for (int i = 0; i < split.length; i++) {
 				String s = split[i].replaceAll("\n", "").trim();

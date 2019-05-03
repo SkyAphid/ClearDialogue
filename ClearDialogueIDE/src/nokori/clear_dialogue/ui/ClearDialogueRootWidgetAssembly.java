@@ -30,8 +30,13 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 	private ProjectNameTextFieldWidget projectNameField;
 
 	public ClearDialogueRootWidgetAssembly init(SharedResources sharedResources) {
+		//Initialize the UI elements
 		initCanvas(sharedResources);
 		initToolbar(sharedResources);
+		
+		//Invert the input order so that the foreground components (the toolbar) take priority over the background ones (the canvas)
+		setInvertInputOrder(true);
+		
 		return this;
 	}
 	

@@ -7,11 +7,14 @@ import java.util.Comparator;
 
 import nokori.clear.vg.ClearColor;
 import nokori.clear.vg.apps.ClearInputApp;
+import nokori.clear.vg.util.NanoVGScaler;
 import nokori.clear.windows.GLFWException;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear_dialogue.project.Dialogue;
+import nokori.clear_dialogue.ui.ClearDialogueCanvas;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget;
+import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget.Mode;
 
 public class MultiEditUtils {
 	
@@ -158,6 +161,89 @@ public class MultiEditUtils {
 			input.show();
 		} catch (GLFWException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static void autoSnap(float mouseX, float mouseY, ClearDialogueCanvas canvas, ArrayList<DraggableDialogueWidget> nodes) {
+
+		/*
+		 * Sort by title. First: sort alphabetically. Second: check if the title has a number in it, and sort by number if applicable.
+		 */
+		
+		Collections.sort(nodes, new Comparator<DraggableDialogueWidget>() {
+			@Override
+			public int compare(DraggableDialogueWidget w1, DraggableDialogueWidget w2) {
+				String title1 = w1.getDialogue().getTitle();
+				String title2 = w2.getDialogue().getTitle();
+				
+				String[] split1 = title1.split(" ");
+				String[] split2 = title2.split(" ");
+				
+				//Matching names with different number labels
+				if (split1.length == split2.length) {
+					int length = split1.length;
+					int matchingIndices = 0;
+					
+					for (int i = 0; i < length; i++) {
+						if (split1[i].contentEquals(split2[i])) {
+							matchingIndices++;
+						}
+					}
+					
+					//System.err.println(split1[0] + " " + matchingIndices + " " + length);
+					
+					//Only one differing section (likely the numerical value)
+					if (matchingIndices == length-1) {
+						for (int i = 0; i < length; i++) {
+							try {
+								int num1 = Integer.parseInt(split1[i]);
+								int num2 = Integer.parseInt(split2[i]);
+								
+								return Integer.compare(num1, num2);
+								
+							} catch (NumberFormatException e) {}
+						}
+					}
+				}
+				
+				//Names don't match, sort alphabetically
+				return w1.getDialogue().getTitle().compareTo(w2.getDialogue().getTitle());
+			}
+		});
+
+		/*
+		 * Set all nodes to the same mode
+		 */
+		
+		DraggableDialogueWidget leaderNode = nodes.get(0);
+		Mode mode = leaderNode.getMode();
+		
+		for (DraggableDialogueWidget w : nodes) {
+			w.transitionMode(mode);
+		}
+		
+		/*
+		 * Auto-Snap
+		 */
+		
+		NanoVGScaler scaler = canvas.getScaler();
+		
+		float x = leaderNode.snapValue(-canvas.getX() + mouseX);
+		float y = leaderNode.snapValue(-canvas.getY() + mouseY);
+		float width = scaler.applyScale(canvas.getWidth());
+		
+		float increment = (Math.max(mode.getWidth(), mode.getHeight()) * DraggableDialogueWidget.SNAP_SIZE_MULTIPLIER);
+		int elementsPerRow = (int) (width / increment);
+		
+		for (int i = 0; i < nodes.size(); i++) {
+			DraggableDialogueWidget w = nodes.get(i);
+			
+			float snapX = x + (increment * (i % elementsPerRow));
+			float snapY = y + (increment * (i / elementsPerRow));
+			
+			w.setGridSnappingEnabled(true);
+			w.move(snapX, snapY);
+			w.setGridSnappingEnabled(false);
 		}
 	}
 }

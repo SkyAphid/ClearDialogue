@@ -72,19 +72,26 @@ public class ConnectorWidget extends HalfCircleWidget {
 			
 			if (ClearStaticResources.isFocusedOrCanFocus(this) || ClearStaticResources.getFocusedWidget() instanceof ConnectorWidget) {
 				ClearStaticResources.getCursor(Type.HAND).apply(e.getWindow());
+				
+				if (ClearStaticResources.getFocusedWidget() == null) {
+					ClearStaticResources.setFocusedWidget(this);
+				}
 			}
 		});
 		
 		setOnMouseExitedEvent(e -> {
 			new FillTransition(TRANSITION_DURATION, getFill(), connectorType.color).play();
 			
-			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
+			if (ClearStaticResources.isFocusedOrCanFocus(this) && !selected) {
 				ClearStaticResources.getCursor(Type.ARROW).apply(e.getWindow());
+				ClearStaticResources.setFocusedWidget(null);
+			} else if (ClearStaticResources.getFocusedWidget() instanceof ConnectorWidget){
+				ClearStaticResources.getCursor(Type.HORIZONTAL_RESIZE).apply(e.getWindow());
 			}
 		});
 		
 		setOnMouseButtonEvent(e -> {
-			if (!e.isConsumed() && !e.isPressed()) {
+			if (!e.isConsumed() && e.isPressed()) {
 				select(e.getWindow());
 			}
 		});
@@ -109,32 +116,40 @@ public class ConnectorWidget extends HalfCircleWidget {
 			}
 			
 			//The mouse wasn't hovering over another connector, so we can go ahead and just cancel the selection
-			endSelecting();
+			endSelecting(window);
 			
 		} else if (isMouseIntersectingThisWidget(window)) {
 			
 			Widget w = ClearStaticResources.getFocusedWidget();
-			
+
 			//Enable connector selection mode if there isn't a focused widget
-			if (w == null) {
-				connector.disconnectAll();
-				selected = true;
-				ClearStaticResources.setFocusedWidget(this);
+			if (ClearStaticResources.isFocusedOrCanFocus(this)) {
+				beginSelecting(window);
 			}
 			
 			//Connect to the focused ConenctorWidget if applicable
-			if (w instanceof ConnectorWidget) {
+			if (w != this && w instanceof ConnectorWidget) {
 				connect((ConnectorWidget) w);
 			}
 		}
 	}
 	
+	private void beginSelecting(Window window) {
+		connector.disconnectAll();
+		selected = true;
+		ClearStaticResources.getCursor(Type.HORIZONTAL_RESIZE).apply(window);
+	}
+	
 	/**
 	 * Ends selecting mode for this Connector and unfocuses it
 	 */
-	private void endSelecting() {
+	private void endSelecting(Window window) {
 		selected = false;
 		ClearStaticResources.setFocusedWidget(null);
+		
+		if (window != null) {
+			ClearStaticResources.getCursor(Type.ARROW).apply(window);
+		}
 	}
 	
 	/**
@@ -150,7 +165,7 @@ public class ConnectorWidget extends HalfCircleWidget {
 		connector.connect(connectWith.connector);
 		
 		//End selecting
-		connectWith.endSelecting();
+		connectWith.endSelecting(null);
 	}
 	
 
@@ -160,5 +175,9 @@ public class ConnectorWidget extends HalfCircleWidget {
 
 	public ConnectorType getConnectorType() {
 		return connectorType;
+	}
+
+	public boolean isSelected() {
+		return selected;
 	}
 }
