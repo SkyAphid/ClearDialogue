@@ -64,6 +64,9 @@ public class ClearDialogueIDECore extends ClearApp {
 			if (WindowMemory.maximized) {
 				window.maximize();
 			}
+		} else {
+			WindowMemory.init(window);
+			WindowMemory.save();
 		}
 
 		//Window position memory

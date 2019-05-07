@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import nokori.clear.windows.Window;
+
 public class WindowMemory {
 	
 	public static final int CURRENT_VERSION = 1;
@@ -14,6 +16,19 @@ public class WindowMemory {
 	
 	public static int x, y, width, height; 
 	public static boolean maximized;
+	
+	/**
+	 * Initializes WindowMemory by using the given window as a base.
+	 * 
+	 * @param window
+	 */
+	public static void init(Window window) {
+		x = window.getX();
+		y = window.getY();
+		width = window.getWidth();
+		height = window.getHeight();
+		maximized = window.isMaximized();
+	}
 	
 	/**
 	 * Loads the WindowMemory and synchronizes this class with it
