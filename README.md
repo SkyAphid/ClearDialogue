@@ -22,11 +22,13 @@ ClearDialogue is a branching dialogue editor for video games designed to be extr
 #### Tools
 - Supports quickly merging projects together into single files
 - Has basic replace/find tools that support refactoring within the current project
-- Use grid snapping to keep nodes aligned neatly in the project (supports manual snapping and automatic mass snapping)
+- Use grid snapping to keep nodes aligned neatly in the project
+- Use automatic mass-grid snapping to organize all highlighted nodes into a grid order alphabetically
 - Move multiple nodes at once, allowing for projects to be quickly edited on a large scale
 - Add/Remove tags to/from multiple nodes at once
-- Change the name of multiple nodes at once (for systematic naming)
+- Change the name of multiple nodes at once; use the #NUM tag to add numbers to the names systematically
 - Supports implementing custom syntax highlighting (I.E. highlighting text commands from your particular engine)
+- And much more!
 
 #### Documentation
 - Includes test applications in the source code showing how to implement ClearDialogue into your games
