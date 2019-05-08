@@ -169,7 +169,7 @@ public class Project implements Serializable {
 	 * @param exactMatch - if true, it will only return a node that equals() the input. Otherwise, contains() will be used.
 	 * @return the Dialogue that meets the criteria, returns null if a match is not found
 	 */
-	public Stack<Dialogue> findNodeWithName(String name, boolean exactMatch) {
+	public Stack<Dialogue> findNodeWithTitle(String name, boolean exactMatch) {
 		return findDialogue(new SearchRule() {
 
 			@Override
