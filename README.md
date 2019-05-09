@@ -1,5 +1,5 @@
 # ClearDialogue
-ClearDialogue is a branching dialogue editor for video games designed to be extremely flexible and work with any type of game engine. It was built with the [Clear LWJGL3 API.](https://github.com/SkyAphid/Clear)
+ClearDialogue is a free open source branching dialogue editor for video games designed to be extremely flexible and work with any type of game engine. It was built with the [Clear LWJGL3 API.](https://github.com/SkyAphid/Clear)
 
 ![ClearDialogue](https://user-images.githubusercontent.com/6147299/56083625-2ae82500-5ded-11e9-8363-d6cc44f202e2.png)
 
