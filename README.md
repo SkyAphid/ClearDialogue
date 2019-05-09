@@ -36,7 +36,7 @@ ClearDialogue is a free open source branching dialogue editor for video games de
 - Code-base is highly customizable and easy to modify
 
 ## Dependencies
-ClearDialogue is configured to use Maven, so most of the required APIs will be downloaded automatically.The only other dependency you need to make sure you have is [Clear.](https://github.com/SkyAphid/Clear)
+ClearDialogue is configured to use Maven, so most of the required APIs will be downloaded automatically. The only other dependency you need to make sure you have is [Clear.](https://github.com/SkyAphid/Clear)
 
 ## Download
 [Get a runnable version of ClearDialogue on the releases page.](https://github.com/SkyAphid/ClearDialogue/releases)
