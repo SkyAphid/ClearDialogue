@@ -36,7 +36,7 @@ public class GitRepoLinkWidget extends LabelWidget {
 		});
 		
 		setOnMouseButtonEvent(e -> {
-			if (isMouseWithin()) {
+			if (isMouseWithin() && !e.isPressed()) {
 				String projectRepoURL = "https://github.com/SkyAphid/ClearDialogue";
 				
 				try {
