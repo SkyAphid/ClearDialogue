@@ -42,7 +42,11 @@ public class FileUtils {
 		filterDescription += " Files";
 
 		//Finally open the TinyFileDialog for the support files
-		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(null, null), filterDescription, filetypes[0], filetypes);
+		Project lastProject = sharedResources.getProject();
+		File lastProjectFileLocation = sharedResources.getProjectFileLocation();
+		String lastProjectName = (lastProjectFileLocation != null ? lastProject.getName() + "." + io.getTypeName() : null);
+		
+		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(lastProjectFileLocation, lastProjectName), filterDescription, filetypes[0], filetypes);
 		
 		//Import the file as a Project
 		if (f != null) {

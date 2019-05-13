@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import org.lwjgl.glfw.GLFW;
+
+import nokori.clear.vg.ClearStaticResources;
 import nokori.clear.vg.NanoVGContext;
 import nokori.clear.vg.transition.Transition;
 import nokori.clear.vg.util.NanoVGScaler;
@@ -68,7 +70,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 				return;
 			}
 			
-			if (!highlightedNodes.isEmpty()) {
+			if (!highlightedNodes.isEmpty() && !ClearStaticResources.isFocused()) {
 				if (e.getKey() == GLFW.GLFW_KEY_T) {
 					MultiEditUtils.addTagsToAll(sharedResources, highlightedNodes);
 				}
@@ -285,8 +287,6 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 				i--;
 			}
 		}
-		
-		Thread.dumpStack();
 	}
 	
 	public void highlightAll() {

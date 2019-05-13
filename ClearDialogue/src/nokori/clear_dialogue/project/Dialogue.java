@@ -64,6 +64,7 @@ public abstract class Dialogue implements Serializable {
 	
 	/**
 	 * The given content will be parsed into assignable data for this specific Dialogue implementation.
+	 * <br><br><i>e.g.</i> Text content inserted into DialogueResponse will convert new lines into individual responses. etc.
 	 * @param content
 	 */
 	public abstract void parseAndSetContent(String content);

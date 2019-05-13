@@ -155,7 +155,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		title.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		title.setOnKeyEvent(e -> {
-			dialogue.setTitle(title.getTextBuilder().toString());
+			dialogue.setTitle(title.getText());
 		});
 		
 		//Tags
@@ -166,7 +166,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		tags.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
 		
 		tags.setOnKeyEvent(e -> {
-			dialogue.setTags(tags.getTextBuilder().toString());
+			dialogue.setTags(tags.getText());
 		});
 		
 		//tags.addChild(new TextAreaAutoFormatterWidget(sharedResources.getSyntaxSettings()));
@@ -232,6 +232,11 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		 */
 		
 		transitionMode(mode);
+		
+		dialogue.setTitle(title.getText());
+		dialogue.setTags(tags.getText());
+		dialogue.parseAndSetContent(content.getText());
+		
 	}
 	
 	/*
@@ -312,7 +317,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	}
 	
 	protected void keyEventCallback() {
-		dialogue.parseAndSetContent(content.getTextBuilder().toString());
+		dialogue.parseAndSetContent(content.getText());
 	}
 	
 	private void highlightingCommands(Event e) {
@@ -375,10 +380,10 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 					//Switch between editing and the last selected mode
 					if (mode != Mode.EDITING) {
 						sharedResources.getCanvas().centerOn(getClippedX(), getClippedY(), EDITING_WIDTH, EDITING_HEIGHT);
+						sharedResources.getCanvas().resetHighlighted(true);
 						transitionMode(Mode.EDITING);
 					} else {
 						endEditing();
-						sharedResources.getCanvas().resetHighlighted(false);
 					}
 				}
 				
