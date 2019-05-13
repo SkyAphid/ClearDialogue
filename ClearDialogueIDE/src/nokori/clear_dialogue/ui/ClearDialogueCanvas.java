@@ -116,7 +116,7 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	 */
 	public void refresh(Project project) {
 		
-		resetHighlighted();
+		resetHighlighted(false);
 		
 		/*
 		 * Remove existing nodes
@@ -276,11 +276,17 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 		sharedResources.refreshContextHint();
 	}
 	
-	public void resetHighlighted() {
+	public void resetHighlighted(boolean onlyResetHighlighterHighlighted) {
 		for (int i = 0; i < highlightedNodes.size(); i++) {
-			highlightedNodes.get(i).setHighlighted(false, false);
-			i--;
+			DraggableDialogueWidget w = highlightedNodes.get(i);
+			
+			if (w.wasHighlightedWithHighlighter() || !onlyResetHighlighterHighlighted) {
+				highlightedNodes.get(i).setHighlighted(false, false);
+				i--;
+			}
 		}
+		
+		Thread.dumpStack();
 	}
 	
 	public void highlightAll() {

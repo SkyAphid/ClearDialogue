@@ -2,6 +2,8 @@ package nokori.clear_dialogue.project;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -103,6 +105,10 @@ public class Project implements Serializable {
 	
 	public int getNumDialogue() {
 		return dialogueList.size();
+	}
+	
+	public List<Dialogue> getUnmodifiableDialogueList() {
+		return Collections.unmodifiableList(dialogueList);
 	}
 	
 	/**

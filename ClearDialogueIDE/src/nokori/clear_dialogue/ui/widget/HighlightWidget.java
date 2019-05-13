@@ -34,7 +34,7 @@ public class HighlightWidget extends RectangleWidget {
 		setWidth(0f);
 		setHeight(0f);
 		
-		canvas.resetHighlighted();
+		canvas.resetHighlighted(true);
 
 		setOnInternalMouseMotionEvent(e -> {
 			float dragX = (float) (-canvas.getX() + e.getScaledMouseX(scaler.getScale()));
@@ -84,7 +84,7 @@ public class HighlightWidget extends RectangleWidget {
 	}
 
 	private void applyHighlighting(ClearDialogueCanvas canvas) {
-		canvas.resetHighlighted();
+		canvas.resetHighlighted(true);
 		
 		Stack<DraggableDialogueWidget> highlighted = getHighlightedNodes();
 		

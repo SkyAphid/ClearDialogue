@@ -209,6 +209,8 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				return;
 			}
 			
+			//TODO: Right click code not being called because something is turning off the highlighting when the node is right clicked
+			
 			if (isMouseWithin() && !e.isPressed()) {
 				leftClickCommands(e);
 				rightClickCommands(e);
@@ -324,7 +326,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			hovering = (isMouseWithin() && ClearStaticResources.isFocusedOrCanFocus(this)) || isDragging();
 		}
 		
-		setHighlighted(hovering, false);
+		setHighlighted(hovering || this.mode == Mode.EDITING, false);
 		
 		if (hovering && e instanceof MouseMotionEvent) {
 			e.setConsumed(true);
@@ -357,10 +359,10 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	public void rightClickCommands(MouseButtonEvent e) {
 		long clickTime = e.getTimestamp();
-
+		
 		if (e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
 			if (lastRightClickTime != -1 && TimeUnit.NANOSECONDS.toMillis(clickTime - lastRightClickTime) <= CLICK_TIME) {
-				
+
 				if (sharedResources.getWindow().isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
 					if (TinyFileDialog.showConfirmDialog("Delete Dialogue", 
 							"Are you sure you want to delete " + dialogue.getTitle() + "?\nThis cannot be undone.",
@@ -376,6 +378,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 						transitionMode(Mode.EDITING);
 					} else {
 						endEditing();
+						sharedResources.getCanvas().resetHighlighted(false);
 					}
 				}
 				
@@ -468,6 +471,15 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		}
 	}
 	
+	public boolean isHighlighted() {
+		return highlighted;
+	}
+
+	public boolean wasHighlightedWithHighlighter() {
+		return highlightedWithHighlighter;
+	}
+	
+
 	/**
 	 * Ends editing mode and transforms the Widget back into it's non-editable form.
 	 */
@@ -494,12 +506,10 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 		new FillTransition(TRANSITION_DURATION, connector.getFill(), connector.getFill().copy().alpha(0f)).play();
 	}
 
-
 	public boolean isGridSnappingEnabled() {
 		return gridSnappingEnabled;
 	}
 	
-
 	public void setGridSnappingEnabled(boolean gridSnappingEnabled) {
 		this.gridSnappingEnabled = gridSnappingEnabled;
 	}
