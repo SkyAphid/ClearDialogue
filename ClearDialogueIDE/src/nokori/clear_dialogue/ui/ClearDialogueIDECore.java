@@ -15,7 +15,7 @@ import nokori.clear_dialogue.ui.util.WindowMemory;
 public class ClearDialogueIDECore extends ClearApp {
 	
 	public static final String PROGRAM_NAME = "ClearDialogue IDE";
-	public static final String PROGRAM_VERSION = "Rev. 1";
+	public static final String PROGRAM_VERSION = "Rev. 2";
 	public static final String PROGRAM_DEVELOPER = "NOKORI•WARE";
 	
 	public static final String PROGRAM_INFORMATION = PROGRAM_NAME + " " + PROGRAM_VERSION + " by " + PROGRAM_DEVELOPER;
