@@ -10,6 +10,7 @@ import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetFile;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetNode;
 import nokori.clear_dialogue.ui.widget.DropdownMenuWidgetTool;
 import nokori.clear_dialogue.ui.widget.GitRepoLinkWidget;
+import nokori.clear_dialogue.ui.widget.ProjectFileLocationLabel;
 import nokori.clear_dialogue.ui.widget.ProjectNameTextFieldWidget;
 
 /**
@@ -24,7 +25,7 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 	
 	public static final ClearColor HIGHLIGHT_COLOR = ClearColor.CORAL.multiply(1.5f).immutable(true);
 	
-	public static final ClearColor CONTEXT_HINTS_TEXT_FILL = ClearColor.GRAY;
+	public static final ClearColor CONTEXT_HINTS_TEXT_FILL = ClearColor.LIGHT_BLACK;
 	public static final int CONTEXT_HINTS_FONT_SIZE = 24;
 	
 	private ProjectNameTextFieldWidget projectNameField;
@@ -64,6 +65,7 @@ public class ClearDialogueRootWidgetAssembly extends RootWidgetAssembly {
 		//Program information and context hints
 		toolbar.addChild(new GitRepoLinkWidget(sharedResources));
 		toolbar.addChild(new ContextHintsWidget(sharedResources));
+		toolbar.addChild(new ProjectFileLocationLabel(sharedResources));
 		
 		//Finalize
 		addChild(toolbar);

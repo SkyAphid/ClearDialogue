@@ -182,7 +182,7 @@ public abstract class DropdownMenuWidget extends ButtonWidget {
 	 */
 	public void expand() {
 		//Expand the dropdown
-		float expandedHeight = HEIGHT + (HEIGHT * optionLabels.length);
+		float expandedHeight = (HEIGHT * 1.5f) + (HEIGHT * optionLabels.length);
 		new WidgetSizeTransition(this, TRANSITION_DURATION, WIDTH, expandedHeight).play();
 		
 		for (int i = 0; i < optionLabels.length; i++) {
