@@ -63,6 +63,12 @@ public class ConnectionRendererWidget extends Widget {
 		ConnectorWidget connector1Widget = findConnectorWidget(connector1);
 		ConnectorWidget connector2Widget = findConnectorWidget(connector2);
 		
+		if (connector1Widget == null || connector2Widget == null) {
+			System.err.println("Invalid Connection: " + connection + " (" +connection.getConnector1() + " + " + connection.getConnector2() + ") -> " + connector1Widget + " + " + connector2Widget);
+			Thread.dumpStack();
+			return;
+		}
+		
 		float sx = connector1Widget.getClippedX() + connector1Widget.getWidth()/2; 
 		float sy = connector1Widget.getClippedY() + connector1Widget.getHeight()/2;
 			
