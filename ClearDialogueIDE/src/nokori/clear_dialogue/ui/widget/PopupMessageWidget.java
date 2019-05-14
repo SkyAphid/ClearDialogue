@@ -1,6 +1,7 @@
 package nokori.clear_dialogue.ui.widget;
 
 import nokori.clear.vg.ClearColor;
+import nokori.clear.vg.ClearStaticResources;
 import nokori.clear.vg.transition.FillTransition;
 import nokori.clear.vg.transition.TransitionImpl;
 import nokori.clear.vg.widget.RectangleWidget;
@@ -115,6 +116,8 @@ public class PopupMessageWidget extends WidgetAssembly {
 	}
 	
 	public void close() {
+		ClearStaticResources.clearFocusIfApplicable(content);
+		
 		setInputEnabled(false);
 		removeChild(content);
 		
