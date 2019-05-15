@@ -24,6 +24,17 @@ public class MultiEditUtils {
 	private static final File FONT_LOCATION = new File("res/fonts/NotoSans/");
 	private static final ClearColor BUTTON_OUTLINE_FILL = ClearColor.CORAL;
 	
+	public static void deleteAll(SharedResources sharedResources, ArrayList<DraggableDialogueWidget> nodes) {
+		if (TinyFileDialog.showConfirmDialog("Delete All", "Are you sure you want to delete " + nodes.size() + " nodes?", 
+				TinyFileDialog.InputType.YES_NO, TinyFileDialog.Icon.QUESTION, false)) {
+			
+			for (int i = 0; i < nodes.size(); i++) {
+				nodes.get(i).requestRemoval(true);
+			}
+			
+		}
+	}
+	
 	public static void addTagsToAll(SharedResources sharedResources, ArrayList<DraggableDialogueWidget> nodes) {
 		
 		String title = "Multi-Tag (Insertion)";

@@ -71,6 +71,11 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 			}
 			
 			if (!highlightedNodes.isEmpty() && !ClearStaticResources.isFocused()) {
+				
+				if (e.getKey() == GLFW.GLFW_KEY_D) {
+					MultiEditUtils.deleteAll(sharedResources, highlightedNodes);
+				}
+				
 				if (e.getKey() == GLFW.GLFW_KEY_T) {
 					MultiEditUtils.addTagsToAll(sharedResources, highlightedNodes);
 				}

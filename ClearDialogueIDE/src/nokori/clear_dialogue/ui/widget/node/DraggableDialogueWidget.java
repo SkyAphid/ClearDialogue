@@ -209,8 +209,6 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 				return;
 			}
 			
-			//TODO: Right click code not being called because something is turning off the highlighting when the node is right clicked
-			
 			if (isMouseWithin() && !e.isPressed()) {
 				leftClickCommands(e);
 				rightClickCommands(e);

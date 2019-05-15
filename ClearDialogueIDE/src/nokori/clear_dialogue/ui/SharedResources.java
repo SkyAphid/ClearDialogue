@@ -137,7 +137,7 @@ public class SharedResources {
 			if (canvas.getNumHighlightedNodes() == 1) {
 				contextHint = scale + " | \"" + canvas.getHighlightedNode(0).getDialogue().getTitle() + "\" Highlighted | T = Add Tags | R = Remove Tags | N = Rename";
 			} else {
-				contextHint = scale + " | " + canvas.getNumHighlightedNodes() + " Highlighted | T = Add Tags to All | R = Remove Tags from All | N = Rename All | S = Relative Mouse sAuto-Snap";
+				contextHint = scale + " | " + canvas.getNumHighlightedNodes() + " Highlighted | D = Delete All | T = Add Tags to All | R = Remove Tags from All | N = Rename All | S = Relative Mouse Auto-Snap";
 			}
 		}
 	}

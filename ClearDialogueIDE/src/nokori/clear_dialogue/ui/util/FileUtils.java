@@ -75,6 +75,10 @@ public class FileUtils {
 		
 		File f = TinyFileDialog.showSaveFileDialog(title, getProjectDirectory(projectFileLocation, project.getName() + "." + io.getTypeName()), filterDescription, filetype, false);
 		
+		if (!f.getAbsolutePath().endsWith("." + io.getTypeName())) {
+			f = new File(f.getAbsolutePath() + "." + io.getTypeName());
+		}
+		
 		if (f != null) {
 			try {
 				io.exportProject(project, f);
