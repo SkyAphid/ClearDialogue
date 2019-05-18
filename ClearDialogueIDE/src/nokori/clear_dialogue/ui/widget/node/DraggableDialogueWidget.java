@@ -223,6 +223,12 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 			if (e.getKey() == GLFW.GLFW_KEY_LEFT_SHIFT) {
 				gridSnappingEnabled = e.isPressed();
 			}
+			
+			//If hovering and the user pressed CTRL-V, paste the content additively onto the node
+			if (highlighted && e.getWindow().isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) && e.getKey() == GLFW.GLFW_KEY_V && e.isPressed()) {
+				dialogue.parseAndSetContent(e.getWindow().getClipboardString());
+				content.setText(dialogue.getRenderableContent());
+			}
 		});
 		
 		/*

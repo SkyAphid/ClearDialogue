@@ -37,6 +37,11 @@ public class DialogueText extends Dialogue {
 		text = content;
 	}
 	
+	@Override
+	public void parseAndAddContent(String content) {
+		text += content;
+	}
+	
 	public String getText() {
 		return text;
 	}

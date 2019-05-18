@@ -69,6 +69,12 @@ public abstract class Dialogue implements Serializable {
 	 */
 	public abstract void parseAndSetContent(String content);
 	
+	/**
+	 * This function is the same as <code>parseAndSetContent()</code>, except that it adds the content to the existing data of the node instead.
+	 * @param content
+	 */
+	public abstract void parseAndAddContent(String content);
+	
 	public Project getProject() {
 		return project;
 	}

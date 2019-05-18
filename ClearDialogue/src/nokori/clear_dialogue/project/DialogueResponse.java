@@ -68,6 +68,15 @@ public class DialogueResponse extends Dialogue {
 	}
 	
 	@Override
+	public void parseAndAddContent(String content) {
+		String[] s = content.split("\n");
+		
+		for (int i = 0; i < s.length; i++) {
+			addResponse(s[i]);
+		}
+	}
+	
+	@Override
 	public ArrayList<DialogueConnector> getAllConnectors() {
 		ArrayList<DialogueConnector> connectors = new ArrayList<DialogueConnector>();
 		connectors.add(getInConnector());

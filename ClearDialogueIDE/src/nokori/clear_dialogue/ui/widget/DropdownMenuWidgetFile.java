@@ -8,7 +8,6 @@ import nokori.clear.windows.Window;
 import nokori.clear_dialogue.io.ClearDialogueAutoIO;
 import nokori.clear_dialogue.io.ClearDialogueJsonIO;
 import nokori.clear_dialogue.project.Project;
-import nokori.clear_dialogue.ui.ClearDialogueCanvas;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.util.FileUtils;
 
@@ -42,13 +41,11 @@ public class DropdownMenuWidgetFile extends DropdownMenuWidget {
 		Project project = sharedResources.getProject();
 		File projectFileLocation = sharedResources.getProjectFileLocation();
 		
-		ClearDialogueCanvas canvas = sharedResources.getCanvas();
-
 		collapse(window);
 		
 		switch(option) {
 		case OPTION_NEW_PROJECT:
-			canvas.refresh(new Project());
+			sharedResources.setProject(new Project(), null);
 			break;
 		case OPTION_PROJECT_DIR:
 			FileUtils.showProjectDirectorySelectDialog();
