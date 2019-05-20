@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.joml:joml:1.9.13">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/joml/joml/1.9.13/joml-1.9.13.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/joml/joml/1.9.13/joml-1.9.13-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/joml/joml/1.9.13/joml-1.9.13-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
