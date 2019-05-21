@@ -5,7 +5,7 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../Clear/ClearVG/demo" />
+      <root url="file://$PROJECT_DIR$/../Clear/ClearVG/src/demo" />
       <root url="file://$PROJECT_DIR$/../Clear/ClearVG/src" />
       <root url="file://$PROJECT_DIR$/../Clear/ClearWindows/src" />
     </SOURCES>
