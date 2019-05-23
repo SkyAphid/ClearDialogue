@@ -7,6 +7,7 @@
 	<version>2.0.0</version>
 
 	<build>
+		<sourceDirectory>src/main/java/</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>

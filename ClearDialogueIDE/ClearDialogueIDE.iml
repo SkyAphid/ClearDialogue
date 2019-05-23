@@ -10,19 +10,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/../../Clear" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../../Clear/ClearVG/src/demo" />
-          <root url="file://$MODULE_DIR$/../../Clear/ClearVG/src" />
-          <root url="file://$MODULE_DIR$/../../Clear/ClearWindows/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
     <orderEntry type="module" module-name="ClearDialogueAPI" />
     <orderEntry type="module" module-name="ClearVG" />
     <orderEntry type="module" module-name="ClearWindows" />
