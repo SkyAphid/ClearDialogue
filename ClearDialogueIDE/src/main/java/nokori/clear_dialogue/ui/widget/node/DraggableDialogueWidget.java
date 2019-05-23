@@ -450,32 +450,36 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	 * @param highlighted
 	 */
 	public void setHighlighted(boolean highlighted, boolean highlightedWithHighlighter) {
+		if (deleteFlag){
+			return;
+		}
+
 		boolean bHighlighted = this.highlighted;
 		this.highlighted = highlighted;
 		this.highlightedWithHighlighter = highlightedWithHighlighter;
-		
+
 		//Register as highlighted to canvas
 		ClearDialogueCanvas canvas = sharedResources.getCanvas();
-		
+
 		if (highlighted) {
 			canvas.notifyDialogueNodeHighlighted(this);
 		} else {
 			canvas.notifyDialogueNodeUnhighlighted(this);
 		}
-		
+
 		//Fade in
 		if (!bHighlighted && highlighted) {
 			FillTransition fadeIn = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL);
 			fadeIn.setLinkedObject(DraggableDialogueWidget.this);
 			fadeIn.play();
 		}
-		
+
 		//Fade out
 		if (bHighlighted && !highlighted) {
 			FillTransition fadeOut = new FillTransition(TRANSITION_DURATION, highlight.getStrokeFill(), ClearColor.CORAL.alpha(0f));
 			fadeOut.setLinkedObject(DraggableDialogueWidget.this);
 			fadeOut.play();
-				
+
 			sharedResources.refreshContextHint();
 		}
 	}
@@ -502,6 +506,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	 * @param flagForDeletion - if true, the contents of this node will also be deleted from the project once the animation is complete.
 	 */
 	public void requestRemoval(boolean flagForDeletion) {
+		setHighlighted(false, false);
 		deleteFlag = flagForDeletion;
 		transitionMode(Mode.DELETION);
 		fadeOutConnector(inConnector);
