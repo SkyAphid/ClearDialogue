@@ -39,8 +39,6 @@ public class ReplaceUtils {
 				boolean breakPoint = false;
 
 				for (int i = 0; i < output.length; i++){
-					System.out.println(output[i]);
-
 					if (!breakPoint){
 						find += output[i];
 					} else{
