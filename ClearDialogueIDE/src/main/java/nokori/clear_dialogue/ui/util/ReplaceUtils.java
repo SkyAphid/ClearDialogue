@@ -8,11 +8,11 @@ import nokori.clear_dialogue.project.Dialogue;
 import nokori.clear_dialogue.project.DialogueResponse;
 import nokori.clear_dialogue.project.DialogueResponse.Response;
 import nokori.clear_dialogue.project.DialogueText;
-import nokori.clear_dialogue.project.Project;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * All tools relating to mass-string replacing in dialogue projects.
@@ -55,7 +55,8 @@ public class ReplaceUtils {
 				if (TinyFileDialog.showConfirmDialog("Confirm Find & Replace", find + "→" + replace,
 						TinyFileDialog.InputType.OK_CANCEL, TinyFileDialog.Icon.QUESTION, false)){
 
-					replace(sharedResources.getProject(), find, replace);
+					int checkNum = replace(sharedResources, find, replace);
+					TinyFileDialog.showMessageDialog("Find & Replace Complete", "Found & replaced in "+ checkNum + " nodes.", TinyFileDialog.Icon.INFORMATION);
 					sharedResources.refreshCanvas();
 				}
 			}
@@ -69,9 +70,11 @@ public class ReplaceUtils {
 	}
 
 	
-	private static void replace(Project project, String find, String replace) {
-		for (int i = 0; i < project.getNumDialogue(); i++) {
-			Dialogue dialogue = project.getDialogue(i);
+	private static int replace(SharedResources sharedResources, String find, String replace) {
+		ArrayList<DraggableDialogueWidget> nodes = sharedResources.getCanvas().getHighlightedNodes();
+
+		for (int i = 0; i < nodes.size(); i++) {
+			Dialogue dialogue = nodes.get(i).getDialogue();
 			
 			dialogue.setTitle(dialogue.getTitle().replace(find, replace));
 			dialogue.setTags(dialogue.getTags().replace(find, replace));
@@ -91,5 +94,7 @@ public class ReplaceUtils {
 				}
 			}
 		}
+
+		return nodes.size();
 	}
 }
