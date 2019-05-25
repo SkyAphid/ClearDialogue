@@ -270,8 +270,10 @@ public class MultiEditUtils {
 	public static void insertText(SharedResources sharedResources, boolean insertAtStart){
 		ArrayList<DraggableDialogueWidget> nodes = sharedResources.getCanvas().getHighlightedNodes();
 
-		String title = "Insert Text at Start";
 		String mode = insertAtStart ? "start" : "end";
+		String modeCapitalized = insertAtStart ? "Start" : "End";
+
+		String title = "Insert Text at " + modeCapitalized;
 
 		ClearInputApp input = new ClearInputApp(sharedResources.getIDECore(), INPUT_WIDTH, INPUT_HEIGHT, BUTTON_OUTLINE_FILL, FONT_LOCATION,
 				title,
