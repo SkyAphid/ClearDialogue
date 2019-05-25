@@ -73,23 +73,23 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 			if (!highlightedNodes.isEmpty() && !ClearStaticResources.isFocused()) {
 				
 				if (e.getKey() == GLFW.GLFW_KEY_D) {
-					MultiEditUtils.deleteAll(sharedResources, highlightedNodes);
+					MultiEditUtils.deleteAll(sharedResources);
 				}
 				
 				if (e.getKey() == GLFW.GLFW_KEY_T) {
-					MultiEditUtils.addTagsToAll(sharedResources, highlightedNodes);
+					MultiEditUtils.addTagsToAll(sharedResources);
 				}
 				
 				if (e.getKey() == GLFW.GLFW_KEY_R) {
-					MultiEditUtils.removeTagsFromAll(sharedResources, highlightedNodes);
+					MultiEditUtils.removeTagsFromAll(sharedResources);
 				}
 				
 				if (e.getKey() == GLFW.GLFW_KEY_N) {
-					MultiEditUtils.multiTitle(sharedResources, highlightedNodes);
+					MultiEditUtils.multiTitle(sharedResources);
 				}
 				
 				if (e.getKey() == GLFW.GLFW_KEY_S) {
-					MultiEditUtils.autoSnap((float) e.getWindow().getScaledMouseX(scaler.getScale()), (float) e.getWindow().getScaledMouseY(scaler.getScale()), this, highlightedNodes);
+					MultiEditUtils.autoSnap((float) e.getWindow().getScaledMouseX(scaler.getScale()), (float) e.getWindow().getScaledMouseY(scaler.getScale()), this);
 				}
 			}
 
@@ -307,11 +307,15 @@ public class ClearDialogueCanvas extends DraggableWidgetAssembly {
 	public int getNumHighlightedNodes() {
 		return highlightedNodes.size();
 	}
-	
+
 	public DraggableDialogueWidget getHighlightedNode(int index) {
 		return highlightedNodes.get(index);
 	}
-	
+
+	public ArrayList<DraggableDialogueWidget> getHighlightedNodes(){
+		return highlightedNodes;
+	}
+
 	/*
 	 * 
 	 * 

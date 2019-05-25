@@ -10,6 +10,7 @@ import nokori.clear.windows.util.TinyFileDialog.Icon;
 import nokori.clear.windows.util.TinyFileDialog.InputType;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.util.FileUtils;
+import nokori.clear_dialogue.ui.util.MultiEditUtils;
 import nokori.clear_dialogue.ui.util.ReplaceUtils;
 
 public class DropdownMenuWidgetTool extends DropdownMenuWidget {
@@ -20,12 +21,16 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 	private static final String OPTION_REFRESH_SYNTAX = "REFRESH SYNTAX";
 	private static final String OPTION_SET_SYNTAX = "SET SYNTAX...";
 	private static final String OPTION_REPLACE = "REPLACE...";
+	private static final String OPTION_INSERT_AT_START = "INSERT AT START...";
+	private static final String OPTION_INSERT_AT_END = "INSERT AT END...";
 	
 	private static final String[] OPTIONS = {
-		OPTION_VIEW_SYNTAX,
-		OPTION_REFRESH_SYNTAX,
-		OPTION_SET_SYNTAX,
-		OPTION_REPLACE
+			OPTION_VIEW_SYNTAX,
+			OPTION_REFRESH_SYNTAX,
+			OPTION_SET_SYNTAX,
+			OPTION_REPLACE,
+			OPTION_INSERT_AT_START,
+			OPTION_INSERT_AT_END
 	};
 	
 	private SharedResources sharedResources;
@@ -37,22 +42,28 @@ public class DropdownMenuWidgetTool extends DropdownMenuWidget {
 
 	@Override
 	protected void optionSelected(Window window, String option, int index) {
-		switch(option) {
-		case OPTION_REPLACE:
-			ReplaceUtils.runReplaceTool(sharedResources);
-			break;
-		case OPTION_VIEW_SYNTAX:
-			showSyntaxPopup();
-			break;
-		case OPTION_REFRESH_SYNTAX:
-			sharedResources.loadAndProcessSyntax(true);
-			collapse(window);
-			break;
-		case OPTION_SET_SYNTAX:
-			FileUtils.showSyntaxFileSelectDialog();
-			sharedResources.loadAndProcessSyntax(true);
-			collapse(window);
-			break;
+		collapse(window);
+
+		switch (option) {
+			case OPTION_REPLACE:
+				ReplaceUtils.runReplaceTool(sharedResources);
+				break;
+			case OPTION_VIEW_SYNTAX:
+				showSyntaxPopup();
+				break;
+			case OPTION_REFRESH_SYNTAX:
+				sharedResources.loadAndProcessSyntax(true);
+				break;
+			case OPTION_SET_SYNTAX:
+				FileUtils.showSyntaxFileSelectDialog();
+				sharedResources.loadAndProcessSyntax(true);
+				break;
+			case OPTION_INSERT_AT_START:
+				MultiEditUtils.insertText(sharedResources, true);
+				break;
+			case OPTION_INSERT_AT_END:
+				MultiEditUtils.insertText(sharedResources, false);
+				break;
 		}
 	}
 	

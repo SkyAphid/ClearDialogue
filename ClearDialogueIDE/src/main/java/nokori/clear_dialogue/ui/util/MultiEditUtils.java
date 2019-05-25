@@ -11,6 +11,7 @@ import nokori.clear.vg.util.NanoVGScaler;
 import nokori.clear.windows.GLFWException;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear_dialogue.project.Dialogue;
+import nokori.clear_dialogue.project.DialogueText;
 import nokori.clear_dialogue.ui.ClearDialogueCanvas;
 import nokori.clear_dialogue.ui.SharedResources;
 import nokori.clear_dialogue.ui.widget.node.DraggableDialogueWidget;
@@ -24,7 +25,9 @@ public class MultiEditUtils {
 	private static final File FONT_LOCATION = new File("res/fonts/NotoSans/");
 	private static final ClearColor BUTTON_OUTLINE_FILL = ClearColor.CORAL;
 	
-	public static void deleteAll(SharedResources sharedResources, ArrayList<DraggableDialogueWidget> nodes) {
+	public static void deleteAll(SharedResources sharedResources) {
+		ArrayList<DraggableDialogueWidget> nodes = sharedResources.getCanvas().getHighlightedNodes();
+
 		if (TinyFileDialog.showConfirmDialog("Delete All", "Are you sure you want to delete " + nodes.size() + " nodes?", 
 				TinyFileDialog.InputType.YES_NO, TinyFileDialog.Icon.QUESTION, false)) {
 			
@@ -35,7 +38,8 @@ public class MultiEditUtils {
 		}
 	}
 	
-	public static void addTagsToAll(SharedResources sharedResources, ArrayList<DraggableDialogueWidget> nodes) {
+	public static void addTagsToAll(SharedResources sharedResources) {
+		ArrayList<DraggableDialogueWidget> nodes = sharedResources.getCanvas().getHighlightedNodes();
 		
 		String title = "Multi-Tag (Insertion)";
 		
@@ -72,7 +76,9 @@ public class MultiEditUtils {
 		}
 	}
 	
-	public static void removeTagsFromAll(SharedResources sharedResources, ArrayList<DraggableDialogueWidget> nodes) {
+	public static void removeTagsFromAll(SharedResources sharedResources) {
+		ArrayList<DraggableDialogueWidget> nodes = sharedResources.getCanvas().getHighlightedNodes();
+
 		String title = "Multi-Tag (Removal)";
 		
 		ClearInputApp input = new ClearInputApp(sharedResources.getIDECore(), INPUT_WIDTH, INPUT_HEIGHT, BUTTON_OUTLINE_FILL, FONT_LOCATION, 
@@ -115,7 +121,9 @@ public class MultiEditUtils {
 		}
 	}
 	
-	public static void multiTitle(SharedResources sharedResources, ArrayList<DraggableDialogueWidget> nodes) {
+	public static void multiTitle(SharedResources sharedResources) {
+		ArrayList<DraggableDialogueWidget> nodes = sharedResources.getCanvas().getHighlightedNodes();
+
 		/*
 		 * Sort the list based on X/Y coordinates so that if the #NUM tag is used, the numbers appear in descending order
 		 */
@@ -175,7 +183,8 @@ public class MultiEditUtils {
 		}
 	}
 
-	public static void autoSnap(float mouseX, float mouseY, ClearDialogueCanvas canvas, ArrayList<DraggableDialogueWidget> nodes) {
+	public static void autoSnap(float mouseX, float mouseY, ClearDialogueCanvas canvas) {
+		ArrayList<DraggableDialogueWidget> nodes = canvas.getHighlightedNodes();
 
 		/*
 		 * Sort by title. First: sort alphabetically. Second: check if the title has a number in it, and sort by number if applicable.
@@ -255,6 +264,55 @@ public class MultiEditUtils {
 			w.setGridSnappingEnabled(true);
 			w.move(snapX, snapY);
 			w.setGridSnappingEnabled(false);
+		}
+	}
+
+	public static void insertText(SharedResources sharedResources, boolean insertAtStart){
+		ArrayList<DraggableDialogueWidget> nodes = sharedResources.getCanvas().getHighlightedNodes();
+
+		String title = "Insert Text at Start";
+		String mode = insertAtStart ? "start" : "end";
+
+		ClearInputApp input = new ClearInputApp(sharedResources.getIDECore(), INPUT_WIDTH, INPUT_HEIGHT, BUTTON_OUTLINE_FILL, FONT_LOCATION,
+				title,
+				"Input text to be inserted at the " + mode + " of the text content (response nodes will be skipped).",
+				"") {
+
+			@Override
+			protected void confirmButtonPressed(String insertion) {
+				if (insertion != null) {
+					int insertions = 0;
+
+					for (int i = 0; i < nodes.size(); i++) {
+						DraggableDialogueWidget w = nodes.get(i);
+
+						if (w.getDialogue() instanceof DialogueText){
+							DialogueText d = (DialogueText) w.getDialogue();
+
+							if (insertAtStart){
+								d.setText(insertion + d.getText());
+							} else{
+								d.setText(d.getText() + insertion);
+							}
+
+							insertions++;
+						}
+					}
+
+
+					TinyFileDialog.showMessageDialog(title, "Inputted content was inserted into " + insertions + " nodes.", TinyFileDialog.Icon.INFORMATION);
+					sharedResources.refreshCanvas();
+
+				} else {
+					TinyFileDialog.showMessageDialog(title, "No content was inputted.", TinyFileDialog.Icon.ERROR);
+				}
+			}
+		};
+
+		try{
+			input.show();
+		} catch (GLFWException e){
+			e.printStackTrace();
 		}
 	}
 }
