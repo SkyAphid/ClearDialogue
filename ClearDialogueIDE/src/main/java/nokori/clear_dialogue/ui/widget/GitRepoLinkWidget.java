@@ -11,7 +11,7 @@ import nokori.clear.vg.font.FontStyle;
 import nokori.clear.vg.transition.FillTransition;
 import nokori.clear.vg.widget.LabelWidget;
 import nokori.clear.vg.widget.assembly.WidgetClip;
-import nokori.clear.windows.util.ClearUtil;
+import nokori.clear.windows.util.OperatingSystemUtil;
 import nokori.clear.windows.util.TinyFileDialog;
 import nokori.clear.windows.util.TinyFileDialog.Icon;
 import nokori.clear_dialogue.ui.ClearDialogueIDECore;
@@ -40,7 +40,7 @@ public class GitRepoLinkWidget extends LabelWidget {
 				String projectRepoURL = "https://github.com/SkyAphid/ClearDialogue";
 				
 				try {
-					ClearUtil.openURLInBrowser(projectRepoURL);
+					OperatingSystemUtil.openURLInBrowser(projectRepoURL);
 				} catch (IOException e1) {
 					TinyFileDialog.showMessageDialog(ClearDialogueIDECore.PROGRAM_NAME + " About", ClearDialogueIDECore.PROGRAM_INFORMATION + "\n" + projectRepoURL, Icon.INFORMATION);
 					e1.printStackTrace();
