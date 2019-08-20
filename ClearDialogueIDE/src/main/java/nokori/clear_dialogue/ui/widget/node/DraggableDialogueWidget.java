@@ -108,7 +108,7 @@ public abstract class DraggableDialogueWidget extends DraggableWidgetAssembly {
 	
 	protected ConnectorWidget inConnector;
 	
-	private static final long CLICK_TIME = 250;
+	private static final long CLICK_TIME = 300;
 	private long lastLeftClickTime = -1L;
 	private long lastRightClickTime = -1L;
 	
