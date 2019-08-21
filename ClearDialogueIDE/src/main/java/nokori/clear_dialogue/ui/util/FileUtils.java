@@ -46,7 +46,7 @@ public class FileUtils {
 		File lastProjectFileLocation = sharedResources.getProjectFileLocation();
 		String lastProjectName = (lastProjectFileLocation != null ? lastProject.getName() + "." + io.getTypeName() : null);
 		
-		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(lastProjectFileLocation, lastProjectName), filterDescription, filetypes[0], filetypes);
+		File f = TinyFileDialog.showOpenFileDialog(title, getProjectDirectory(lastProjectFileLocation, lastProjectName), filterDescription, filetypes);
 		
 		//Import the file as a Project
 		if (f != null) {
