@@ -8,8 +8,8 @@ ClearDialogue is a free open source branching dialogue editor for video games de
 ## New free Dialogue Editor available!
 I've built an entirely new, future-proof dialogue editor that is open source and free to use as well that uses Javascript & CSS, making it easier for collaborating on. Check it out!
 
-![corkboard-logo](https://github.com/user-attachments/assets/2473d931-0e36-49b8-9cb2-f3319f3d328e)
-### [Visit Corkboard's Github Page](https://github.com/SkyAphid/corkboard)
+[![corkboard-logo](https://github.com/user-attachments/assets/2473d931-0e36-49b8-9cb2-f3319f3d328e)](https://github.com/SkyAphid/corkboard)
+### [Visit Corkboard's Github Page]
 
 
 ## Features
